@@ -1,4 +1,4 @@
-# XManagerPlus
+# XMPlus
 A Trojan, Shadowsocks, vmess, Vless user management panel
 
 |功能             | vmess | vless | trojan | ss   | ss-plugin|
@@ -21,5 +21,5 @@ A Trojan, Shadowsocks, vmess, Vless user management panel
 ```
 配置文件路径：/etc/XMPlus 配置文件详见：配置文件说明
 
-bash <(curl -Ls https://raw.githubusercontent.com/xcode75/XManagerPlus/XMPlus/install.sh)
+bash <(curl -Ls https://raw.githubusercontent.com/xcode75/XMPlus/setup/install.sh)
 ```
