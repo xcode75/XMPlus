@@ -1,5 +1,4 @@
-# XMPlus
-A Trojan, Shadowsocks, vmess, Vless user management panel
+# XManagerPlus Backend
 
 |功能             | vmess | vless | trojan | ss   | ss-plugin|
 | ----------------| ----- | ----- | -------| -----|----------|
