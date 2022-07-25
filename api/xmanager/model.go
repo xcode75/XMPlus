@@ -87,7 +87,7 @@ type UserTraffic struct {
 
 type RuleItem struct {
 	ID      int    `json:"id"`
-	Content string `json:"regex"`
+	Content string `json:"rule"`
 }
 
 type IllegalItem struct {

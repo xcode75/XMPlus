@@ -182,7 +182,7 @@ func (c *APIClient) GetUserList() (UserList *[]api.UserInfo, err error) {
 
 // ReportNodeStatus reports the node status to the xmanager
 func (c *APIClient) ReportNodeStatus(nodeStatus *api.NodeStatus) (err error) {
-	path := fmt.Sprintf("/api/v1/update/server/%d", c.NodeID)
+	path := fmt.Sprintf("/api/v1/update/server/status/%d", c.NodeID)
 	systemload := SystemLoad{
 		Uptime: strconv.Itoa(nodeStatus.Uptime),
 		Load:   fmt.Sprintf("%.2f %.2f %.2f", nodeStatus.CPU/100, nodeStatus.CPU/100, nodeStatus.CPU/100),
@@ -210,7 +210,7 @@ func (c *APIClient) ReportNodeOnlineUsers(onlineUserList *[]api.OnlineUser) erro
 	}
 
 	postData := &PostData{Data: data}
-	path := fmt.Sprintf("/api/v1/update/online")
+	path := fmt.Sprintf("/api/v1/update/users/online")
 	res, err := c.client.R().
 		SetQueryParam("serverid", strconv.Itoa(c.NodeID)).
 		SetBody(postData).
@@ -237,7 +237,7 @@ func (c *APIClient) ReportUserTraffic(userTraffic *[]api.UserTraffic) error {
 			Download: traffic.Download}
 	}
 	postData := &PostData{Data: data}
-	path := "/api/v1/update/traffic"
+	path := "/api/v1/update/users/traffic"
 	res, err := c.client.R().
 		SetQueryParam("serverid", strconv.Itoa(c.NodeID)).
 		SetBody(postData).
@@ -255,7 +255,7 @@ func (c *APIClient) ReportUserTraffic(userTraffic *[]api.UserTraffic) error {
 // GetNodeRule will pull the audit rule form sspanel
 func (c *APIClient) GetNodeRule() (*[]api.DetectRule, error) {
 	ruleList := c.LocalRuleList
-	path := "/api/v1/query/rules"
+	path := "/api/v1/query/detect/rules"
 	res, err := c.client.R().
 		SetResult(&Response{}).
 		ForceContentType("application/json").
@@ -288,7 +288,7 @@ func (c *APIClient) ReportIllegal(detectResultList *[]api.DetectResult) error {
 		}
 	}
 	postData := &PostData{Data: data}
-	path := "/api/v1/update/rules"
+	path := "/api/v1/update/report/rules"
 	res, err := c.client.R().
 		SetQueryParam("serverid", strconv.Itoa(c.NodeID)).
 		SetBody(postData).
@@ -505,7 +505,7 @@ func (c *APIClient) ParseTransitNodeResponse(nodeInfoResponse *TransitNodeInfoRe
 		Method = nodeInfoResponse.Method
 	}
 	
-	if nodeInfoResponse.Type == "Shadowsocks" && nodeInfoResponse.Protocol == "ws" {
+	if nodeInfoResponse.Type == "Shadowsocks" && (nodeInfoResponse.Protocol == "ws" || nodeInfoResponse.Protocol == "grpc") {
 		port = port - 1
 		if port <= 0 {
 			return nil, fmt.Errorf("Shadowsocks-Plugin listen port must be greater than 1")
