@@ -138,6 +138,8 @@ func (p *Panel) Start() {
 	}
 	log.Print("Core Started Successfully")
 	p.Server = server
+	
+	log.Print("XMPlus Started Successfully")
 	// Load Nodes config
 	for _, nodeConfig := range p.panelConfig.NodesConfig {
 		var apiClient api.API
@@ -164,7 +166,6 @@ func (p *Panel) Start() {
 		}
 	}	
 	p.Running = true
-	log.Print("XMPlus Started")
 	return
 }
 
