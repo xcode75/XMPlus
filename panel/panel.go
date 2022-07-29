@@ -131,12 +131,12 @@ func (p *Panel) loadCore(panelConfig *Config) *core.Instance {
 func (p *Panel) Start() {
 	p.access.Lock()
 	defer p.access.Unlock()
-	log.Print("Starting XMPlus..")
 	// Load Core
 	server := p.loadCore(p.panelConfig)
 	if err := server.Start(); err != nil {
-		log.Panicf("Failed to start instance: %s", err)
+		log.Panicf("Failed to Start Instance: %s", err)
 	}
+	log.Print("Core Started Successfully")
 	p.Server = server
 	// Load Nodes config
 	for _, nodeConfig := range p.panelConfig.NodesConfig {
@@ -160,10 +160,11 @@ func (p *Panel) Start() {
 	for _, s := range p.Service {
 		err := s.Start()
 		if err != nil {
-			log.Panicf("XMPlus Service Start fialed: %s", err)
+			log.Panicf("XMPlus Service Failed to Start: %s", err)
 		}
-	}
+	}	
 	p.Running = true
+	log.Print("XMPlus Started")
 	return
 }
 
@@ -174,7 +175,7 @@ func (p *Panel) Close() {
 	for _, s := range p.Service {
 		err := s.Close()
 		if err != nil {
-			log.Panicf("XMPlus Service Close fialed: %s", err)
+			log.Panicf("XMPlus Service Close, Failed: %s", err)
 		}
 	}
 	p.Service = nil
