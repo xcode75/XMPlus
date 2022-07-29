@@ -527,13 +527,12 @@ func (d *DefaultDispatcher) routedDispatch(ctx context.Context, link *transport.
 			outTag := route.GetOutboundTag()
 			if h := d.ohm.GetHandler(outTag); h != nil {
 			    isPickRoute = 2
-				newError("Taking detour 【", outTag, "】 for 【", destination, "】").WriteToLog(session.ExportIDToError(ctx))
+				newError("Taking A Detour 【", outTag, "】 For 【", destination, "】").WriteToLog(session.ExportIDToError(ctx))
 				handler = h
-			} else {
-				newError("Non existing outTag: 【", outTag, "】").AtWarning().WriteToLog(session.ExportIDToError(ctx))
 			}
+			//newError("Non existing outTag: 【", outTag, "】").AtWarning().WriteToLog(session.ExportIDToError(ctx))
 		} else {
-			newError("Default route for ", destination).WriteToLog(session.ExportIDToError(ctx))
+			newError("Default Route For: ", destination).WriteToLog(session.ExportIDToError(ctx))
 		}
 	}
 
