@@ -530,7 +530,7 @@ func (d *DefaultDispatcher) routedDispatch(ctx context.Context, link *transport.
 				newError("Taking A Detour 【", outTag, "】 For 【", destination, "】").WriteToLog(session.ExportIDToError(ctx))
 				handler = h
 			}
-			//newError("Non existing outTag: 【", outTag, "】").AtWarning().WriteToLog(session.ExportIDToError(ctx))
+			newError("Non Existing OutboundTag: 【", outTag, "】").AtWarning().WriteToLog(session.ExportIDToError(ctx))
 		} else {
 			newError("Default Route For: ", destination).WriteToLog(session.ExportIDToError(ctx))
 		}

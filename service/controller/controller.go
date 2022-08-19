@@ -69,7 +69,7 @@ func (c *Controller) Start() error {
 		}	
 		c.transitnodeInfo = newTransitNodeInfo
 		c.TransitTag = c.buildRTag()
-		err = c.Transit(newTransitNodeInfo, userInfo)
+		err = c.Transit(newTransitNodeInfo)
 		if err != nil {
 				log.Panic(err)
 				return err
@@ -106,12 +106,12 @@ func (c *Controller) Start() error {
 	}
 	
 	c.nodeInfoMonitorPeriodic = &task.Periodic{
-		Interval: time.Duration(c.config.UpdatePeriodic) * time.Second,
+		Interval: time.Duration(120) * time.Second,
 		Execute:  c.nodeInfoMonitor,
 	}
 	
 	c.userReportPeriodic = &task.Periodic{
-		Interval: time.Duration(c.config.UpdatePeriodic) * time.Second,
+		Interval: time.Duration(120) * time.Second,
 		Execute:  c.userInfoMonitor,
 	}
 	
@@ -167,11 +167,11 @@ func (c *Controller) nodeInfoMonitor() (err error) {
 		}
 		
 		if c.Rtag == false {
-			c.removeRules(oldtag, c.userList)		
+			c.removeRules(oldtag)		
 		}
 		
 		if c.Rtag == true {
-			err := c.removeTransitTag(c.TransitTag, c.userList)
+			err := c.removeTransitTag(c.TransitTag)
 			if err != nil {
 				return err
 			}
@@ -191,19 +191,19 @@ func (c *Controller) nodeInfoMonitor() (err error) {
 		c.Rtag = false
 		
 		// Add new Transit tag
-		if newNodeInfo.RelayNodeID > 1 {
-			newTransitNodeInfo, err := c.apiClient.GetTransitNodeInfo()
-			if err != nil {
-				log.Print(err)
-				return nil
-			}
-			c.transitnodeInfo = newTransitNodeInfo
-			c.TransitTag = c.buildRTag()
-			err = c.Transit(newTransitNodeInfo, newUserInfo)
-			if err != nil {
-					log.Panic(err)
-					return err
-			}
+		if newNodeInfo.RelayNodeID > 0 && !c.Rtag {
+			//newTransitNodeInfo, err := c.apiClient.GetTransitNodeInfo()
+			//if err != nil {
+			//	log.Print(err)
+			//	return nil
+			//}
+			//c.transitnodeInfo = newTransitNodeInfo
+			//c.TransitTag = c.buildRTag()
+			//err = c.Transit(newTransitNodeInfo, newUserInfo)
+			//if err != nil {
+			//		log.Panic(err)
+			//		return err
+			//}
 			c.Rtag = true			
 		}
 				
@@ -283,6 +283,21 @@ func (c *Controller) nodeInfoMonitor() (err error) {
 		}
 	}
 	c.userList = newUserInfo
+	
+	if c.Rtag == true {
+		newTransitNodeInfo, err := c.apiClient.GetTransitNodeInfo()
+		if err != nil {
+			log.Print(err)
+			return nil
+		}
+		c.transitnodeInfo = newTransitNodeInfo
+		c.TransitTag = c.buildRTag()
+		err = c.Transit(newTransitNodeInfo)
+		if err != nil {
+			log.Panic(err)
+			return err
+		}			
+	}
 	return nil
 }
 
@@ -298,8 +313,8 @@ func (c *Controller) removeOldTag(oldtag string) (err error) {
 	return nil
 }
 
-func (c *Controller) removeTransitTag(tag string, userInfo *[]api.UserInfo) (err error) {
-	for _, user := range *userInfo {
+func (c *Controller) removeTransitTag(tag string) (err error) {
+	for _, user := range *c.userList {
 		err = c.removeOutbound(fmt.Sprintf("Relay_%s|%d", tag,user.UID))
 		if err != nil {
 			return err
@@ -308,8 +323,8 @@ func (c *Controller) removeTransitTag(tag string, userInfo *[]api.UserInfo) (err
 	return nil
 }
 
-func (c *Controller) removeRules(tag string, userInfo *[]api.UserInfo){
-	for _, user := range *userInfo {
+func (c *Controller) removeRules(tag string){
+	for _, user := range *c.userList {
 		c.RemoveUserRoutingRule([]string{fmt.Sprintf("%s|%s|%d", tag, user.Email, user.UID)})			
 	}	
 }
@@ -342,9 +357,9 @@ func (c *Controller) addNewTag(newNodeInfo *api.NodeInfo) (err error) {
 	return nil
 }
 
-func (c *Controller) Transit(newTransitNodeInfo *api.TransitNodeInfo, userInfo *[]api.UserInfo) (err error) {
+func (c *Controller) Transit(newTransitNodeInfo *api.TransitNodeInfo) (err error) {
 	if newTransitNodeInfo.NodeType != "Shadowsocks-Plugin" {
-		for _, user := range *userInfo {			
+		for _, user := range *c.userList {			
 			TransitConfig, err := TransitBuilder(c.config, newTransitNodeInfo, c.TransitTag, user.UUID, user.Email, user.Passwd, user.UID)
 			if err != nil {
 				return err
@@ -433,7 +448,7 @@ func (c *Controller) addNewUser(userInfo *[]api.UserInfo, nodeInfo *api.NodeInfo
 	if err != nil {
 		return err
 	}
-	log.Printf("【NodeType：%s | NodeID: %d 】  Added %d New Users", c.nodeInfo.NodeType,c.nodeInfo.NodeID, len(*userInfo))
+	log.Printf("【NodeType：%s | NodeID: %d 】  Added %d New User(s)", c.nodeInfo.NodeType,c.nodeInfo.NodeID, len(*userInfo))
 	
 	return nil
 }

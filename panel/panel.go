@@ -136,10 +136,10 @@ func (p *Panel) Start() {
 	if err := server.Start(); err != nil {
 		log.Panicf("Failed to Start Instance: %s", err)
 	}
-	log.Print("Core Started Successfully")
+	log.Print("Instance Started Successfully")
 	p.Server = server
 	
-	log.Print("XMPlus Started Successfully")
+	log.Print("XMPlus Started")
 	// Load Nodes config
 	for _, nodeConfig := range p.panelConfig.NodesConfig {
 		var apiClient api.API
@@ -162,7 +162,7 @@ func (p *Panel) Start() {
 	for _, s := range p.Service {
 		err := s.Start()
 		if err != nil {
-			log.Panicf("XMPlus Service Failed to Start: %s", err)
+			log.Panicf("XMPlus Service Failed: %s", err)
 		}
 	}	
 	p.Running = true
