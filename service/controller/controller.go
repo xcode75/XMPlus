@@ -153,8 +153,9 @@ func (c *Controller) nodeInfoMonitor() (err error) {
 		log.Print(err)
 		return nil
 	}
-
+	
 	var nodeInfoChanged bool = false
+	
 	// If nodeInfo changed
 	if !reflect.DeepEqual(c.nodeInfo, newNodeInfo) {
 		
@@ -188,22 +189,24 @@ func (c *Controller) nodeInfoMonitor() (err error) {
 		c.nodeInfo = newNodeInfo
 		c.Tag = c.buildTag()
 		
+		nodeInfoChanged = true
+
 		c.Rtag = false
-		
+				
 		// Add new Transit tag
 		if c.nodeInfo.RelayNodeID > 0 && !c.Rtag {
-			//newTransitNodeInfo, err := c.apiClient.GetTransitNodeInfo()
-			//if err != nil {
-			//	log.Print(err)
-			//	return nil
-			//}
-			//c.transitnodeInfo = newTransitNodeInfo
-			//c.TransitTag = c.buildRTag()
-			//err = c.Transit(newTransitNodeInfo, newUserInfo)
-			//if err != nil {
-			//		log.Panic(err)
-			//		return err
-			//}
+			newTransitNodeInfo, err := c.apiClient.GetTransitNodeInfo()
+			if err != nil {
+				log.Print(err)
+				return nil
+			}
+			c.transitnodeInfo = newTransitNodeInfo
+			c.TransitTag = c.buildRTag()
+			err = c.Transit(newTransitNodeInfo)
+			if err != nil {
+					log.Panic(err)
+					return err
+			}
 			c.Rtag = true			
 		}
 				
@@ -214,7 +217,6 @@ func (c *Controller) nodeInfoMonitor() (err error) {
 			return err
 		}
 				
-		nodeInfoChanged = true
 		// Remove Old limiter
 		if err = c.DeleteInboundLimiter(oldtag); err != nil {
 			log.Print(err)
@@ -245,7 +247,7 @@ func (c *Controller) nodeInfoMonitor() (err error) {
 			log.Print(err)
 		}
 	}
-
+	
 	if nodeInfoChanged {
 		err = c.addNewUser(newUserInfo, newNodeInfo)
 		if err != nil {
@@ -284,20 +286,6 @@ func (c *Controller) nodeInfoMonitor() (err error) {
 	}
 	c.userList = newUserInfo
 	
-	if c.Rtag == true {
-		newTransitNodeInfo, err := c.apiClient.GetTransitNodeInfo()
-		if err != nil {
-			log.Print(err)
-			return nil
-		}
-		c.transitnodeInfo = newTransitNodeInfo
-		c.TransitTag = c.buildRTag()
-		err = c.Transit(newTransitNodeInfo)
-		if err != nil {
-			log.Panic(err)
-			return err
-		}			
-	}
 	return nil
 }
 
