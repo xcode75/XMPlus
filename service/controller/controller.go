@@ -191,7 +191,7 @@ func (c *Controller) nodeInfoMonitor() (err error) {
 		c.Rtag = false
 		
 		// Add new Transit tag
-		if newNodeInfo.RelayNodeID > 0 && !c.Rtag {
+		if c.nodeInfo.RelayNodeID > 0 && !c.Rtag {
 			//newTransitNodeInfo, err := c.apiClient.GetTransitNodeInfo()
 			//if err != nil {
 			//	log.Print(err)
