@@ -69,7 +69,7 @@ func (c *Controller) Start() error {
 		}	
 		c.transitnodeInfo = newTransitNodeInfo
 		c.TransitTag = c.buildRTag()
-		err = c.Transit(newTransitNodeInfo)
+		err = c.Transit(newTransitNodeInfo, userInfo)
 		if err != nil {
 				log.Panic(err)
 				return err
@@ -157,7 +157,7 @@ func (c *Controller) nodeInfoMonitor() (err error) {
 	var nodeInfoChanged bool = false
 	
 	// If nodeInfo changed
-	if !reflect.DeepEqual(c.nodeInfo, newNodeInfo) {
+	if !reflect.DeepEqual(c.nodeInfo, newNodeInfo) || !reflect.DeepEqual(c.userList, newUserInfo){
 		
 		// Remove old tag
 		oldtag := c.Tag
@@ -168,11 +168,11 @@ func (c *Controller) nodeInfoMonitor() (err error) {
 		}
 		
 		if c.Rtag == false {
-			c.removeRules(oldtag)		
+			c.removeRules(oldtag, newUserInfo)		
 		}
 		
 		if c.Rtag == true {
-			err := c.removeTransitTag(c.TransitTag)
+			err := c.removeTransitTag(c.TransitTag, newUserInfo)
 			if err != nil {
 				return err
 			}
@@ -202,7 +202,7 @@ func (c *Controller) nodeInfoMonitor() (err error) {
 			}
 			c.transitnodeInfo = newTransitNodeInfo
 			c.TransitTag = c.buildRTag()
-			err = c.Transit(newTransitNodeInfo)
+			err = c.Transit(newTransitNodeInfo, newUserInfo)
 			if err != nil {
 					log.Panic(err)
 					return err
@@ -301,8 +301,8 @@ func (c *Controller) removeOldTag(oldtag string) (err error) {
 	return nil
 }
 
-func (c *Controller) removeTransitTag(tag string) (err error) {
-	for _, user := range *c.userList {
+func (c *Controller) removeTransitTag(tag string, userInfo *[]api.UserInfo) (err error) {
+	for _, user := range *userInfo {
 		err = c.removeOutbound(fmt.Sprintf("Relay_%s|%d", tag,user.UID))
 		if err != nil {
 			return err
@@ -311,8 +311,8 @@ func (c *Controller) removeTransitTag(tag string) (err error) {
 	return nil
 }
 
-func (c *Controller) removeRules(tag string){
-	for _, user := range *c.userList {
+func (c *Controller) removeRules(tag string, userInfo *[]api.UserInfo){
+	for _, user := range *userInfo {
 		c.RemoveUserRoutingRule([]string{fmt.Sprintf("%s|%s|%d", tag, user.Email, user.UID)})			
 	}	
 }
@@ -345,9 +345,9 @@ func (c *Controller) addNewTag(newNodeInfo *api.NodeInfo) (err error) {
 	return nil
 }
 
-func (c *Controller) Transit(newTransitNodeInfo *api.TransitNodeInfo) (err error) {
+func (c *Controller) Transit(newTransitNodeInfo *api.TransitNodeInfo, userInfo *[]api.UserInfo) (err error) {
 	if newTransitNodeInfo.NodeType != "Shadowsocks-Plugin" {
-		for _, user := range *c.userList {			
+		for _, user := range *userInfo {			
 			TransitConfig, err := TransitBuilder(c.config, newTransitNodeInfo, c.TransitTag, user.UUID, user.Email, user.Passwd, user.UID)
 			if err != nil {
 				return err
