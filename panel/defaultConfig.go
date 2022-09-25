@@ -22,6 +22,7 @@ func getDefaultConnetionConfig() *ConnetionConfig {
 
 func getDefaultControllerConfig() *controller.Config {
 	return &controller.Config{
+		SendIP:         "0.0.0.0",
 		DNSType:        "AsIs",
 	}
 }
