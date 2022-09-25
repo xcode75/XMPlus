@@ -14,5 +14,4 @@ RUN  apk --update --no-cache add tzdata ca-certificates \
 RUN mkdir /etc/XMPlus/
 COPY --from=builder /app/XMPlus /usr/local/bin
 
-ENTRYPOINT [ "/usr/local/bin/XMPlus", "--config"]
-CMD ["/etc/XMPlus/config.yml"]
+ENTRYPOINT [ "XMPlus", "--config", "/etc/XMPlus/config.yml"]
