@@ -44,6 +44,7 @@ type NodeInfo struct {
 	ProxyProtocol     bool
 	Sniffing          bool
 	Address           string
+	IP                string
 }
 
 type TransitNodeInfo struct {
@@ -62,6 +63,7 @@ type TransitNodeInfo struct {
 	HeaderType        string
 	AllowInsecure     bool
 	Address           string
+	IP                string
 	ListenIP          string
 	ProxyProtocol     bool
 	Sniffing          bool

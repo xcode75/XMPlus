@@ -21,7 +21,6 @@ Nodes:
       DeviceLimit: 0                                             # Local settings will replace remote settings, 0 means disable
       RuleListPath:                                              #/etc/XMPlus/rulelist #Path to local rulelist file
     ControllerConfig:
-      SendIP: 0.0.0.0                                            # IP address you want to send pacakage
       EnableDNS: true                                            # Use custom DNS config, Please ensure that you set the dns.json well
       DisableUploadTraffic: false                                # Disable Upload traffic stats to panel 
       DisableGetRule: false                                      # Disable Get rule from panel
