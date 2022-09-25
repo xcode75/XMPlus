@@ -30,7 +30,7 @@ require (
 
 require (
 	cloud.google.com/go/compute v1.6.1 // indirect
-	
+	github.com/andybalholm/brotli v1.0.4 // indirect
 	github.com/lufia/plan9stats v0.0.0-20211012122336-39d0f177ccd0 // indirect
 	github.com/Azure/azure-sdk-for-go v62.0.0+incompatible // indirect
 	github.com/Azure/go-autorest v14.2.0+incompatible // indirect
@@ -175,6 +175,7 @@ require (
 )
 
 require (
+	github.com/klauspost/compress v1.15.10 // indirect
 	github.com/klauspost/cpuid/v2 v2.1.1 // indirect
 	github.com/marten-seemann/qtls-go1-19 v0.1.0-beta.1 // indirect
 	github.com/mimuret/golang-iij-dpf v0.7.1 // indirect
