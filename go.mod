@@ -11,7 +11,7 @@ require (
 	github.com/golang/protobuf v1.5.2
 	github.com/imdario/mergo v0.3.13
 	github.com/juju/ratelimit v1.0.2
-	github.com/lucas-clemente/quic-go v0.28.0 // indirect
+	github.com/lucas-clemente/quic-go v0.29.1
 	github.com/miekg/dns v1.1.50 // indirect
 	github.com/r3labs/diff/v2 v2.15.1
 	github.com/sagernet/sing v0.0.0-20220714145306-09b55ce4b6d0
@@ -24,7 +24,7 @@ require (
 	github.com/xcode75/XMCore v1.6.0
 	golang.org/x/net v0.0.0-20220624214902-1bab6f366d9e
 	google.golang.org/appengine v1.6.7 // indirect
-	google.golang.org/grpc v1.48.0 // indirect
+	google.golang.org/grpc v1.49.0 // indirect
 	google.golang.org/protobuf v1.28.0
 )
 
@@ -144,7 +144,7 @@ require (
 	github.com/vinyldns/go-vinyldns v0.9.16 // indirect
 	github.com/vmihailenco/msgpack v4.0.4+incompatible // indirect
 	github.com/vultr/govultr/v2 v2.16.0 // indirect
-	github.com/xtls/go v0.0.0-20210920065950-d4af136d3672 // indirect
+	github.com/xtls/go v0.0.0-20220914232946-0441cf4cf837
 	github.com/yusufpapurcu/wmi v1.2.2 // indirect
 	go.opencensus.io v0.23.0 // indirect
 	go.starlark.net v0.0.0-20220328144851-d1966c6b9fcd // indirect
@@ -168,8 +168,8 @@ require (
 )
 
 require (
-	github.com/sagernet/sing v0.0.0-20220627234642-a817f7084d9c
-	github.com/sagernet/sing-shadowsocks v0.0.0-20220627234717-689e0165ef2c
+	github.com/sagernet/sing v0.0.0-20220801112236-1bb95f9661fc
+	github.com/sagernet/sing-shadowsocks v0.0.0-20220801112336-a91eacdd01e1
 )
 
 require (
