@@ -210,8 +210,8 @@ func TransitBuilder(config *Config, nodeInfo api.TransitNodeInfo ,tag string, UU
 	
 	outboundDetourConfig.Tag = tag
 	
-	if nodeInfo.IP != "" {
-		ipAddress := net.ParseAddress(nodeInfo.IP)
+	if config.SendIP != "" {
+		ipAddress := net.ParseAddress(config.SendIP)
 		outboundDetourConfig.SendThrough = &conf.Address{ipAddress}
 	}
 	outboundDetourConfig.Protocol = protocol

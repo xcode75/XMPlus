@@ -21,7 +21,6 @@ type NodeInfoResponse struct {
 	ProxyProtocol   bool    `json:"proxyprotocol"`
 	Sniffing        bool    `json:"sniffing"`
 	ServiceName     string  `json:"servicename"`
-	IP              string  `json:"sendip"`
 }
 
 type TransitNodeInfoResponse struct {
@@ -42,7 +41,6 @@ type TransitNodeInfoResponse struct {
 	Sniffing        bool    `json:"sniffing"`
 	ServiceName     string  `json:"servicename"`
 	Flow            string  `json:"flow"`
-	IP              string  `json:"sendip"`
 }
 
 // UserResponse is the response of user
