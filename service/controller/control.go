@@ -112,22 +112,31 @@ func (c *Controller) removeUsers(users []string, tag string) error {
 	return nil
 }
 
-func (c *Controller) getTraffic(email string) (up int64, down int64) {
+func (c *Controller) getTraffic(email string) (up int64, down int64, upCounter stats.Counter, downCounter stats.Counter) {
 	upName := "user>>>" + email + ">>>traffic>>>uplink"
 	downName := "user>>>" + email + ">>>traffic>>>downlink"
-	statsManager := c.server.GetFeature(stats.ManagerType()).(stats.Manager)
-	upCounter := statsManager.GetCounter(upName)
-	downCounter := statsManager.GetCounter(downName)
-	if upCounter != nil {
+	upCounter = c.stm.GetCounter(upName)
+	downCounter = c.stm.GetCounter(downName)
+	if upCounter != nil && upCounter.Value() != 0 {
 		up = upCounter.Value()
+	} else {
+		upCounter = nil
+	}
+	if downCounter != nil && downCounter.Value() != 0 {
+		down = downCounter.Value()
+	} else {
+		downCounter = nil
+	}
+	return up, down, upCounter, downCounter
+}
+
+func (c *Controller) resetTraffic(upCounterList *[]stats.Counter, downCounterList *[]stats.Counter) {
+	for _, upCounter := range *upCounterList {
 		upCounter.Set(0)
 	}
-	if downCounter != nil {
-		down = downCounter.Value()
+	for _, downCounter := range *downCounterList {
 		downCounter.Set(0)
 	}
-	return up, down
-
 }
 
 func (c *Controller) AddInboundLimiter(tag string, nodeSpeedLimit uint64, userList *[]api.UserInfo) error {

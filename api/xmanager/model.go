@@ -6,7 +6,7 @@ import "encoding/json"
 type NodeInfoResponse struct {
 	SpeedLimit      float64 `json:"speedlimit"`
 	Method		    string  `json:"method"`
-	Port		    int     `json:"port"`
+	Port		    uint32     `json:"port"`
 	Address         string  `json:"server"`
 	Type            string  `json:"type"`
 	Security		string	`json:"security"`
@@ -16,6 +16,7 @@ type NodeInfoResponse struct {
     Protocol        string  `json:"protocol"`	
 	AllowInsecure   bool    `json:"allowinsecure"`
 	RelayNodeID		int     `json:"relayid"`
+	UpdateRelay		int     `json:"relayupdate"`
 	ListenIP        string  `json:"listenip"`
 	ProxyProtocol   bool    `json:"proxyprotocol"`
 	Sniffing        bool    `json:"sniffing"`
@@ -25,7 +26,7 @@ type NodeInfoResponse struct {
 type TransitNodeInfoResponse struct {
 	SpeedLimit      float64 `json:"speedlimit"`
 	Method		    string  `json:"method"`
-	Port		    int     `json:"port"`
+	Port		    uint32     `json:"port"`
 	Address         string  `json:"server"`
 	Type            string  `json:"type"`
 	Security		string	`json:"security"`
@@ -34,7 +35,6 @@ type TransitNodeInfoResponse struct {
 	Headertype      string  `json:"header"`
     Protocol        string  `json:"protocol"`	
 	AllowInsecure   bool    `json:"allowinsecure"`
-	Relay			int     `json:"relay"`
 	NodeID		    int     `json:"relayid"`
 	ListenIP        string  `json:"listenip"`
 	ProxyProtocol   bool    `json:"proxyprotocol"`

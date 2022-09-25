@@ -1,26 +1,26 @@
 {
     "domainStrategy": "IPOnDemand",
     "rules": [
-        {
-            "type": "field",
-            "outboundTag": "block",
-            "ip": [
-                "geoip:private"
-            ]
-        },
-        {
-            "type": "field",
-            "outboundTag": "block",
-            "protocol": [
-                "bittorrent"
-            ]
-        },
-        {
-            "type": "field",
-            "outboundTag": "IPv6_out",
-            "domain": [
-                "geosite:netflix"
-            ]
-        }
+	  {
+		"type": "field",
+		"outboundTag": "Http_Out",
+		"domain": [
+			"geosite:netflix"
+		]
+	  },
+      {
+        "ip": [
+          "geoip:private"
+        ],
+        "outboundTag": "blocked",
+        "type": "field"
+      },
+      {
+        "outboundTag": "blocked",
+        "protocol": [
+          "bittorrent"
+        ],
+        "type": "field"
+      }	
     ]
 }

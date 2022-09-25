@@ -20,7 +20,7 @@ type Controller struct {
 	clientInfo              api.ClientInfo
 	apiClient               api.API
 	nodeInfo                *api.NodeInfo
-	transitnodeInfo         *api.TransitNodeInfo
+	transitnodeInfo         *[]api.TransitNodeInfo
 	Tag                     string
 	TransitTag              string
 	Rtag                    bool
@@ -68,7 +68,6 @@ func (c *Controller) Start() error {
 			return nil
 		}	
 		c.transitnodeInfo = newTransitNodeInfo
-		c.TransitTag = c.buildRTag()
 		err = c.Transit(newTransitNodeInfo, userInfo)
 		if err != nil {
 				log.Panic(err)
@@ -172,7 +171,7 @@ func (c *Controller) nodeInfoMonitor() (err error) {
 		}
 		
 		if c.Rtag == true {
-			err := c.removeTransitTag(c.TransitTag, newUserInfo)
+			err := c.removeTransitTag(c.transitnodeInfo, newUserInfo)
 			if err != nil {
 				return err
 			}
@@ -184,7 +183,7 @@ func (c *Controller) nodeInfoMonitor() (err error) {
 				log.Print(er)
 				return nil
 			}
-		}	
+		}
         
 		c.nodeInfo = newNodeInfo
 		c.Tag = c.buildTag()
@@ -201,7 +200,6 @@ func (c *Controller) nodeInfoMonitor() (err error) {
 				return nil
 			}
 			c.transitnodeInfo = newTransitNodeInfo
-			c.TransitTag = c.buildRTag()
 			err = c.Transit(newTransitNodeInfo, newUserInfo)
 			if err != nil {
 					log.Panic(err)
@@ -301,11 +299,21 @@ func (c *Controller) removeOldTag(oldtag string) (err error) {
 	return nil
 }
 
-func (c *Controller) removeTransitTag(tag string, userInfo *[]api.UserInfo) (err error) {
+func (c *Controller) removeTransitTag(newTransitNodeInfo *[]api.TransitNodeInfo, userInfo *[]api.UserInfo) (err error) {
 	for _, user := range *userInfo {
-		err = c.removeOutbound(fmt.Sprintf("Relay_%s|%d", tag,user.UID))
-		if err != nil {
-			return err
+		count := 0
+		for _, TransitNodeInfo := range *newTransitNodeInfo {
+			count++
+			if count == 1 {
+				c.TransitTag =  fmt.Sprintf("Relay_%d_%s_%d_%d|%d", c.nodeInfo.NodeID, TransitNodeInfo.NodeType, TransitNodeInfo.Port, TransitNodeInfo.NodeID, user.UID)	
+			} else {
+				c.TransitTag = fmt.Sprintf("%s_%d", c.TransitTag, count)
+			}
+		
+			err = c.removeOutbound(c.TransitTag)
+			if err != nil {
+				return err
+			}
 		}
 	}
 	return nil
@@ -345,20 +353,34 @@ func (c *Controller) addNewTag(newNodeInfo *api.NodeInfo) (err error) {
 	return nil
 }
 
-func (c *Controller) Transit(newTransitNodeInfo *api.TransitNodeInfo, userInfo *[]api.UserInfo) (err error) {
-	if newTransitNodeInfo.NodeType != "Shadowsocks-Plugin" {
-		for _, user := range *userInfo {			
-			TransitConfig, err := TransitBuilder(c.config, newTransitNodeInfo, c.TransitTag, user.UUID, user.Email, user.Passwd, user.UID)
+func (c *Controller) Transit(newTransitNodeInfo *[]api.TransitNodeInfo, userInfo *[]api.UserInfo) (err error) {
+	totalservers := len(*newTransitNodeInfo)
+	for _, user := range *userInfo {
+		counter := 0
+		for _, TransitNodeInfo := range *newTransitNodeInfo {
+			counter ++
+			
+			if counter == 1 {
+				c.TransitTag =  fmt.Sprintf("Relay_%d_%s_%d_%d|%d", c.nodeInfo.NodeID, TransitNodeInfo.NodeType, TransitNodeInfo.Port, TransitNodeInfo.NodeID, user.UID)	
+			} else {
+				c.TransitTag = fmt.Sprintf("%s_%d", c.TransitTag, counter)
+			}
+			
+			TransitConfig, err := TransitBuilder(c.config, TransitNodeInfo, c.TransitTag, user.UUID, user.Email, user.Passwd, counter, totalservers)
 			if err != nil {
 				return err
 			}
+			
 			err = c.addOutbound(TransitConfig)
 			if err != nil {
 				return err
 			}
-			c.AddUserRoutingRule(fmt.Sprintf("Relay_%s|%d", c.TransitTag,user.UID), []string{fmt.Sprintf("%s|%s|%d", c.Tag, user.Email, user.UID)})		
+			
+			if counter == 1 {
+				c.AddUserRoutingRule(c.TransitTag, []string{fmt.Sprintf("%s|%s|%d", c.Tag, user.Email, user.UID)})	
+			}	
 		}
-	}	
+	}
 	return nil
 }
 
@@ -497,21 +519,38 @@ func (c *Controller) userInfoMonitor() (err error) {
 	}
 
 	// Get User traffic
-	userTraffic := make([]api.UserTraffic, 0)
+	var userTraffic []api.UserTraffic
+	var upCounterList []stats.Counter
+	var downCounterList []stats.Counter
+	
 	for _, user := range *c.userList {
-		up, down := c.getTraffic(fmt.Sprintf("%s|%s|%d", c.Tag, user.Email, user.UID))
+	    up, down, upCounter, downCounter := c.getTraffic(fmt.Sprintf("%s|%s|%d", c.Tag, user.Email, user.UID))
 		if up > 0 || down > 0 {
 			userTraffic = append(userTraffic, api.UserTraffic{
 				UID:      user.UID,
 				Email:    user.Email,
 				Upload:   up,
 				Download: down})
+				
+			if upCounter != nil {
+				upCounterList = append(upCounterList, upCounter)
+			}
+			if downCounter != nil {
+				downCounterList = append(downCounterList, downCounter)
+			}	
 		}
 	}
-	if len(userTraffic) > 0 && !c.config.DisableUploadTraffic {
-		err = c.apiClient.ReportUserTraffic(&userTraffic)
+	
+	if len(userTraffic) > 0 {
+		var err error // Define an empty error
+		if !c.config.DisableUploadTraffic {
+			err = c.apiClient.ReportUserTraffic(&userTraffic)
+		}
+		// If report traffic error, not clear the traffic
 		if err != nil {
 			log.Print(err)
+		} else {
+			c.resetTraffic(&upCounterList, &downCounterList)
 		}
 	}
 
@@ -525,6 +564,7 @@ func (c *Controller) userInfoMonitor() (err error) {
 			log.Printf("Report %d Online IPs", len(*onlineDevice))
 		}
 	}
+	
 	// Report Illegal user
 	if detectResult, err := c.GetDetectResult(c.Tag); err != nil {
 		log.Print(err)
@@ -536,6 +576,7 @@ func (c *Controller) userInfoMonitor() (err error) {
 		}
 
 	}
+	
 	return nil
 }
 
@@ -543,6 +584,3 @@ func (c *Controller) buildTag() string {
 	return fmt.Sprintf("%s|%d|%d", c.nodeInfo.NodeType, c.nodeInfo.Port, c.nodeInfo.NodeID)
 }
 
-func (c *Controller) buildRTag() string {
-	return fmt.Sprintf("%d_%s_%d_%d", c.nodeInfo.NodeID, c.transitnodeInfo.NodeType, c.transitnodeInfo.Port, c.transitnodeInfo.NodeID)
-}

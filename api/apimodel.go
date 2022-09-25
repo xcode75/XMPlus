@@ -20,15 +20,15 @@ type NodeStatus struct {
 	CPU    float64
 	Mem    float64
 	Disk   float64
-	Uptime int
+	Uptime uint64
 }
 
 type NodeInfo struct {
 	NodeType          string 
 	NodeID            int
-	Port              int
+	Port              uint32
 	SpeedLimit        uint64 // Bps
-	AlterID           int
+	AlterID           uint16
 	TransportProtocol string
 	Host              string
 	Path              string
@@ -39,17 +39,19 @@ type NodeInfo struct {
 	HeaderType        string
 	AllowInsecure     bool
 	RelayNodeID		  int
+	UpdateRelay		  int
 	ListenIP          string
 	ProxyProtocol     bool
 	Sniffing          bool
+	Address           string
 }
 
 type TransitNodeInfo struct {
 	NodeType          string 
 	NodeID            int
-	Port              int
+	Port              uint32
 	SpeedLimit        uint64 // Bps
-	AlterID           int
+	AlterID           uint16
 	TransportProtocol string
 	Host              string
 	Path              string
