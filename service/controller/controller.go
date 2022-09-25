@@ -7,11 +7,16 @@ import (
 	"time"
 
 	"github.com/xcode75/XMPlus/api"
+	"github.com/xcode75/XMPlus/app/mydispatcher"
 	"github.com/xcode75/XMPlus/common/legocmd"
 	"github.com/xcode75/XMPlus/common/serverstatus"
 	"github.com/xcode75/XMCore/common/protocol"
 	"github.com/xcode75/XMCore/common/task"
 	"github.com/xcode75/XMCore/core"
+	"github.com/xcode75/XMCore/features/stats"
+	"github.com/xcode75/XMCore/features/inbound"
+	"github.com/xcode75/XMCore/features/outbound"
+	"github.com/xcode75/XMCore/features/routing"
 )
 
 type Controller struct {
@@ -27,6 +32,10 @@ type Controller struct {
 	userList                *[]api.UserInfo
 	nodeInfoMonitorPeriodic *task.Periodic
 	userReportPeriodic      *task.Periodic
+	ihm                     inbound.Manager
+	ohm                     outbound.Manager
+	stm                     stats.Manager
+	dispatcher              *mydispatcher.DefaultDispatcher
 }
 
 // New return a Controller service with default parameters.
@@ -35,6 +44,10 @@ func New(server *core.Instance, api api.API, config *Config) *Controller {
 		server:    server,
 		config:    config,
 		apiClient: api,
+		ihm:        server.GetFeature(inbound.ManagerType()).(inbound.Manager),
+		ohm:        server.GetFeature(outbound.ManagerType()).(outbound.Manager),
+		stm:        server.GetFeature(stats.ManagerType()).(stats.Manager),
+		dispatcher: server.GetFeature(routing.DispatcherType()).(*mydispatcher.DefaultDispatcher),
 	}
 	return controller
 }

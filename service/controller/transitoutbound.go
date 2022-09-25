@@ -230,7 +230,7 @@ func TransitBuilder(config *Config, nodeInfo api.TransitNodeInfo ,tag string, UU
 }
 
 
-func buildRVmessUser(tag string, UUID string, Email string, serverAlterID int) *protocol.User {
+func buildRVmessUser(tag string, UUID string, Email string, serverAlterID uint16) *protocol.User {
 	vmessAccount := &VMessAccount{
 		ID:       UUID,
 		AlterIds: uint16(serverAlterID),

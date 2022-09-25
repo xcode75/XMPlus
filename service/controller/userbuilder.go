@@ -15,7 +15,7 @@ import (
 
 var AEADMethod = []shadowsocks.CipherType{shadowsocks.CipherType_AES_128_GCM, shadowsocks.CipherType_AES_256_GCM, shadowsocks.CipherType_CHACHA20_POLY1305}
 
-func buildVmessUser(tag string, userInfo *[]api.UserInfo, serverAlterID int) (users []*protocol.User) {
+func buildVmessUser(tag string, userInfo *[]api.UserInfo, serverAlterID uint16) (users []*protocol.User) {
 	users = make([]*protocol.User, len(*userInfo))
 	for i, user := range *userInfo {
 		vmessAccount := &conf.VMessAccount{
