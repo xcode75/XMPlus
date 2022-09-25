@@ -12,6 +12,9 @@ require (
 	github.com/imdario/mergo v0.3.13
 	github.com/juju/ratelimit v1.0.2
 	github.com/lucas-clemente/quic-go v0.29.1
+	github.com/marten-seemann/qtls-go1-16 v0.1.5 // indirect
+	github.com/marten-seemann/qtls-go1-17 v0.1.2 // indirect
+	github.com/marten-seemann/qtls-go1-18 v0.1.2 // indirect
 	github.com/miekg/dns v1.1.50 // indirect
 	github.com/r3labs/diff/v2 v2.15.1
 	github.com/sagernet/sing v0.0.0-20220714145306-09b55ce4b6d0
@@ -31,6 +34,7 @@ require (
 require (
 	cloud.google.com/go/compute v1.6.1 // indirect
 	github.com/andybalholm/brotli v1.0.4 // indirect
+	github.com/marten-seemann/qtls-go1-19 v0.1.0 // indirect
 	github.com/lufia/plan9stats v0.0.0-20211012122336-39d0f177ccd0 // indirect
 	github.com/Azure/azure-sdk-for-go v62.0.0+incompatible // indirect
 	github.com/Azure/go-autorest v14.2.0+incompatible // indirect
@@ -91,9 +95,6 @@ require (
 	github.com/liquidweb/liquidweb-cli v0.6.10 // indirect
 	github.com/liquidweb/liquidweb-go v1.6.3 // indirect
 	github.com/magiconair/properties v1.8.6 // indirect
-	github.com/marten-seemann/qtls-go1-16 v0.1.5 // indirect
-	github.com/marten-seemann/qtls-go1-17 v0.1.2 // indirect
-	github.com/marten-seemann/qtls-go1-18 v0.1.2 // indirect
 	github.com/mattn/go-isatty v0.0.14 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
@@ -177,7 +178,6 @@ require (
 require (
 	github.com/klauspost/compress v1.15.10 // indirect
 	github.com/klauspost/cpuid/v2 v2.1.1 // indirect
-	github.com/marten-seemann/qtls-go1-19 v0.1.0-beta.1 // indirect
 	github.com/mimuret/golang-iij-dpf v0.7.1 // indirect
 	lukechampine.com/blake3 v1.1.7 // indirect
 )
