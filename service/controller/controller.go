@@ -210,19 +210,20 @@ func (c *Controller) nodeInfoMonitor() (err error) {
 	
 	// Add new Transit tag
 	if c.Rtag == false {
-		c.removeRules(oldtag, c.userList)		
-	}
-		
-	if c.Rtag == true && c.transitnodeInfo != nil {
-		err := c.removeTransitTag(c.transitnodeInfo, c.userList)
-		if err != nil {
-			return err
-		}
+		c.removeRules(oldtag, newUserInfo)		
 	}
 		
 	c.Rtag = false
 	
 	if c.nodeInfo.RelayNodeID > 0 {
+	
+		if c.transitnodeInfo != nil {
+			err := c.removeTransitTag(c.transitnodeInfo, newUserInfo)
+			if err != nil {
+				return err
+			}
+		}
+		
 		newTransitNodeInfo, err := c.apiClient.GetTransitNodeInfo()
 		if err != nil {
 			log.Print(err)
@@ -230,7 +231,7 @@ func (c *Controller) nodeInfoMonitor() (err error) {
 		}
 			
 		c.transitnodeInfo = newTransitNodeInfo
-		err = c.Transit(c.transitnodeInfo, c.userList)
+		err = c.Transit(c.transitnodeInfo, newUserInfo)
 		if err != nil {
 			log.Panic(err)
 			return err
