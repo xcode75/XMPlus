@@ -169,12 +169,12 @@ func (c *Controller) nodeInfoMonitor() (err error) {
 	}
 	
 	var nodeInfoChanged bool = false
+	oldtag := c.Tag
 	
 	// If nodeInfo changed
 	if !reflect.DeepEqual(c.nodeInfo, newNodeInfo) {
 		
 		// Remove old tag
-		oldtag := c.Tag
 		err := c.removeOldTag(oldtag)
 		if err != nil {
 			log.Print(err)
