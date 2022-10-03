@@ -502,11 +502,11 @@ func (c *APIClient) ParseTransitNodeResponse(nodeInfoResponse *[]TransitNodeInfo
 			Host = nodeInfo.Host
 		}	
 
-		if nodeInfo.Type == "Shadowsocks"  {
+		if Type == "Shadowsocks"  {
 			Method = nodeInfo.Method
 		}
 		
-		if nodeInfo.Type == "Shadowsocks" && (nodeInfo.Protocol == "ws" || nodeInfo.Protocol == "grpc" || nodeInfo.Protocol == "quic" ) {
+		if Type == "Shadowsocks" && (nodeInfo.Protocol == "ws" || nodeInfo.Protocol == "grpc" || nodeInfo.Protocol == "quic" ) {
 			port = port - 1
 			if port <= 0 {
 				return nil, fmt.Errorf("Shadowsocks-Plugin listen port must be greater than 1")
