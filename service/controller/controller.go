@@ -63,15 +63,7 @@ func (c *Controller) Start() error {
 		return err
 	}
 	c.nodeInfo = newNodeInfo
-	
-	
-	// TransitNode
-	newTransitNodeInfo, err := c.apiClient.GetTransitNodeInfo()
-	if err != nil {
-		log.Panic(err)
-		return nil
-	}	
-	c.transitnodeInfo = newTransitNodeInfo
+
 	
 	// Update user
 	userInfo, err := c.apiClient.GetUserList()
@@ -82,13 +74,14 @@ func (c *Controller) Start() error {
 	c.Tag = c.buildTag()
 		
 	c.Rtag = false
+	
 	// Add new Transit	tag
 	if c.nodeInfo.RelayNodeID > 0 {	
-		//newTransitNodeInfo, err := c.apiClient.GetTransitNodeInfo()
-		//if err != nil {
-		//	log.Panic(err)
-		//	return nil
-		//}	
+		newTransitNodeInfo, err := c.apiClient.GetTransitNodeInfo()
+		if err != nil {
+			log.Panic(err)
+			return nil
+		}	
 		
 		err = c.Transit(newTransitNodeInfo, userInfo)
 		if err != nil {
@@ -167,13 +160,6 @@ func (c *Controller) nodeInfoMonitor() (err error) {
 		log.Print(err)
 		return nil
 	}				
-	
-	// TransitNode
-	newTransitNodeInfo, err := c.apiClient.GetTransitNodeInfo()
-	if err != nil {
-		log.Print(err)
-		return nil
-	}
 			
 	// Update User
 	newUserInfo, err := c.apiClient.GetUserList()
@@ -185,7 +171,7 @@ func (c *Controller) nodeInfoMonitor() (err error) {
 	var nodeInfoChanged bool = false
 	
 	// If nodeInfo changed
-	if !reflect.DeepEqual(c.nodeInfo, newNodeInfo) || !reflect.DeepEqual(c.transitnodeInfo, newTransitNodeInfo){
+	if !reflect.DeepEqual(c.nodeInfo, newNodeInfo) {
 		
 		// Remove old tag
 		oldtag := c.Tag
@@ -196,11 +182,11 @@ func (c *Controller) nodeInfoMonitor() (err error) {
 		}
 		
 		if c.Rtag == false {
-			c.removeRules(oldtag, newUserInfo)		
+			c.removeRules(oldtag, c.userList)		
 		}
 		
 		if c.Rtag == true {
-			err := c.removeTransitTag(c.transitnodeInfo, newUserInfo)
+			err := c.removeTransitTag(c.transitnodeInfo, c.userList)
 			if err != nil {
 				return err
 			}
@@ -220,24 +206,7 @@ func (c *Controller) nodeInfoMonitor() (err error) {
 		nodeInfoChanged = true
 
 		c.Rtag = false
-				
-		// Add new Transit tag
-		if c.nodeInfo.RelayNodeID > 0 {
-			//newTransitNodeInfo, err := c.apiClient.GetTransitNodeInfo()
-			//if err != nil {
-			//	log.Print(err)
-			//	return nil
-			//}
-			
-			c.transitnodeInfo = newTransitNodeInfo
-			err = c.Transit(newTransitNodeInfo, newUserInfo)
-			if err != nil {
-					log.Panic(err)
-					return err
-			}
-			c.Rtag = true			
-		}
-				
+					
 		// Add new tag
 		err = c.addNewTag(newNodeInfo)
 		if err != nil {
@@ -250,6 +219,23 @@ func (c *Controller) nodeInfoMonitor() (err error) {
 			log.Print(err)
 			return nil
 		}
+	}
+	
+	// Add new Transit tag
+	if c.nodeInfo.RelayNodeID > 0 {
+		newTransitNodeInfo, err := c.apiClient.GetTransitNodeInfo()
+		if err != nil {
+			log.Print(err)
+			return nil
+		}
+			
+		c.transitnodeInfo = newTransitNodeInfo
+		err = c.Transit(c.transitnodeInfo, c.userList)
+		if err != nil {
+			log.Panic(err)
+			return err
+		}
+		c.Rtag = true			
 	}
 	
 	// Check Rule
