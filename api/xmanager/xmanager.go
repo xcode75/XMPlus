@@ -464,6 +464,7 @@ func (c *APIClient) ParseTransitNodeResponse(nodeInfoResponse *[]TransitNodeInfo
 	for _, nodeInfo := range *nodeInfoResponse {
 		var  enableTLS  bool
 		var  speedlimit uint64 = 0
+		var Type string 
 
 		port := nodeInfo.Port
 		Host := ""
