@@ -77,11 +77,13 @@ func (c *Controller) Start() error {
 	
 	// Add new Transit	tag
 	if c.nodeInfo.RelayNodeID > 0 {	
+	
 		newTransitNodeInfo, err := c.apiClient.GetTransitNodeInfo()
 		if err != nil {
 			log.Panic(err)
 			return nil
 		}	
+		c.transitnodeInfo = newTransitNodeInfo
 		
 		err = c.Transit(newTransitNodeInfo, userInfo)
 		if err != nil {
