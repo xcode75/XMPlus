@@ -217,7 +217,7 @@ func (c *Controller) nodeInfoMonitor() (err error) {
 	
 	if c.nodeInfo.RelayNodeID > 0 {
 	
-		if c.transitnodeInfo != nil {
+		if c.Rtag == true {
 			err := c.removeTransitTag(c.transitnodeInfo, newUserInfo)
 			if err != nil {
 				return err
