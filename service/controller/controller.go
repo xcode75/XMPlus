@@ -64,6 +64,15 @@ func (c *Controller) Start() error {
 	}
 	c.nodeInfo = newNodeInfo
 	
+	
+	// TransitNode
+	newTransitNodeInfo, err := c.apiClient.GetTransitNodeInfo()
+	if err != nil {
+		log.Panic(err)
+		return nil
+	}	
+	c.transitnodeInfo = newTransitNodeInfo
+	
 	// Update user
 	userInfo, err := c.apiClient.GetUserList()
 	if err != nil {
@@ -75,12 +84,12 @@ func (c *Controller) Start() error {
 	c.Rtag = false
 	// Add new Transit	tag
 	if c.nodeInfo.RelayNodeID > 0 {	
-		newTransitNodeInfo, err := c.apiClient.GetTransitNodeInfo()
-		if err != nil {
-			log.Panic(err)
-			return nil
-		}	
-		c.transitnodeInfo = newTransitNodeInfo
+		//newTransitNodeInfo, err := c.apiClient.GetTransitNodeInfo()
+		//if err != nil {
+		//	log.Panic(err)
+		//	return nil
+		//}	
+		
 		err = c.Transit(newTransitNodeInfo, userInfo)
 		if err != nil {
 				log.Panic(err)
@@ -159,6 +168,13 @@ func (c *Controller) nodeInfoMonitor() (err error) {
 		return nil
 	}				
 	
+	// TransitNode
+	newTransitNodeInfo, err := c.apiClient.GetTransitNodeInfo()
+	if err != nil {
+		log.Print(err)
+		return nil
+	}
+			
 	// Update User
 	newUserInfo, err := c.apiClient.GetUserList()
 	if err != nil {
@@ -169,7 +185,7 @@ func (c *Controller) nodeInfoMonitor() (err error) {
 	var nodeInfoChanged bool = false
 	
 	// If nodeInfo changed
-	if !reflect.DeepEqual(c.nodeInfo, newNodeInfo) || !reflect.DeepEqual(c.userList, newUserInfo){
+	if !reflect.DeepEqual(c.nodeInfo, newNodeInfo) || !reflect.DeepEqual(c.transitnodeInfo, newTransitNodeInfo){
 		
 		// Remove old tag
 		oldtag := c.Tag
@@ -206,12 +222,13 @@ func (c *Controller) nodeInfoMonitor() (err error) {
 		c.Rtag = false
 				
 		// Add new Transit tag
-		if c.nodeInfo.RelayNodeID > 0 && !c.Rtag {
-			newTransitNodeInfo, err := c.apiClient.GetTransitNodeInfo()
-			if err != nil {
-				log.Print(err)
-				return nil
-			}
+		if c.nodeInfo.RelayNodeID > 0 {
+			//newTransitNodeInfo, err := c.apiClient.GetTransitNodeInfo()
+			//if err != nil {
+			//	log.Print(err)
+			//	return nil
+			//}
+			
 			c.transitnodeInfo = newTransitNodeInfo
 			err = c.Transit(newTransitNodeInfo, newUserInfo)
 			if err != nil {

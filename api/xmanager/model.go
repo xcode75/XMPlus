@@ -26,7 +26,7 @@ type NodeInfoResponse struct {
 type TransitNodeInfoResponse struct {
 	SpeedLimit      float64 `json:"speedlimit"`
 	Method		    string  `json:"method"`
-	Port		    uint32     `json:"port"`
+	Port		    uint32  `json:"port"`
 	Address         string  `json:"server"`
 	Type            string  `json:"type"`
 	Security		string	`json:"security"`

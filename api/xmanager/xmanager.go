@@ -464,7 +464,7 @@ func (c *APIClient) ParseTransitNodeResponse(nodeInfoResponse *[]TransitNodeInfo
 	for _, nodeInfo := range *nodeInfoResponse {
 		var  enableTLS  bool
 		var  speedlimit uint64 = 0
-		var Type string
+
 		port := nodeInfo.Port
 		Host := ""
 		Path := ""
@@ -474,10 +474,6 @@ func (c *APIClient) ParseTransitNodeResponse(nodeInfoResponse *[]TransitNodeInfo
 		Method := ""
 		
 		Type = nodeInfo.Type
-		
-		if nodeInfo.Address == "" {
-			return nil, fmt.Errorf("No server address in response")
-		}
 		
 		if nodeInfo.Security == "xtls" || nodeInfo.Security == "tls"{
 			enableTLS = true
@@ -509,7 +505,7 @@ func (c *APIClient) ParseTransitNodeResponse(nodeInfoResponse *[]TransitNodeInfo
 			Method = nodeInfo.Method
 		}
 		
-		if nodeInfo.Type == "Shadowsocks" && (nodeInfo.Protocol == "ws" || nodeInfo.Protocol == "grpc") {
+		if nodeInfo.Type == "Shadowsocks" && (nodeInfo.Protocol == "ws" || nodeInfo.Protocol == "grpc" || nodeInfo.Protocol == "quic" ) {
 			port = port - 1
 			if port <= 0 {
 				return nil, fmt.Errorf("Shadowsocks-Plugin listen port must be greater than 1")
