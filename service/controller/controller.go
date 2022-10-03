@@ -181,17 +181,6 @@ func (c *Controller) nodeInfoMonitor() (err error) {
 			return nil
 		}
 		
-		if c.Rtag == false {
-			c.removeRules(oldtag, c.userList)		
-		}
-		
-		if c.Rtag == true {
-			err := c.removeTransitTag(c.transitnodeInfo, c.userList)
-			if err != nil {
-				return err
-			}
-		}
-		
 		if c.nodeInfo.NodeType == "Shadowsocks-Plugin"  {
 			er := c.removeOldTag(fmt.Sprintf("dokodemo-door_%s", c.Tag))
 			if er != nil {
@@ -204,8 +193,6 @@ func (c *Controller) nodeInfoMonitor() (err error) {
 		c.Tag = c.buildTag()
 		
 		nodeInfoChanged = true
-
-		c.Rtag = false
 					
 		// Add new tag
 		err = c.addNewTag(newNodeInfo)
@@ -222,6 +209,19 @@ func (c *Controller) nodeInfoMonitor() (err error) {
 	}
 	
 	// Add new Transit tag
+	if c.Rtag == false {
+		c.removeRules(oldtag, c.userList)		
+	}
+		
+	if c.Rtag == true {
+		err := c.removeTransitTag(c.transitnodeInfo, c.userList)
+		if err != nil {
+			return err
+		}
+	}
+		
+	c.Rtag = false
+	
 	if c.nodeInfo.RelayNodeID > 0 {
 		newTransitNodeInfo, err := c.apiClient.GetTransitNodeInfo()
 		if err != nil {
