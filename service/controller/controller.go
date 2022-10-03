@@ -214,7 +214,7 @@ func (c *Controller) nodeInfoMonitor() (err error) {
 	}
 		
 	if c.Rtag == true {
-		err := c.removeTransitTag(c.transitnodeInfo, c.userList)
+		err := c.removeTransitTag(c.transitnodeInfo, newUserInfo)
 		if err != nil {
 			return err
 		}

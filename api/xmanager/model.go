@@ -16,7 +16,6 @@ type NodeInfoResponse struct {
     Protocol        string  `json:"protocol"`	
 	AllowInsecure   bool    `json:"allowinsecure"`
 	RelayNodeID		int     `json:"relayid"`
-	UpdateRelay		int     `json:"relayupdate"`
 	ListenIP        string  `json:"listenip"`
 	ProxyProtocol   bool    `json:"proxyprotocol"`
 	Sniffing        bool    `json:"sniffing"`

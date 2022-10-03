@@ -361,7 +361,6 @@ func (c *APIClient) ParseNodeResponse(nodeInfoResponse *NodeInfoResponse) (*api.
 	nodeinfo := &api.NodeInfo{
 		NodeType:          Type,
 		NodeID:            c.NodeID,
-		UpdateRelay:       nodeInfoResponse.UpdateRelay,
 		Port:              port,
 		SpeedLimit:        speedlimit,
 		AlterID:           AlterID,

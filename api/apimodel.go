@@ -39,7 +39,6 @@ type NodeInfo struct {
 	HeaderType        string
 	AllowInsecure     bool
 	RelayNodeID		  int
-	UpdateRelay		  int
 	ListenIP          string
 	ProxyProtocol     bool
 	Sniffing          bool
