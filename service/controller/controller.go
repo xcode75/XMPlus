@@ -212,18 +212,17 @@ func (c *Controller) nodeInfoMonitor() (err error) {
 	if c.Rtag == false {
 		c.removeRules(oldtag, newUserInfo)		
 	}
+	
+	if c.Rtag == true {
+		err := c.removeTransitTag(c.transitnodeInfo, newUserInfo)
+		if err != nil {
+			return err
+		}
+	}
 		
 	c.Rtag = false
 	
 	if c.nodeInfo.RelayNodeID > 0 {
-	
-		if c.Rtag == true {
-			err := c.removeTransitTag(c.transitnodeInfo, newUserInfo)
-			if err != nil {
-				return err
-			}
-		}
-		
 		newTransitNodeInfo, err := c.apiClient.GetTransitNodeInfo()
 		if err != nil {
 			log.Print(err)
