@@ -537,8 +537,8 @@ func (c *APIClient) ParseTransitNodeResponse(nodeInfoResponse *[]TransitNodeInfo
 			ProxyProtocol:     nodeInfo.ProxyProtocol,
 			Sniffing:          nodeInfo.Sniffing,
 			Flow:              Flow,
-		    RejectUnknownSNI:  nodeInfoResponse.RejectUnknownSNI,
-		    Fingerprint:       nodeInfoResponse.Fingerprint,
+		    RejectUnknownSNI:  nodeInfo.RejectUnknownSNI,
+		    Fingerprint:       nodeInfo.Fingerprint,
 		})
 	}
 	
