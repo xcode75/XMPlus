@@ -11,10 +11,10 @@ require (
 	github.com/golang/protobuf v1.5.2
 	github.com/imdario/mergo v0.3.13
 	github.com/juju/ratelimit v1.0.2
-	github.com/lucas-clemente/quic-go v0.29.1
-	github.com/marten-seemann/qtls-go1-16 v0.1.5 // indirect
-	github.com/marten-seemann/qtls-go1-17 v0.1.2 // indirect
-	github.com/marten-seemann/qtls-go1-18 v0.1.2 // indirect
+	github.com/lucas-clemente/quic-go v0.29.2
+	github.com/marten-seemann/qtls-go1-16 v0.1.5
+	github.com/marten-seemann/qtls-go1-17 v0.1.2
+	github.com/marten-seemann/qtls-go1-18 v0.1.3
 	github.com/miekg/dns v1.1.50 // indirect
 	github.com/r3labs/diff/v2 v2.15.1
 	github.com/sagernet/sing v0.0.0-20220714145306-09b55ce4b6d0
@@ -27,7 +27,7 @@ require (
 	github.com/xcode75/XMCore v1.6.1
 	golang.org/x/net v0.0.0-20220909164309-bea034e7d591
 	google.golang.org/appengine v1.6.7 // indirect
-	google.golang.org/grpc v1.49.0 // indirect
+	google.golang.org/grpc v1.50.1 // indirect
 	google.golang.org/protobuf v1.28.1
 )
 
@@ -121,7 +121,7 @@ require (
 	github.com/power-devops/perfstat v0.0.0-20210106213030-5aafc221ea8c // indirect
 	github.com/pquerna/otp v1.3.0 // indirect
 	github.com/rainycape/memcache v0.0.0-20150622160815-1031fa0ce2f2 // indirect
-	github.com/refraction-networking/utls v1.1.2
+	github.com/refraction-networking/utls v1.1.5
 	github.com/riobard/go-bloom v0.0.0-20200614022211-cdc8013cb5b3 // indirect
 	github.com/rogpeppe/go-internal v1.8.1 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
