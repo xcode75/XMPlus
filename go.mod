@@ -5,7 +5,7 @@ go 1.19
 require (
 	github.com/deckarep/golang-set v1.8.0
 	github.com/fsnotify/fsnotify v1.6.0
-	github.com/go-acme/lego/v4 v4.8.0
+	github.com/go-acme/lego/v4 v4.9.0
 	github.com/go-ole/go-ole v1.2.6 // indirect
 	github.com/go-resty/resty/v2 v2.7.0
 	github.com/golang/protobuf v1.5.2
@@ -175,6 +175,7 @@ require (
 	github.com/klauspost/compress v1.15.10 // indirect
 	github.com/klauspost/cpuid/v2 v2.1.1 // indirect
 	github.com/mimuret/golang-iij-dpf v0.7.1 // indirect
+	github.com/sacloud/libsacloud v1.36.2 // indirect
 	github.com/sacloud/api-client-go v0.2.1 // indirect
 	github.com/sacloud/go-http v0.1.2 // indirect
 	github.com/sacloud/iaas-api-go v1.3.2 // indirect
