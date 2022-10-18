@@ -20,6 +20,8 @@ type NodeInfoResponse struct {
 	ProxyProtocol   bool    `json:"proxyprotocol"`
 	Sniffing        bool    `json:"sniffing"`
 	ServiceName     string  `json:"servicename"`
+	Fingerprint       string `json:"tlsfingerprint"`
+	RejectUnknownSNI  bool    `json:"rejectunknownsni"`
 }
 
 type TransitNodeInfoResponse struct {
@@ -40,6 +42,8 @@ type TransitNodeInfoResponse struct {
 	Sniffing        bool    `json:"sniffing"`
 	ServiceName     string  `json:"servicename"`
 	Flow            string  `json:"flow"`
+	Fingerprint       string `json:"tlsfingerprint"`
+	RejectUnknownSNI  bool    `json:"rejectunknownsni"`
 }
 
 // UserResponse is the response of user

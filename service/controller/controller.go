@@ -171,11 +171,12 @@ func (c *Controller) nodeInfoMonitor() (err error) {
 	}
 	
 	var nodeInfoChanged bool = false
-	oldtag := c.Tag
+
+	c.removeRules(c.Tag, newUserInfo)		
 	
 	// If nodeInfo changed
 	if !reflect.DeepEqual(c.nodeInfo, newNodeInfo) {
-		
+		oldtag := c.Tag
 		// Remove old tag
 		err := c.removeOldTag(oldtag)
 		if err != nil {
@@ -211,9 +212,6 @@ func (c *Controller) nodeInfoMonitor() (err error) {
 	}
 	
 	// Add new Transit tag
-	if c.Rtag == false {
-		c.removeRules(oldtag, newUserInfo)		
-	}
 	
 	if c.Rtag == true {
 		err := c.removeTransitTag(c.transitnodeInfo, newUserInfo)
@@ -323,7 +321,7 @@ func (c *Controller) removeTransitTag(newTransitNodeInfo *[]api.TransitNodeInfo,
 		for _, TransitNodeInfo := range *newTransitNodeInfo {
 			count++
 			if count == 1 {
-				c.TransitTag =  fmt.Sprintf("Relay_%d_%s_%d_%d|%d", c.nodeInfo.NodeID, TransitNodeInfo.NodeType, TransitNodeInfo.Port, TransitNodeInfo.NodeID, user.UID)	
+				c.TransitTag =  fmt.Sprintf("Relay_%d_%s_%d_%d_%d", c.nodeInfo.NodeID, TransitNodeInfo.NodeType, TransitNodeInfo.Port, TransitNodeInfo.NodeID, user.UID)	
 			} else {
 				c.TransitTag = fmt.Sprintf("%s_%d", c.TransitTag, count)
 			}
@@ -379,7 +377,7 @@ func (c *Controller) Transit(newTransitNodeInfo *[]api.TransitNodeInfo, userInfo
 			counter ++
 			
 			if counter == 1 {
-				c.TransitTag =  fmt.Sprintf("Relay_%d_%s_%d_%d|%d", c.nodeInfo.NodeID, TransitNodeInfo.NodeType, TransitNodeInfo.Port, TransitNodeInfo.NodeID, user.UID)	
+				c.TransitTag =  fmt.Sprintf("Relay_%d_%s_%d_%d_%d", c.nodeInfo.NodeID, TransitNodeInfo.NodeType, TransitNodeInfo.Port, TransitNodeInfo.NodeID, user.UID)	
 			} else {
 				c.TransitTag = fmt.Sprintf("%s_%d", c.TransitTag, counter)
 			}

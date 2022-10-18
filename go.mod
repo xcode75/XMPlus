@@ -24,7 +24,7 @@ require (
 	github.com/stretchr/testify v1.8.0
 	github.com/tklauser/go-sysconf v0.3.10 // indirect
 	github.com/urfave/cli v1.22.9
-	github.com/xcode75/XMCore v1.6.0
+	github.com/xcode75/XMCore v1.6.1
 	golang.org/x/net v0.0.0-20220909164309-bea034e7d591
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/grpc v1.49.0 // indirect

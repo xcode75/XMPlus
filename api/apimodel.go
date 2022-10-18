@@ -43,6 +43,8 @@ type NodeInfo struct {
 	ProxyProtocol     bool
 	Sniffing          bool
 	Address           string
+	Fingerprint       string
+	RejectUnknownSNI  bool
 }
 
 type TransitNodeInfo struct {
@@ -65,6 +67,8 @@ type TransitNodeInfo struct {
 	ProxyProtocol     bool
 	Sniffing          bool
 	Flow              string
+	Fingerprint       string
+	RejectUnknownSNI  bool
 }
 
 type UserInfo struct {

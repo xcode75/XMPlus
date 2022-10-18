@@ -179,6 +179,8 @@ func InboundBuilder(config *Config, nodeInfo *api.NodeInfo, tag string) (*core.I
 			if nodeInfo.AllowInsecure {
 				tlsSettings.Insecure = true
 			}
+			tlsSettings.Fingerprint = nodeInfo.Fingerprint
+			tlsSettings.RejectUnknownSNI = nodeInfo.RejectUnknownSNI
 			streamSetting.TLSSettings = tlsSettings
 		} else if nodeInfo.TLSType == "xtls" {
 			xtlsSettings := &conf.XTLSConfig{}
@@ -186,6 +188,8 @@ func InboundBuilder(config *Config, nodeInfo *api.NodeInfo, tag string) (*core.I
 			if nodeInfo.AllowInsecure {
 				xtlsSettings.Insecure = true
 			}
+			xtlsSettings.Fingerprint = nodeInfo.Fingerprint
+			xtlsSettings.RejectUnknownSNI = nodeInfo.RejectUnknownSNI
 			streamSetting.XTLSSettings = xtlsSettings
 		}
 	}

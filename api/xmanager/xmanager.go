@@ -378,6 +378,8 @@ func (c *APIClient) ParseNodeResponse(nodeInfoResponse *NodeInfoResponse) (*api.
 		ListenIP:          nodeInfoResponse.ListenIP,
 		ProxyProtocol:     nodeInfoResponse.ProxyProtocol,
 		Sniffing:          nodeInfoResponse.Sniffing,
+		RejectUnknownSNI:  nodeInfoResponse.RejectUnknownSNI,
+		Fingerprint:       nodeInfoResponse.Fingerprint,
 	}
 
 	return nodeinfo, nil
@@ -535,6 +537,8 @@ func (c *APIClient) ParseTransitNodeResponse(nodeInfoResponse *[]TransitNodeInfo
 			ProxyProtocol:     nodeInfo.ProxyProtocol,
 			Sniffing:          nodeInfo.Sniffing,
 			Flow:              Flow,
+		    RejectUnknownSNI:  nodeInfoResponse.RejectUnknownSNI,
+		    Fingerprint:       nodeInfoResponse.Fingerprint,
 		})
 	}
 	
