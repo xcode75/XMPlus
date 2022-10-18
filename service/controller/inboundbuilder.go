@@ -176,6 +176,7 @@ func InboundBuilder(config *Config, nodeInfo *api.NodeInfo, tag string) (*core.I
 		if nodeInfo.TLSType == "tls" {
 			tlsSettings := &conf.TLSConfig{}
 			tlsSettings.Certs = append(tlsSettings.Certs, &conf.TLSCertConfig{CertFile: certFile, KeyFile: keyFile, OcspStapling: 3600})
+			tlsSettings.ServerName = config.CertConfig.CertDomain
 			if nodeInfo.AllowInsecure {
 				tlsSettings.Insecure = true
 			}
@@ -185,6 +186,7 @@ func InboundBuilder(config *Config, nodeInfo *api.NodeInfo, tag string) (*core.I
 		} else if nodeInfo.TLSType == "xtls" {
 			xtlsSettings := &conf.XTLSConfig{}
 			xtlsSettings.Certs = append(xtlsSettings.Certs, &conf.XTLSCertConfig{CertFile: certFile, KeyFile: keyFile, OcspStapling: 3600})
+			xtlsSettings.ServerName = config.CertConfig.CertDomain
 			if nodeInfo.AllowInsecure {
 				xtlsSettings.Insecure = true
 			}
