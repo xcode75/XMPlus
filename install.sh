@@ -145,10 +145,19 @@ install_XMPlus() {
     echo -e "${green}XMPlus ${last_version}${plain} 安装完成，已设置开机自启"
     cp geoip.dat /etc/XMPlus/
     cp geosite.dat /etc/XMPlus/ 
-    cp dns.json /etc/XMPlus/
-	cp route.json /etc/XMPlus/
-	cp outbound.json /etc/XMPlus/
-    cp rulelist /etc/XMPlus/
+	
+    if [[ ! -f /etc/XMPlus/dns.json ]]; then
+		cp dns.json /etc/XMPlus/
+	fi
+	if [[ ! -f /etc/XMPlus/route.json ]]; then 
+		cp route.json /etc/XMPlus/
+	fi
+	if [[ ! -f /etc/XMPlus/outbound.json ]]; then
+		cp outbound.json /etc/XMPlus/
+	fi
+	if [[ ! -f /etc/XMPlus/rulelist ]]; then
+		cp rulelist /etc/XMPlus/
+	fi
 
     if [[ ! -f /etc/XMPlus/config.yml ]]; then
         cp config.yml /etc/XMPlus/
@@ -164,10 +173,6 @@ install_XMPlus() {
         else
             echo -e "${red}XMPlus 可能启动失败，请稍后使用 XMPlus log 查看日志信息，若无法启动，则可能更改了配置格式，请前往 wiki 查看：https://github.com/xcode75/XMPlus${plain}"
         fi
-    fi
-
-    if [[ ! -f /etc/XMPlus/dns.json ]]; then
-        cp dns.json /etc/XMPlus/
     fi
     
     curl -o /usr/bin/XMPlus -Ls https://raw.githubusercontent.com/xcode75/XMPlus/master/XMPlus.sh
