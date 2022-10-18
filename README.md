@@ -1,5 +1,8 @@
 # XManagerPlus Backend
 
+#### 配置文件路径：/etc/XMPlus 配置文件
+
+
 |功能             | vmess | vless | trojan | ss   | ss-plugin|
 | ----------------| ----- | ----- | -------| -----|----------|
 | 获取节点信息     | √     |  √    |   √    |  √   |    √     |
@@ -18,7 +21,5 @@
 
 ### 一键脚本安装
 ```
-配置文件路径：/etc/XMPlus 配置文件详见：配置文件说明
-
 bash <(curl -Ls https://raw.githubusercontent.com/xcode75/XMPlus/setup/install.sh)
 ```
