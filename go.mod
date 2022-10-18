@@ -4,21 +4,21 @@ go 1.19
 
 require (
 	github.com/deckarep/golang-set v1.8.0
-	github.com/fsnotify/fsnotify v1.5.4
+	github.com/fsnotify/fsnotify v1.6.0
 	github.com/go-acme/lego/v4 v4.8.0
 	github.com/go-ole/go-ole v1.2.6 // indirect
 	github.com/go-resty/resty/v2 v2.7.0
 	github.com/golang/protobuf v1.5.2
 	github.com/imdario/mergo v0.3.13
 	github.com/juju/ratelimit v1.0.2
-	github.com/lucas-clemente/quic-go v0.29.2
-	github.com/marten-seemann/qtls-go1-16 v0.1.5
-	github.com/marten-seemann/qtls-go1-17 v0.1.2
-	github.com/marten-seemann/qtls-go1-18 v0.1.3
+	github.com/lucas-clemente/quic-go v0.29.2 // indirect
+	github.com/marten-seemann/qtls-go1-16 v0.1.5 // indirect
+	github.com/marten-seemann/qtls-go1-17 v0.1.2 // indirect
+	github.com/marten-seemann/qtls-go1-18 v0.1.3 // indirect
 	github.com/miekg/dns v1.1.50 // indirect
 	github.com/r3labs/diff/v2 v2.15.1
-	github.com/sagernet/sing v0.0.0-20220714145306-09b55ce4b6d0
-	github.com/sagernet/sing-shadowsocks v0.0.0-20220716012931-952ae62e05d7
+	github.com/sagernet/sing v0.0.0-20220801112236-1bb95f9661fc
+	github.com/sagernet/sing-shadowsocks v0.0.0-20220801112336-a91eacdd01e1
 	github.com/shirou/gopsutil/v3 v3.22.7
 	github.com/spf13/viper v1.12.0
 	github.com/stretchr/testify v1.8.0
@@ -33,9 +33,6 @@ require (
 
 require (
 	cloud.google.com/go/compute v1.6.1 // indirect
-	github.com/andybalholm/brotli v1.0.4 // indirect
-	github.com/marten-seemann/qtls-go1-19 v0.1.0 // indirect
-	github.com/lufia/plan9stats v0.0.0-20211012122336-39d0f177ccd0 // indirect
 	github.com/Azure/azure-sdk-for-go v62.0.0+incompatible // indirect
 	github.com/Azure/go-autorest v14.2.0+incompatible // indirect
 	github.com/Azure/go-autorest/autorest v0.11.24 // indirect
@@ -51,10 +48,10 @@ require (
 	github.com/akamai/AkamaiOPEN-edgegrid-golang v1.1.1 // indirect
 	github.com/aliyun/alibaba-cloud-sdk-go v1.61.1505 // indirect
 	github.com/andres-erbsen/clock v0.0.0-20160526145045-9e14626cd129 // indirect
+	github.com/andybalholm/brotli v1.0.4 // indirect
 	github.com/aws/aws-sdk-go v1.43.12 // indirect
 	github.com/boombuler/barcode v1.0.1 // indirect
 	github.com/cenkalti/backoff/v4 v4.1.2 // indirect
-	github.com/cheekybits/genny v1.0.0 // indirect
 	github.com/cloudflare/cloudflare-go v0.34.0 // indirect
 	github.com/cpu/goacmedns v0.1.1 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.1 // indirect
@@ -94,7 +91,9 @@ require (
 	github.com/liquidweb/go-lwApi v0.0.5 // indirect
 	github.com/liquidweb/liquidweb-cli v0.6.10 // indirect
 	github.com/liquidweb/liquidweb-go v1.6.3 // indirect
+	github.com/lufia/plan9stats v0.0.0-20211012122336-39d0f177ccd0 // indirect
 	github.com/magiconair/properties v1.8.6 // indirect
+	github.com/marten-seemann/qtls-go1-19 v0.1.1 // indirect
 	github.com/mattn/go-isatty v0.0.14 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
@@ -121,7 +120,7 @@ require (
 	github.com/power-devops/perfstat v0.0.0-20210106213030-5aafc221ea8c // indirect
 	github.com/pquerna/otp v1.3.0 // indirect
 	github.com/rainycape/memcache v0.0.0-20150622160815-1031fa0ce2f2 // indirect
-	github.com/refraction-networking/utls v1.1.5
+	github.com/refraction-networking/utls v1.1.5 // indirect
 	github.com/riobard/go-bloom v0.0.0-20200614022211-cdc8013cb5b3 // indirect
 	github.com/rogpeppe/go-internal v1.8.1 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
@@ -146,20 +145,19 @@ require (
 	github.com/vinyldns/go-vinyldns v0.9.16 // indirect
 	github.com/vmihailenco/msgpack v4.0.4+incompatible // indirect
 	github.com/vultr/govultr/v2 v2.16.0 // indirect
-	github.com/xtls/go v0.0.0-20220914232946-0441cf4cf837
+	github.com/xtls/go v0.0.0-20220914232946-0441cf4cf837 // indirect
 	github.com/yusufpapurcu/wmi v1.2.2 // indirect
 	go.opencensus.io v0.23.0 // indirect
-	go.starlark.net v0.0.0-20220817180228-f738f5508c12
+	go.starlark.net v0.0.0-20220817180228-f738f5508c12 // indirect
 	go.uber.org/ratelimit v0.2.0 // indirect
-	golang.org/x/crypto v0.0.0-20220829220503-c86fa9a7ed90
+	golang.org/x/crypto v0.0.0-20220829220503-c86fa9a7ed90 // indirect
 	golang.org/x/exp v0.0.0-20220916125017-b168a2c6b86b // indirect
-	golang.org/x/mod v0.6.0-dev.0.20220106191415-9b9b3d81d5e3 // indirect
+	golang.org/x/mod v0.6.0-dev.0.20220419223038-86c51ed26bb4 // indirect
 	golang.org/x/oauth2 v0.0.0-20220411215720-9780585627b5 // indirect
-	golang.org/x/sys v0.0.0-20220915200043-7b5979e65e41
+	golang.org/x/sys v0.0.0-20220915200043-7b5979e65e41 // indirect
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/time v0.0.0-20220224211638-0e9765cccd65 // indirect
-	golang.org/x/tools v0.1.11-0.20220325154526-54af36eca237 // indirect
-	golang.org/x/xerrors v0.0.0-20220517211312-f3a8303e98df // indirect
+	golang.org/x/tools v0.1.12 // indirect
 	google.golang.org/api v0.81.0 // indirect
 	google.golang.org/genproto v0.0.0-20220916172020-2692e8806bfa // indirect
 	gopkg.in/ini.v1 v1.66.4 // indirect
@@ -171,11 +169,7 @@ require (
 )
 
 require (
-	github.com/sagernet/sing v0.0.0-20220801112236-1bb95f9661fc
-	github.com/sagernet/sing-shadowsocks v0.0.0-20220801112336-a91eacdd01e1
-)
-
-require (
+	github.com/golang/mock v1.6.0 // indirect
 	github.com/klauspost/compress v1.15.10 // indirect
 	github.com/klauspost/cpuid/v2 v2.1.1 // indirect
 	github.com/mimuret/golang-iij-dpf v0.7.1 // indirect
