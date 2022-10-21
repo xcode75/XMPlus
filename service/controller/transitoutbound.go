@@ -202,7 +202,7 @@ func TransitBuilder(config *Config, nodeInfo api.TransitNodeInfo ,tag string, UU
 		kcpSettings := &conf.KCPConfig{
 			Seed:          nodeInfo.Seed,
 			HeaderConfig:  headers,
-			Congestion:    nodeInfo.Congestion
+			Congestion:    nodeInfo.Congestion,
 		}
 		streamSetting.KCPSettings = kcpSettings
 	}else if networkType == "quic" {
@@ -216,7 +216,7 @@ func TransitBuilder(config *Config, nodeInfo api.TransitNodeInfo ,tag string, UU
 		quicSettings := &conf.QUICConfig{
 			Security:  nodeInfo.Quic_security,
 			Header:    headers,
-			Key:       nodeInfo.Quic_key
+			Key:       nodeInfo.Quic_key,
 		}
 		streamSetting.QUICSettings = quicSettings
 	}

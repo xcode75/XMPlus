@@ -21,6 +21,7 @@ type NodeInfoResponse struct {
 	Sniffing        bool    `json:"sniffing"`
 	ServiceName     string  `json:"servicename"`
 	Fingerprint     string `json:"tlsfingerprint"`
+	RejectUnknownSNI  bool    `json:"rejectunknownsni"`
 	Seed            string    `json:"kcp_seed"`
 	Congestion      bool    `json:"congestion"`
 	Quic_security   string    `json:"quic_security"`

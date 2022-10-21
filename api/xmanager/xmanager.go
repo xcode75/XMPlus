@@ -312,9 +312,6 @@ func (c *APIClient) ParseNodeResponse(nodeInfoResponse *NodeInfoResponse) (*api.
 	HeaderType := "none"
 	ServiceName := ""
 	Method := ""
-	//Seed:= ""
-	//Quic_security:= ""
-	//Quic_key:= ""
 	
 	Type = nodeInfoResponse.Type
 	
@@ -480,9 +477,7 @@ func (c *APIClient) ParseTransitNodeResponse(nodeInfoResponse *[]TransitNodeInfo
 		HeaderType := "none"
 		ServiceName := ""
 		Flow := "none"
-		//Seed:= ""
-		//Quic_security:= ""
-		//Quic_key:= ""
+		Method := ""
 		
 		Type = nodeInfo.Type
 		

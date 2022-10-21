@@ -173,7 +173,7 @@ func InboundBuilder(config *Config, nodeInfo *api.NodeInfo, tag string) (*core.I
 		kcpSettings := &conf.KCPConfig{
 			Seed:          nodeInfo.Seed,
 			HeaderConfig:  headers,
-			Congestion:    nodeInfo.Congestion
+			Congestion:    nodeInfo.Congestion,
 		}
 		streamSetting.KCPSettings = kcpSettings
 	}else if networkType == "quic" {
@@ -187,7 +187,7 @@ func InboundBuilder(config *Config, nodeInfo *api.NodeInfo, tag string) (*core.I
 		quicSettings := &conf.QUICConfig{
 			Security:  nodeInfo.Quic_security,
 			Header:    headers,
-			Key:       nodeInfo.Quic_key
+			Key:       nodeInfo.Quic_key,
 		}
 		streamSetting.QUICSettings = quicSettings
 	}
