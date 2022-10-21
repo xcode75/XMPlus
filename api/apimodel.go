@@ -46,7 +46,6 @@ type NodeInfo struct {
 	Fingerprint       string
 	RejectUnknownSNI  bool
 	Seed              string    
-	Congestion        bool    
 	Quic_security     string    
 	Quic_key          string  
 }
@@ -73,8 +72,7 @@ type TransitNodeInfo struct {
 	Flow              string
 	Fingerprint       string
 	RejectUnknownSNI  bool
-	Seed              string    
-	Congestion        bool    
+	Seed              string   
 	Quic_security     string    
 	Quic_key          string  
 }
