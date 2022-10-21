@@ -312,6 +312,9 @@ func (c *APIClient) ParseNodeResponse(nodeInfoResponse *NodeInfoResponse) (*api.
 	HeaderType := "none"
 	ServiceName := ""
 	Method := ""
+	//Seed:= ""
+	//Quic_security:= ""
+	//Quic_key:= ""
 	
 	Type = nodeInfoResponse.Type
 	
@@ -380,6 +383,10 @@ func (c *APIClient) ParseNodeResponse(nodeInfoResponse *NodeInfoResponse) (*api.
 		Sniffing:          nodeInfoResponse.Sniffing,
 		RejectUnknownSNI:  nodeInfoResponse.RejectUnknownSNI,
 		Fingerprint:       nodeInfoResponse.Fingerprint,
+		Congestion:        nodeInfoResponse.Congestion,
+		Seed:              nodeInfoResponse.Seed,
+		Quic_security:     nodeInfoResponse.Quic_security,
+		Quic_key:          nodeInfoResponse.Quic_key,
 	}
 
 	return nodeinfo, nil
@@ -473,7 +480,9 @@ func (c *APIClient) ParseTransitNodeResponse(nodeInfoResponse *[]TransitNodeInfo
 		HeaderType := "none"
 		ServiceName := ""
 		Flow := "none"
-		Method := ""
+		//Seed:= ""
+		//Quic_security:= ""
+		//Quic_key:= ""
 		
 		Type = nodeInfo.Type
 		
@@ -539,6 +548,10 @@ func (c *APIClient) ParseTransitNodeResponse(nodeInfoResponse *[]TransitNodeInfo
 			Flow:              Flow,
 		    RejectUnknownSNI:  nodeInfo.RejectUnknownSNI,
 		    Fingerprint:       nodeInfo.Fingerprint,
+			Congestion:        nodeInfo.Congestion,
+			Seed:              nodeInfo.Seed,
+			Quic_security:     nodeInfo.Quic_security,
+			Quic_key:          nodeInfo.Quic_key,
 		})
 	}
 	

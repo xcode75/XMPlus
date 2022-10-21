@@ -20,8 +20,11 @@ type NodeInfoResponse struct {
 	ProxyProtocol   bool    `json:"proxyprotocol"`
 	Sniffing        bool    `json:"sniffing"`
 	ServiceName     string  `json:"servicename"`
-	Fingerprint       string `json:"tlsfingerprint"`
-	RejectUnknownSNI  bool    `json:"rejectunknownsni"`
+	Fingerprint     string `json:"tlsfingerprint"`
+	Seed            string    `json:"kcp_seed"`
+	Congestion      bool    `json:"congestion"`
+	Quic_security   string    `json:"quic_security"`
+	Quic_key        string    `json:"quic_key"`
 }
 
 type TransitNodeInfoResponse struct {
@@ -42,8 +45,12 @@ type TransitNodeInfoResponse struct {
 	Sniffing        bool    `json:"sniffing"`
 	ServiceName     string  `json:"servicename"`
 	Flow            string  `json:"flow"`
-	Fingerprint       string `json:"tlsfingerprint"`
+	Fingerprint     string `json:"tlsfingerprint"`
 	RejectUnknownSNI  bool    `json:"rejectunknownsni"`
+	Seed            string    `json:"kcp_seed"`
+	Congestion      bool    `json:"congestion"`
+	Quic_security   string    `json:"quic_security"`
+	Quic_key        string    `json:"quic_key"`
 }
 
 // UserResponse is the response of user
