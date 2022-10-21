@@ -200,9 +200,9 @@ func TransitBuilder(config *Config, nodeInfo api.TransitNodeInfo ,tag string, UU
 			return nil, fmt.Errorf("Marshal Header Type %s into config fialed: %s", header, err)
 		}
 		kcpSettings := &conf.KCPConfig{
-			Seed:          nodeInfo.Seed,
-			HeaderConfig:  headers,
-			Congestion:    nodeInfo.Congestion,
+			Seed:          &nodeInfo.Seed,
+			HeaderConfig:  header,
+			Congestion:    &nodeInfo.Congestion,
 		}
 		streamSetting.KCPSettings = kcpSettings
 	}else if networkType == "quic" {
@@ -215,7 +215,7 @@ func TransitBuilder(config *Config, nodeInfo api.TransitNodeInfo ,tag string, UU
 		}
 		quicSettings := &conf.QUICConfig{
 			Security:  nodeInfo.Quic_security,
-			Header:    headers,
+			Header:    header,
 			Key:       nodeInfo.Quic_key,
 		}
 		streamSetting.QUICSettings = quicSettings

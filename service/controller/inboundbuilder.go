@@ -171,9 +171,9 @@ func InboundBuilder(config *Config, nodeInfo *api.NodeInfo, tag string) (*core.I
 			return nil, fmt.Errorf("Marshal Header Type %s into config fialed: %s", header, err)
 		}
 		kcpSettings := &conf.KCPConfig{
-			Seed:          nodeInfo.Seed,
-			HeaderConfig:  headers,
-			Congestion:    nodeInfo.Congestion,
+			Seed:          &nodeInfo.Seed,
+			HeaderConfig:  header,
+			Congestion:    &nodeInfo.Congestion,
 		}
 		streamSetting.KCPSettings = kcpSettings
 	}else if networkType == "quic" {
@@ -186,7 +186,7 @@ func InboundBuilder(config *Config, nodeInfo *api.NodeInfo, tag string) (*core.I
 		}
 		quicSettings := &conf.QUICConfig{
 			Security:  nodeInfo.Quic_security,
-			Header:    headers,
+			Header:    header,
 			Key:       nodeInfo.Quic_key,
 		}
 		streamSetting.QUICSettings = quicSettings
