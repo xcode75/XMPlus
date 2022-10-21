@@ -22,7 +22,6 @@ type NodeInfoResponse struct {
 	ServiceName     string  `json:"servicename"`
 	Fingerprint     string `json:"tlsfingerprint"`
 	RejectUnknownSNI  bool    `json:"rejectunknownsni"`
-	Seed            string    `json:"kcp_seed"`
 	Quic_security   string    `json:"quic_security"`
 	Quic_key        string    `json:"quic_key"`
 }
@@ -47,7 +46,6 @@ type TransitNodeInfoResponse struct {
 	Flow            string  `json:"flow"`
 	Fingerprint     string `json:"tlsfingerprint"`
 	RejectUnknownSNI  bool    `json:"rejectunknownsni"`
-	Seed            string    `json:"kcp_seed"`
 	Quic_security   string    `json:"quic_security"`
 	Quic_key        string    `json:"quic_key"`
 }

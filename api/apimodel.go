@@ -44,8 +44,7 @@ type NodeInfo struct {
 	Sniffing          bool
 	Address           string
 	Fingerprint       string
-	RejectUnknownSNI  bool
-	Seed              string    
+	RejectUnknownSNI  bool   
 	Quic_security     string    
 	Quic_key          string  
 }
@@ -71,8 +70,7 @@ type TransitNodeInfo struct {
 	Sniffing          bool
 	Flow              string
 	Fingerprint       string
-	RejectUnknownSNI  bool
-	Seed              string   
+	RejectUnknownSNI  bool   
 	Quic_security     string    
 	Quic_key          string  
 }
