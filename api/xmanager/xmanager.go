@@ -380,7 +380,6 @@ func (c *APIClient) ParseNodeResponse(nodeInfoResponse *NodeInfoResponse) (*api.
 		Sniffing:          nodeInfoResponse.Sniffing,
 		RejectUnknownSNI:  nodeInfoResponse.RejectUnknownSNI,
 		Fingerprint:       nodeInfoResponse.Fingerprint,
-		Seed:              nodeInfoResponse.Seed,
 		Quic_security:     nodeInfoResponse.Quic_security,
 		Quic_key:          nodeInfoResponse.Quic_key,
 	}
@@ -542,7 +541,6 @@ func (c *APIClient) ParseTransitNodeResponse(nodeInfoResponse *[]TransitNodeInfo
 			Flow:              Flow,
 		    RejectUnknownSNI:  nodeInfo.RejectUnknownSNI,
 		    Fingerprint:       nodeInfo.Fingerprint,
-			Seed:              nodeInfo.Seed,
 			Quic_security:     nodeInfo.Quic_security,
 			Quic_key:          nodeInfo.Quic_key,
 		})
