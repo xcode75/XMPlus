@@ -4,7 +4,7 @@ go 1.19
 
 require (
 	github.com/deckarep/golang-set v1.8.0
-	github.com/golang/mock v1.6.0 // indirect
+	github.com/golang/mock v1.6.0
 	github.com/fsnotify/fsnotify v1.6.0
 	github.com/go-acme/lego/v4 v4.8.0
 	github.com/go-ole/go-ole v1.2.6 // indirect
