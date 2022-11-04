@@ -4,6 +4,7 @@ go 1.19
 
 require (
 	github.com/deckarep/golang-set v1.8.0
+	github.com/golang/mock v1.6.0 // indirect
 	github.com/fsnotify/fsnotify v1.6.0
 	github.com/go-acme/lego/v4 v4.8.0
 	github.com/go-ole/go-ole v1.2.6 // indirect
@@ -171,7 +172,6 @@ require (
 
 require (
 	github.com/civo/civogo v0.3.11 // indirect
-	github.com/golang/mock v1.6.0 // indirect
 	github.com/googleapis/enterprise-certificate-proxy v0.0.0-20220520183353-fd19c99a87aa // indirect
 	github.com/hashicorp/errwrap v1.0.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
