@@ -106,7 +106,7 @@ func TransitBuilder(config *Config, nodeInfo *api.TransitNodeInfo , tag string, 
 						Address:  nodeInfo.Address,
 						Port:     uint16(nodeInfo.Port),
 						Password: UUID,
-						Email:    fmt.Sprintf("%s_%s|%s", tag, Email, UID),
+						Email:    fmt.Sprintf("%s_%s|%s", tag, Email, UUID),
 						Level:    0,
 						Flow:    nodeInfo.Flow,
 					},
@@ -120,7 +120,7 @@ func TransitBuilder(config *Config, nodeInfo *api.TransitNodeInfo , tag string, 
 						Address: nodeInfo.Address,
 						Port:     uint16(nodeInfo.Port),
 						Password: UUID,
-						Email:    fmt.Sprintf("%s_%s|%s", tag, Email, UID),
+						Email:    fmt.Sprintf("%s_%s|%s", tag, Email, UUID),
 						Level:    0,
 					},
 				},
@@ -135,7 +135,7 @@ func TransitBuilder(config *Config, nodeInfo *api.TransitNodeInfo , tag string, 
 					Address: nodeInfo.Address,
 					Port:     uint16(nodeInfo.Port),
 					Password: Passwd,
-					Email:    fmt.Sprintf("%s_%s|%s", tag, Email, UID),
+					Email:    fmt.Sprintf("%s_%s|%s", tag, Email, UUID),
 					Level:    0,
 					Cipher:   nodeInfo.CypherMethod,
 				},
@@ -245,12 +245,12 @@ func buildRVmessUser(tag string, UUID string, Email string, serverAlterID uint16
 	}
 	return &protocol.User{
 		Level:   0,
-		Email:   fmt.Sprintf("%s_%s|%s", tag,Email, UID), 
+		Email:   fmt.Sprintf("%s_%s|%s", tag,Email, UUID), 
 		Account: serial.ToTypedMessage(vmessAccount.Build()),
 	}
 }
 
-func buildRVlessUser(tag string, nodeInfo api.TransitNodeInfo , UUID string, Email string)  *protocol.User {
+func buildRVlessUser(tag string, nodeInfo *api.TransitNodeInfo , UUID string, Email string)  *protocol.User {
 	var xtlsFlow string
 	if nodeInfo.TLSType == "xtls" {
 		xtlsFlow = nodeInfo.Flow
@@ -262,7 +262,7 @@ func buildRVlessUser(tag string, nodeInfo api.TransitNodeInfo , UUID string, Ema
 	}
 	return &protocol.User{
 		Level:   0,
-		Email:   fmt.Sprintf("%s_%s|%s", tag, Email, UID),
+		Email:   fmt.Sprintf("%s_%s|%s", tag, Email, UUID),
 		Account: serial.ToTypedMessage(vlessAccount),
 	}
 }

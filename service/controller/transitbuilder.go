@@ -24,6 +24,7 @@ import (
 	"github.com/sagernet/sing-shadowsocks/shadowaead_2022"
 	C "github.com/sagernet/sing/common"
 	"github.com/xcode75/XMCore/proxy/shadowsocks_2022"
+	"github.com/xcode75/XMCore/common/uuid"
 )
 
 type Address struct {
@@ -116,7 +117,8 @@ func (c *VMessOutboundConfig) Build() (proto.Message, error) {
 				return nil, newError("invalid VMess user").Base(err)
 			}
 
-			u := account.ID
+			userid := strings.Split(user.Email, "|")
+			u, err := uuid.ParseString(userid[1])
 			if err != nil {
 				return nil, err
 			}
@@ -171,7 +173,8 @@ func (c *VLessOutboundConfig) Build() (proto.Message, error) {
 				return nil, newError(`VLESS users: invalid user`).Base(err)
 			}
 
-			u := account.Id
+			userid := strings.Split(user.Email, "|")
+			u, err := uuid.ParseString(userid[1])
 			if err != nil {
 				return nil, err
 			}
