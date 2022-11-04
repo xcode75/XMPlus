@@ -229,8 +229,8 @@ func (c *Controller) nodeInfoMonitor() (err error) {
 			log.Print(err)
 			return nil
 		}
-		c.TransitTag = c.buildRTag()	
 		c.transitnodeInfo = newTransitNodeInfo
+		c.TransitTag = c.buildRTag()
 		err = c.Transit(c.transitnodeInfo, newUserInfo)
 		if err != nil {
 			log.Panic(err)
