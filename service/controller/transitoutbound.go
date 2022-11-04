@@ -46,7 +46,7 @@ type ShadowsocksServer struct {
 }
 
 
-func TransitBuilder(config *Config, nodeInfo api.TransitNodeInfo ,tag string, UUID string, Email string, Passwd string, counter int,totalservers int) (*core.OutboundHandlerConfig, error) {
+func TransitBuilder(config *Config, nodeInfo *api.TransitNodeInfo , tag string, UUID string, Email string, Passwd string, UID int) (*core.OutboundHandlerConfig, error) {
 	outboundDetourConfig := &OutboundDetourConfig{}
 	var (
 		protocol      string
@@ -106,7 +106,7 @@ func TransitBuilder(config *Config, nodeInfo api.TransitNodeInfo ,tag string, UU
 						Address:  nodeInfo.Address,
 						Port:     uint16(nodeInfo.Port),
 						Password: UUID,
-						Email:    fmt.Sprintf("%s_%s|%s", tag, Email, UUID),
+						Email:    fmt.Sprintf("%s_%s|%s", tag, Email, UID),
 						Level:    0,
 						Flow:    nodeInfo.Flow,
 					},
@@ -120,7 +120,7 @@ func TransitBuilder(config *Config, nodeInfo api.TransitNodeInfo ,tag string, UU
 						Address: nodeInfo.Address,
 						Port:     uint16(nodeInfo.Port),
 						Password: UUID,
-						Email:    fmt.Sprintf("%s_%s|%s", tag, Email, UUID),
+						Email:    fmt.Sprintf("%s_%s|%s", tag, Email, UID),
 						Level:    0,
 					},
 				},
@@ -135,7 +135,7 @@ func TransitBuilder(config *Config, nodeInfo api.TransitNodeInfo ,tag string, UU
 					Address: nodeInfo.Address,
 					Port:     uint16(nodeInfo.Port),
 					Password: Passwd,
-					Email:    fmt.Sprintf("%s_%s|%s", tag, Email, UUID),
+					Email:    fmt.Sprintf("%s_%s|%s", tag, Email, UID),
 					Level:    0,
 					Cipher:   nodeInfo.CypherMethod,
 				},
@@ -223,7 +223,7 @@ func TransitBuilder(config *Config, nodeInfo api.TransitNodeInfo ,tag string, UU
 		}
 	}
 	
-	outboundDetourConfig.Tag = tag
+	outboundDetourConfig.Tag = fmt.Sprintf("Relay_%s|%d", tag,UID)
 	
 	if config.SendIP != "" {
 		ipAddress := net.ParseAddress(config.SendIP)
@@ -232,14 +232,6 @@ func TransitBuilder(config *Config, nodeInfo api.TransitNodeInfo ,tag string, UU
 	outboundDetourConfig.Protocol = protocol
 	outboundDetourConfig.StreamSetting = streamSetting
 	outboundDetourConfig.Settings = &setting
-	
-	if(counter < totalservers){
-		ct := counter + 1
-		proxySettings := &conf.ProxyConfig{
-			Tag: fmt.Sprintf("%s_%d", tag, ct),
-		}
-		outboundDetourConfig.ProxySettings = proxySettings
-	}
 	
 	return outboundDetourConfig.Build()
 }
@@ -253,7 +245,7 @@ func buildRVmessUser(tag string, UUID string, Email string, serverAlterID uint16
 	}
 	return &protocol.User{
 		Level:   0,
-		Email:   fmt.Sprintf("%s_%s|%s", tag,Email, UUID), 
+		Email:   fmt.Sprintf("%s_%s|%s", tag,Email, UID), 
 		Account: serial.ToTypedMessage(vmessAccount.Build()),
 	}
 }
@@ -270,7 +262,7 @@ func buildRVlessUser(tag string, nodeInfo api.TransitNodeInfo , UUID string, Ema
 	}
 	return &protocol.User{
 		Level:   0,
-		Email:   fmt.Sprintf("%s_%s|%s", tag, Email, UUID),
+		Email:   fmt.Sprintf("%s_%s|%s", tag, Email, UID),
 		Account: serial.ToTypedMessage(vlessAccount),
 	}
 }

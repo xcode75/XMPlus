@@ -25,7 +25,7 @@ type Controller struct {
 	clientInfo              api.ClientInfo
 	apiClient               api.API
 	nodeInfo                *api.NodeInfo
-	transitnodeInfo         *[]api.TransitNodeInfo
+	transitnodeInfo         *api.TransitNodeInfo
 	Tag                     string
 	TransitTag              string
 	Rtag                    bool
@@ -84,7 +84,7 @@ func (c *Controller) Start() error {
 			return nil
 		}	
 		c.transitnodeInfo = newTransitNodeInfo
-		
+		c.TransitTag = c.buildRTag()
 		err = c.Transit(newTransitNodeInfo, userInfo)
 		if err != nil {
 				log.Panic(err)
@@ -211,10 +211,10 @@ func (c *Controller) nodeInfoMonitor() (err error) {
 		}
 	}
 	
-	// Add new Transit tag
+	// Remove Transit tag
 	
 	if c.Rtag == true {
-		err := c.removeTransitTag(c.transitnodeInfo, newUserInfo)
+		err := c.removeTransitTag(c.TransitTag, newUserInfo)
 		if err != nil {
 			return err
 		}
@@ -222,13 +222,14 @@ func (c *Controller) nodeInfoMonitor() (err error) {
 		
 	c.Rtag = false
 	
+	// Add new Transit tag
 	if c.nodeInfo.RelayNodeID > 0 {
 		newTransitNodeInfo, err := c.apiClient.GetTransitNodeInfo()
 		if err != nil {
 			log.Print(err)
 			return nil
 		}
-			
+		c.TransitTag = c.buildRTag()	
 		c.transitnodeInfo = newTransitNodeInfo
 		err = c.Transit(c.transitnodeInfo, newUserInfo)
 		if err != nil {
@@ -315,21 +316,11 @@ func (c *Controller) removeOldTag(oldtag string) (err error) {
 	return nil
 }
 
-func (c *Controller) removeTransitTag(newTransitNodeInfo *[]api.TransitNodeInfo, userInfo *[]api.UserInfo) (err error) {
+func (c *Controller) removeTransitTag(tag string, userInfo *[]api.UserInfo) (err error) {
 	for _, user := range *userInfo {
-		count := 0
-		for _, TransitNodeInfo := range *newTransitNodeInfo {
-			count++
-			if count == 1 {
-				c.TransitTag =  fmt.Sprintf("Relay_%d_%s_%d_%d_%d", c.nodeInfo.NodeID, TransitNodeInfo.NodeType, TransitNodeInfo.Port, TransitNodeInfo.NodeID, user.UID)	
-			} else {
-				c.TransitTag = fmt.Sprintf("%s_%d", c.TransitTag, count)
-			}
-		
-			err = c.removeOutbound(c.TransitTag)
-			if err != nil {
-				return err
-			}
+		err = c.removeOutbound(fmt.Sprintf("Relay_%s|%d", tag,user.UID))
+		if err != nil {
+			return err
 		}
 	}
 	return nil
@@ -369,20 +360,10 @@ func (c *Controller) addNewTag(newNodeInfo *api.NodeInfo) (err error) {
 	return nil
 }
 
-func (c *Controller) Transit(newTransitNodeInfo *[]api.TransitNodeInfo, userInfo *[]api.UserInfo) (err error) {
-	totalservers := len(*newTransitNodeInfo)
-	for _, user := range *userInfo {
-		counter := 0
-		for _, TransitNodeInfo := range *newTransitNodeInfo {
-			counter ++
-			
-			if counter == 1 {
-				c.TransitTag =  fmt.Sprintf("Relay_%d_%s_%d_%d_%d", c.nodeInfo.NodeID, TransitNodeInfo.NodeType, TransitNodeInfo.Port, TransitNodeInfo.NodeID, user.UID)	
-			} else {
-				c.TransitTag = fmt.Sprintf("%s_%d", c.TransitTag, counter)
-			}
-			
-			TransitConfig, err := TransitBuilder(c.config, TransitNodeInfo, c.TransitTag, user.UUID, user.Email, user.Passwd, counter, totalservers)
+func (c *Controller) Transit(newTransitNodeInfo *api.TransitNodeInfo, userInfo *[]api.UserInfo) (err error) {
+	if newTransitNodeInfo.NodeType != "Shadowsocks-Plugin" {
+		for _, user := range *userInfo {			
+			TransitConfig, err := TransitBuilder(c.config, newTransitNodeInfo, c.TransitTag, user.UUID, user.Email, user.Passwd, user.UID)
 			if err != nil {
 				return err
 			}
@@ -391,10 +372,7 @@ func (c *Controller) Transit(newTransitNodeInfo *[]api.TransitNodeInfo, userInfo
 			if err != nil {
 				return err
 			}
-			
-			if counter == 1 {
-				c.AddUserRoutingRule(c.TransitTag, []string{fmt.Sprintf("%s|%s|%d", c.Tag, user.Email, user.UID)})	
-			}	
+			c.AddUserRoutingRule(c.TransitTag, []string{fmt.Sprintf("%s|%s|%d", c.Tag, user.Email, user.UID)})		
 		}
 	}
 	return nil
@@ -600,3 +578,6 @@ func (c *Controller) buildTag() string {
 	return fmt.Sprintf("%s|%d|%d", c.nodeInfo.NodeType, c.nodeInfo.Port, c.nodeInfo.NodeID)
 }
 
+-func (c *Controller) buildRTag() string {
+	return fmt.Sprintf("%d_%s_%d_%d", c.nodeInfo.NodeID, c.transitnodeInfo.NodeType, c.transitnodeInfo.Port, c.transitnodeInfo.NodeID)
+}

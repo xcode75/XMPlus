@@ -11,7 +11,6 @@ import (
 	"github.com/xcode75/XMCore/common/net"
 	"github.com/xcode75/XMCore/common/protocol"
 	"github.com/xcode75/XMCore/common/serial"
-	"github.com/xcode75/XMCore/common/uuid"
 	"github.com/xcode75/XMCore/proxy/vmess"
 	"github.com/xcode75/XMCore/proxy/vmess/outbound"
 	"github.com/xcode75/XMCore/proxy/vless"
@@ -117,8 +116,7 @@ func (c *VMessOutboundConfig) Build() (proto.Message, error) {
 				return nil, newError("invalid VMess user").Base(err)
 			}
 
-			userid := strings.Split(user.Email, "|")
-			u, err := uuid.ParseString(userid[1])
+			u := account.ID
 			if err != nil {
 				return nil, err
 			}
@@ -173,16 +171,15 @@ func (c *VLessOutboundConfig) Build() (proto.Message, error) {
 				return nil, newError(`VLESS users: invalid user`).Base(err)
 			}
 
-			userid := strings.Split(user.Email, "|")
-			u, err := uuid.ParseString(userid[1])
+			u := account.Id
 			if err != nil {
 				return nil, err
 			}
 			account.Id = u.String()
 
 			switch account.Flow {
-			case "", "xtls-rprx-origin", "xtls-rprx-origin-udp443", "xtls-rprx-direct", "xtls-rprx-direct-udp443":
-			case "xtls-rprx-splice", "xtls-rprx-splice-udp443":
+			case "", vless.XRO, vless.XRO + "-udp443", vless.XRD, vless.XRD + "-udp443", vless.XRV, vless.XRV + "-udp443":
+			case vless.XRS, vless.XRS + "-udp443":
 				if runtime.GOOS != "linux" && runtime.GOOS != "android" {
 					return nil, newError(`VLESS users: "` + account.Flow + `" only support linux in this version`)
 				}

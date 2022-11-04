@@ -430,7 +430,7 @@ func (c *APIClient) ParseUserListResponse(userInfoResponse *[]UserResponse) (*[]
 
 
 // GetNodeInfo will pull GetTransitNodeInfo Config from xmanager
-func (c *APIClient) GetTransitNodeInfo() (transitnodeinfo *[]api.TransitNodeInfo, err error) {
+func (c *APIClient) GetTransitNodeInfo() (transitnodeinfo *api.TransitNodeInfo, err error) {
 	path := fmt.Sprintf("/api/v1/query/server/transit/%d", c.NodeID)
 	res, err := c.client.R().
 		SetResult(&Response{}).
@@ -442,7 +442,7 @@ func (c *APIClient) GetTransitNodeInfo() (transitnodeinfo *[]api.TransitNodeInfo
 		return nil, err
 	}
 
-	nodeResponse := new([]TransitNodeInfoResponse)
+	nodeResponse := new(TransitNodeInfoResponse)
 
 	if err := json.Unmarshal(response.Data, nodeResponse); err != nil {
 		return nil, fmt.Errorf("Unmarshal %s failed: %s", reflect.TypeOf(nodeResponse), err)
@@ -460,91 +460,91 @@ func (c *APIClient) GetTransitNodeInfo() (transitnodeinfo *[]api.TransitNodeInfo
 
 
 
-func (c *APIClient) ParseTransitNodeResponse(nodeInfoResponse *[]TransitNodeInfoResponse) (*[]api.TransitNodeInfo, error) {
+func (c *APIClient) ParseTransitNodeResponse(nodeInfoResponse *TransitNodeInfoResponse) (*api.TransitNodeInfo, error) {
+	var enableTLS  bool
+	var speedlimit uint64 = 0
+	var Type string
+	var AlterID uint16 = 0
 	
-	transitnodeinfo := []api.TransitNodeInfo{}
+	port := nodeInfoResponse.Port
+	Host := ""
+	Path := ""
+	HeaderType := "none"
+	ServiceName := ""
+	Method := ""
+	Flow := "none"
 	
-	for _, nodeInfo := range *nodeInfoResponse {
-		var  enableTLS  bool
-		var  speedlimit uint64 = 0
-		var Type string 
-
-		port := nodeInfo.Port
-		Host := ""
-		Path := ""
-		HeaderType := "none"
-		ServiceName := ""
-		Flow := "none"
-		Method := ""
-		
-		Type = nodeInfo.Type
-		
-		if nodeInfo.Security == "xtls" || nodeInfo.Security == "tls"{
-			enableTLS = true
-		}
-		
-		if nodeInfo.Protocol == "grpc" {
-			ServiceName = nodeInfo.ServiceName
-			Flow = nodeInfo.Flow
-		}
-
-		if nodeInfo.Protocol == "tcp" {
-			HeaderType = nodeInfo.Headertype
-		}
-		
-		if HeaderType == "http" {
-			Host = nodeInfo.Host
-		}
-		
-		if HeaderType == "" {
-			HeaderType = "none"
-		}
-		
-		if nodeInfo.Protocol == "ws" || nodeInfo.Protocol == "h2" {
-			Path = nodeInfo.Path
-			Host = nodeInfo.Host
-		}	
-
-		if Type == "Shadowsocks"  {
-			Method = nodeInfo.Method
-		}
-		
-		if Type == "Shadowsocks" && (nodeInfo.Protocol == "ws" || nodeInfo.Protocol == "grpc" || nodeInfo.Protocol == "quic" ) {
-			port = port - 1
-			if port <= 0 {
-				return nil, fmt.Errorf("Shadowsocks-Plugin listen port must be greater than 1")
-			}
-			Type = "Shadowsocks-Plugin"
-		}
-		
-		speedlimit = uint64((nodeInfo.SpeedLimit * 1000000) / 8)
-		
-		transitnodeinfo = append(transitnodeinfo, api.TransitNodeInfo{
-			NodeType:          Type,
-			NodeID:            nodeInfo.NodeID,
-			Port:              port,
-			SpeedLimit:        speedlimit,
-			AlterID:           0,
-			TransportProtocol: nodeInfo.Protocol,
-			EnableTLS:         enableTLS,
-			TLSType:           nodeInfo.Security,
-			Path:              Path,
-			Host:              Host,
-			ServiceName:       ServiceName,
-			HeaderType:        HeaderType,
-			CypherMethod:      Method,
-			AllowInsecure:     nodeInfo.AllowInsecure,
-			Address:           nodeInfo.Address,
-			ListenIP:          nodeInfo.ListenIP,
-			ProxyProtocol:     nodeInfo.ProxyProtocol,
-			Sniffing:          nodeInfo.Sniffing,
-			Flow:              Flow,
-		    RejectUnknownSNI:  nodeInfo.RejectUnknownSNI,
-		    Fingerprint:       nodeInfo.Fingerprint,
-			Quic_security:     nodeInfo.Quic_security,
-			Quic_key:          nodeInfo.Quic_key,
-		})
+	Type = nodeInfoResponse.Type
+	
+	if nodeInfoResponse.Address == "" {
+		return nil, fmt.Errorf("No server address in response")
 	}
 	
-	return &transitnodeinfo, nil	
+	if nodeInfoResponse.Security == "xtls" || nodeInfoResponse.Security == "tls"{
+		enableTLS = true
+	}
+	
+	if nodeInfoResponse.Protocol == "grpc" {
+		ServiceName = nodeInfoResponse.ServiceName
+		Flow = "xtls-rprx-direct"
+	}
+
+	if nodeInfoResponse.Protocol == "tcp" {
+		HeaderType = nodeInfoResponse.Headertype
+	}
+	
+	if HeaderType == "http" {
+		Host = nodeInfoResponse.Host
+	}
+	
+	if HeaderType == "" {
+		HeaderType = "none"
+	}
+	
+	if nodeInfoResponse.Protocol == "ws" || nodeInfoResponse.Protocol == "h2" {
+		Path = nodeInfoResponse.Path
+		Host = nodeInfoResponse.Host
+	}	
+
+	if nodeInfoResponse.Type == "Shadowsocks" {
+		Method = nodeInfoResponse.Method
+	}
+	
+	if nodeInfoResponse.Type == "Shadowsocks"  && (nodeInfoResponse.Protocol == "ws" || nodeInfoResponse.Protocol == "quic" || nodeInfoResponse.Protocol == "grpc") {
+		port = port - 1
+		if port <= 0 {
+			return nil, fmt.Errorf("Shadowsocks-Plugin listen port must be greater than 1")
+		}
+		Type = "Shadowsocks-Plugin"
+	}
+	
+	speedlimit = uint64((nodeInfoResponse.SpeedLimit * 1000000) / 8)
+
+	nodeinfo := &api.TransitNodeInfo{
+		NodeType:          Type,
+		NodeID:            c.NodeID,
+		Port:              port,
+		SpeedLimit:        speedlimit,
+		AlterID:           AlterID,
+		TransportProtocol: nodeInfoResponse.Protocol,
+		EnableTLS:         enableTLS,
+		TLSType:           nodeInfoResponse.Security,
+		Path:              Path,
+		Host:              Host,
+		ServiceName:       ServiceName,
+		HeaderType:        HeaderType,
+		CypherMethod:      Method,
+		Flow:              Flow,
+		Address:           nodeInfoResponse.Address,
+		AllowInsecure:     nodeInfoResponse.AllowInsecure,
+		ListenIP:          nodeInfoResponse.ListenIP,
+		ProxyProtocol:     nodeInfoResponse.ProxyProtocol,
+		Sniffing:          nodeInfoResponse.Sniffing,
+		RejectUnknownSNI:  nodeInfoResponse.RejectUnknownSNI,
+		Fingerprint:       nodeInfoResponse.Fingerprint,
+		Quic_security:     nodeInfoResponse.Quic_security,
+		Quic_key:          nodeInfoResponse.Quic_key,
+	}
+
+	return nodeinfo, nil
 }
