@@ -578,6 +578,7 @@ func (c *Controller) buildTag() string {
 	return fmt.Sprintf("%s|%d|%d", c.nodeInfo.NodeType, c.nodeInfo.Port, c.nodeInfo.NodeID)
 }
 
+
 func (c *Controller) buildRTag() string {
-	return fmt.Sprintf("%d_%s_%d_%d", c.nodeInfo.NodeID, c.transitnodeInfo.NodeType, c.transitnodeInfo.Port, c.transitnodeInfo.NodeID)
+	return fmt.Sprintf("%s_%d_%d", c.transitnodeInfo.NodeType, c.transitnodeInfo.Port, c.transitnodeInfo.NodeID)
 }

@@ -522,7 +522,7 @@ func (c *APIClient) ParseTransitNodeResponse(nodeInfoResponse *TransitNodeInfoRe
 
 	nodeinfo := &api.TransitNodeInfo{
 		NodeType:          Type,
-		NodeID:            c.NodeID,
+		NodeID:            nodeInfoResponse.NodeID,
 		Port:              port,
 		SpeedLimit:        speedlimit,
 		AlterID:           AlterID,
