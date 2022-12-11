@@ -122,12 +122,12 @@ func (c *Controller) Start() error {
 	}
 	
 	c.nodeInfoMonitorPeriodic = &task.Periodic{
-		Interval: time.Duration(90) * time.Second,
+		Interval: time.Duration(60) * time.Second,
 		Execute:  c.nodeInfoMonitor,
 	}
 	
 	c.userReportPeriodic = &task.Periodic{
-		Interval: time.Duration(90) * time.Second,
+		Interval: time.Duration(60) * time.Second,
 		Execute:  c.userInfoMonitor,
 	}
 	
