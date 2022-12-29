@@ -24,6 +24,6 @@ cd /etc/XMPlus
 
 ### Onclick Install
 ```
-bash <(curl -Ls https://raw.githubusercontent.com/xcode75/XMPlus/setup/install.sh)
+bash <(curl -Ls https://raw.githubusercontent.com/xcode75/XMPlus/install/install.sh)
 ```
 
