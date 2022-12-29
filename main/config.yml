@@ -1,0 +1,44 @@
+Log:
+  Level: info # Log level: none, error, warning, info, debug 
+  AccessPath: # /etc/XMPlus/access.Log
+  ErrorPath: # /etc/XMPlus/error.log
+DnsConfigPath:  /etc/XMPlus/dns.json
+RouteConfigPath: # /etc/XMPlus/route.json
+InboundConfigPath: # /etc/XMPlus/inbound.json
+OutboundConfigPath: # /etc/XMPlus/outbound.json
+ConnectionConfig:
+  Handshake: 8 
+  ConnIdle: 150 
+  UplinkOnly: 0 
+  DownlinkOnly: 0 
+  BufferSize: 64
+Nodes:
+  -
+    ApiConfig:
+      ApiHost: "http://127.0.0.1"
+      ApiKey: "123"
+      NodeID: 1
+      Timeout: 30 
+    ControllerConfig:
+      UpdatePeriodic: 60
+      CertConfig:
+        Provider: cloudflare
+        Email: author@xmplus.dev
+        CertEnv:
+          CLOUDFLARE_EMAIL: 
+          CLOUDFLARE_API_KEY: 
+          
+#  -
+#    ApiConfig:
+#      ApiHost: "http://127.0.0.1"
+#      ApiKey: "123"
+#      NodeID: 2
+#      Timeout: 30 
+#    ControllerConfig:
+#      UpdatePeriodic: 60
+#      CertConfig:
+#        Provider: cloudflare
+#        Email: author@xmplus.dev
+#        CertEnv:
+#          CLOUDFLARE_EMAIL: 
+#          CLOUDFLARE_API_KEY: 
