@@ -100,7 +100,7 @@ update() {
     else
         version=$2
     fi
-    bash <(curl -Ls https://raw.githubusercontent.com/xcode75/XMPlus/master/install.sh) $version
+    bash <(curl -Ls https://raw.githubusercontent.com/xcode75/XMPlus/install/install.sh) $version
     if [[ $? == 0 ]]; then
         echo -e "${green}The update is complete and XMPlus has restarted automatically, please use XMPlus log to view the operation log${plain}"
         exit
