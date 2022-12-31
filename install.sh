@@ -136,7 +136,7 @@ install_XMPlus() {
     chmod +x XMPlus
     mkdir /etc/XMPlus/ -p
     rm /etc/systemd/system/XMPlus.service -f
-    file="https://raw.githubusercontent.com/xcode75/XMPlus/setup/XMPlus.service"
+    file="https://raw.githubusercontent.com/xcode75/XMPlus/install/XMPlus.service"
     wget -N --no-check-certificate -O /etc/systemd/system/XMPlus.service ${file}
     #cp -f XMPlus.service /etc/systemd/system/
     systemctl daemon-reload
