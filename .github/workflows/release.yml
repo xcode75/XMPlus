@@ -55,21 +55,10 @@ jobs:
       - name: Get project dependencies
         run: go mod download
 
-
       - name: Build XMPlus
         run: |
           mkdir -p build_assets
           go build -v -o build_assets/XMPlus -trimpath -ldflags "-s -w -buildid=" ./main
-
-      - name: Build Mips softfloat XMPlus
-        if: matrix.goarch == 'mips' || matrix.goarch == 'mipsle'
-        run: |
-          GOMIPS=softfloat go build -v -o build_assets/XMPlus_softfloat -trimpath -ldflags "-s -w -buildid=" ./main
-      - name: Rename Windows XMPlus
-        if: matrix.goos == 'windows'
-        run: |
-          cd ./build_assets || exit 1
-          mv XMPlus XMPlus.exe
 
       - name: Prepare to release
         run: |
