@@ -1,0 +1,29 @@
+[
+    {
+        "protocol": "freedom",
+		"settings": {}
+    },
+    {
+      "tag": "Http_Out",
+      "protocol": "http",
+      "settings": {
+        "servers": [
+          {
+            "address": "127.0.0.1",
+            "port": 34567
+          }
+        ]
+      },
+      "streamSettings": {
+        "security": "none",
+        "tlsSettings": {
+          "allowInsecure": false
+        }
+      }
+    },
+    {
+        "protocol": "blackhole",
+        "tag": "block",
+		"settings": {}
+    }
+]

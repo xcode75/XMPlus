@@ -1,0 +1,46 @@
+Log:
+  Level: info                                                   # Log level: none, error, warning, info, debug
+  AccessPath: #/etc/XMPlus/access.Log                           # Access log path
+  ErrorPath: #/etc/XMPlus/error.log                             # Error log path
+DnsConfigPath: /etc/XMPlus/dns.json                             #https://xtls.github.io/config/base/dns/
+RouteConfigPath: # /etc/XMPlus/route.json                       #https://xtls.github.io/config/base/route/
+OutboundConfigPath: # /etc/XMPlus/outbound.json                 #https://xtls.github.io/config/base/outbound/
+ConnetionConfig:                                                # By customizing the relevant configuration released by the ConnetionConfig connection, the memory usage can be optimized to a certain extent
+  Handshake: 15                                                 # Handshake time limit when the connection is established. The unit is seconds. The default value is 4. When the inbound proxy processes a new connection, if the time used in the handshake phase exceeds this time, the connection is terminated.
+  ConnIdle: 300                                                 # Reducing ConnIdle may be able to optimize the memory usage when the number of connections is high, but it will lead to higher user connection delays.
+  UplinkOnly: 0                                                 # In the HTTP browsing scenario, you can set UplinkOnly
+  DownlinkOnly: 0                                               # Set DownlinkOnly to 0 to improve the efficiency of connection closing and reduce memory usage.
+  BufferSize: 64                                                # Reducing BufferSize can optimize memory usage, but it may cause CPU usage to rise。
+Nodes:  
+  -
+    ApiConfig:
+      ApiHost: "https://www.xx.com"                              #XManagerPlus Website Address 
+      ApiKey: "xxx"                                              #XManagerPlus API Key
+      NodeID: 1                                                  #Node ID
+      Timeout: 60                                                # Query Node info timeout
+      DeviceLimit: 0                                             # Local settings will replace remote settings, 0 means disable
+      RuleListPath:                                              #/etc/XMPlus/rulelist #Path to local rulelist file
+    ControllerConfig:
+      SendIP: 0.0.0.0                                            # IP address you want to send pacakage
+      EnableDNS: true                                            # Use custom DNS config, Please ensure that you set the dns.json well
+      DisableUploadTraffic: false                                # Disable Upload traffic stats to panel 
+      DisableGetRule: false                                      # Disable Get rule from panel
+      DisableIVCheck:  false                                     # Disable Shadowsoocks IVCheck
+      DNSType: AsIs                                              # AsIs, UseIP, UseIPv4, UseIPv6, DNS strategy
+      EnableFallback: false                                      # Only support for Trojan and Vless
+      FallBackConfigs:                                           # Support multiple fallbacks
+        -
+          SNI:                                                   # TLS SNI(Server Name Indication), Empty for any
+          Path:                                                  # HTTP PATH, Empty for any
+          Dest: 80                                               # Required, Destination of fallback, check https://xtls.github.io/config/fallback/ for details.
+          ProxyProtocolVer: 0                                    # Send PROXY protocol version, 0 for dsable
+      CertConfig:
+        CertMode: http                                           # none, file, http, dns
+        CertDomain: "uk1.xx.com"                                 # Domain to cert
+        CertFile: /etc/XMPlus/uk1.xx.com.crt                     # SSL CERT path 
+        KeyFile: /etc/XMPlus/uk1.xx.com.key                      # SSL KEY PATH 
+        Email: xxx@gmail.com                                     # Domain for SSL authorization
+        Provider: cloudflare                                     # https://go-acme.github.io/lego/dns/
+        DNSEnv: 
+          CLOUDFLARE_EMAIL:                                      # Cloudflare email
+          CLOUDFLARE_API_KEY:                                    # Cloudflare global api key
