@@ -6,6 +6,7 @@ import (
 	"reflect"
 	"time"
 	"strings"
+	"sync"
 
 	"github.com/xcode75/xcore/common/protocol"
 	"github.com/xcode75/xcore/common/serial"
@@ -29,6 +30,7 @@ import (
 )
 
 type Controller struct {
+    sync.Mutex
 	server       *core.Instance
 	config       *Config
 	clientInfo   api.ClientInfo
@@ -228,6 +230,14 @@ func (c *Controller) nodeInfoMonitor() (err error) {
 	var nodeInfoChanged = false
 	// If nodeInfo changed
 	if !reflect.DeepEqual(c.nodeInfo, newNodeInfo) {
+		//Reload DNS
+		if !reflect.DeepEqual(c.nodeInfo.NameServerConfig, newNodeInfo.NameServerConfig) {
+			log.Printf("%s Reload DNS service", c.logPrefix())
+			if err := c.addNewDNS(newNodeInfo); err != nil {
+				log.Print(err)
+				return nil
+			}
+		}
 		// Remove old tag
 		oldTag := c.Tag
 		err := c.removeOldTag(oldTag)
@@ -310,14 +320,7 @@ func (c *Controller) nodeInfoMonitor() (err error) {
 		if err := c.AddInboundLimiter(c.Tag, newNodeInfo.SpeedLimit, newUserInfo); err != nil {
 			log.Print(err)
 			return nil
-		}
-
-		// Add DNS
-		log.Printf("%s Reload DNS service", c.logPrefix())
-		if err := c.addNewDNS(newNodeInfo); err != nil {
-			log.Print(err)
-			return nil
-		}
+		}	
 	} else {
 		var deleted, added []api.UserInfo
 		if usersChanged {
@@ -692,9 +695,7 @@ func (c *Controller) addNewDNS(newNodeInfo *api.NodeInfo) error {
 		return err
 	}
 	if feature, ok := obj.(features.Feature); ok {
-		if err := c.server.AddFeature(feature); err != nil {
-			return err
-		}
+		c.server.AddFeature(feature)
 	}
 
 	return nil
