@@ -338,7 +338,7 @@ func (c *Controller) nodeInfoMonitor() (err error) {
 			if err := c.UpdateInboundLimiter(c.Tag, &added); err != nil {
 				log.Print(err)
 			}
-			log.Printf("%s %d New Users Added", c.logPrefix(), len(added))
+			//log.Printf("%s %d New Users Added", c.logPrefix(), len(added))
 		}
 	}
 	c.userList = newUserInfo
@@ -506,7 +506,7 @@ func (c *Controller) addNewUser(userInfo *[]api.UserInfo, nodeInfo *api.NodeInfo
 	if err != nil {
 		return err
 	}
-	log.Printf("%s Added %d new users", c.logPrefix(), len(*userInfo))
+	log.Printf("%s %d New Users Added", c.logPrefix(), len(*userInfo))
 	return nil
 }
 
