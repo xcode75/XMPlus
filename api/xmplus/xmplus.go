@@ -2,7 +2,6 @@ package xmplus
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"log"
 	"regexp"
