@@ -211,21 +211,16 @@ func (c *Controller) nodeInfoMonitor() (err error) {
 	var usersChanged = true
 	newUserInfo, err := c.apiClient.GetUserList()
 	if err != nil {
-		if err.Error() == "users no change" {
-			usersChanged = false
-			newUserInfo = c.userList
-		} else {
-			log.Print(err)
-			return nil
-		}
+		log.Print(err)
+		return nil
 	}
 	
 	var updateRelay = false
-	// Remove user relay rule
-	if usersChanged {
+	if !reflect.DeepEqual(c.userList, newUserInfo) {
 		updateRelay = true
 		c.removeRules(c.Tag, c.userList)
 	}
+	
 	
 	var nodeInfoChanged = false
 	// If nodeInfo changed
@@ -322,33 +317,30 @@ func (c *Controller) nodeInfoMonitor() (err error) {
 			return nil
 		}	
 	} else {
-		var deleted, added []api.UserInfo
-		if usersChanged {
-			deleted, added = compareUserList(c.userList, newUserInfo)
-			if len(deleted) > 0 {
-				deletedEmail := make([]string, len(deleted))
-				for i, u := range deleted {
-					deletedEmail[i] = fmt.Sprintf("%s|%s|%d", c.Tag, u.Email, u.UID)
-				}
-				err := c.removeUsers(deletedEmail, c.Tag)
-				if err != nil {
-					log.Print(err)
-				}
-				log.Printf("%s %d Users Deleted", c.logPrefix(), len(deleted))
+		//var deleted, added []api.UserInfo
+		deleted, added = compareUserList(c.userList, newUserInfo)
+		if len(deleted) > 0 {
+			deletedEmail := make([]string, len(deleted))
+			for i, u := range deleted {
+				deletedEmail[i] = fmt.Sprintf("%s|%s|%d", c.Tag, u.Email, u.UID)
 			}
-			if len(added) > 0 {
-				err = c.addNewUser(&added, c.nodeInfo)
-				if err != nil {
-					log.Print(err)
-				}
-				// Update Limiter
-				if err := c.UpdateInboundLimiter(c.Tag, &added); err != nil {
-					log.Print(err)
-				}
-				log.Printf("%s %d New Users Added", c.logPrefix(), len(added))
+			err := c.removeUsers(deletedEmail, c.Tag)
+			if err != nil {
+				log.Print(err)
 			}
+			log.Printf("%s %d Users Deleted", c.logPrefix(), len(deleted))
 		}
-		
+		if len(added) > 0 {
+			err = c.addNewUser(&added, c.nodeInfo)
+			if err != nil {
+				log.Print(err)
+			}
+			// Update Limiter
+			if err := c.UpdateInboundLimiter(c.Tag, &added); err != nil {
+				log.Print(err)
+			}
+			log.Printf("%s %d New Users Added", c.logPrefix(), len(added))
+		}
 	}
 	c.userList = newUserInfo
 	return nil
@@ -520,31 +512,30 @@ func (c *Controller) addNewUser(userInfo *[]api.UserInfo, nodeInfo *api.NodeInfo
 }
 
 func compareUserList(old, new *[]api.UserInfo) (deleted, added []api.UserInfo) {
-	mSrc := make(map[api.UserInfo]byte) // 按源数组建索引
-	mAll := make(map[api.UserInfo]byte) // 源+目所有元素建索引
+	mSrc := make(map[api.UserInfo]byte) 
+	mAll := make(map[api.UserInfo]byte) 
 
-	var set []api.UserInfo // 交集
+	var set []api.UserInfo 
 
-	// 1.源数组建立map
 	for _, v := range *old {
 		mSrc[v] = 0
 		mAll[v] = 0
 	}
-	// 2.目数组中，存不进去，即重复元素，所有存不进去的集合就是并集
+
 	for _, v := range *new {
 		l := len(mAll)
 		mAll[v] = 1
-		if l != len(mAll) { // 长度变化，即可以存
+		if l != len(mAll) {
 			l = len(mAll)
-		} else { // 存不了，进并集
+		} else { 
 			set = append(set, v)
 		}
 	}
-	// 3.遍历交集，在并集中找，找到就从并集中删，删完后就是补集（即并-交=所有变化的元素）
+	
 	for _, v := range set {
 		delete(mAll, v)
 	}
-	// 4.此时，mall是补集，所有元素去源中找，找到就是删除的，找不到的必定能在目数组中找到，即新加的
+	
 	for v := range mAll {
 		_, exist := mSrc[v]
 		if exist {
