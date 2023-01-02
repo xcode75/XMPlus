@@ -318,7 +318,7 @@ func (c *Controller) nodeInfoMonitor() (err error) {
 		}	
 	} else {
 		//var deleted, added []api.UserInfo
-		deleted, added = compareUserList(c.userList, newUserInfo)
+		deleted, added := compareUserList(c.userList, newUserInfo)
 		if len(deleted) > 0 {
 			deletedEmail := make([]string, len(deleted))
 			for i, u := range deleted {
