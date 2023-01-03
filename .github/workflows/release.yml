@@ -67,8 +67,17 @@ jobs:
           cp ${GITHUB_WORKSPACE}/main/outbound.json ./build_assets/outbound.json
           cp ${GITHUB_WORKSPACE}/main/inbound.json ./build_assets/inbound.json
           cp ${GITHUB_WORKSPACE}/main/config.yml ./build_assets/config.yml
-          wget -O ./build_assets/geoip.dat "https://raw.githubusercontent.com/v2fly/geoip/release/geoip.dat"
-          wget -O ./build_assets/geosite.dat "https://raw.githubusercontent.com/v2fly/domain-list-community/release/dlc.dat"
+          LIST=('geoip geoip geoip' 'domain-list-community dlc geosite')
+          for i in "${LIST[@]}"
+          do
+              INFO=($(echo $i | awk 'BEGIN{FS=" ";OFS=" "} {print $1,$2,$3}'))
+              FILE_NAME="${INFO[2]}.dat"
+              echo -e "Downloading https://raw.githubusercontent.com/v2fly/${INFO[0]}/release/${INFO[1]}.dat..."
+              curl -L "https://raw.githubusercontent.com/v2fly/${INFO[0]}/release/${INFO[1]}.dat" -o ./build_assets/${FILE_NAME}
+              echo -e "Verifying HASH key..."
+              HASH="$(curl -sL "https://raw.githubusercontent.com/v2fly/${INFO[0]}/release/${INFO[1]}.dat.sha256sum" | awk -F ' ' '{print $1}')"
+              [ "$(sha256sum "./build_assets/${FILE_NAME}" | awk -F ' ' '{print $1}')" == "${HASH}" ] || { echo -e "The HASH key of ${FILE_NAME} does not match cloud one."; exit 1; }
+          done
       - name: Create ZIP archive
         shell: bash
         run: |
