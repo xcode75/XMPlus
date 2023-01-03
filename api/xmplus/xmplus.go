@@ -10,6 +10,7 @@ import (
 	"sync/atomic"
 	"time"
 	"sync"
+	"errors"
 
 	"github.com/bitly/go-simplejson"
 	"github.com/go-resty/resty/v2"
@@ -124,9 +125,9 @@ func (c *APIClient) GetUserList() (UserList *[]api.UserInfo, err error) {
 		Get(path)
 
 	// Etag identifier for a specific version of a resource. StatusCode = 304 means no changed
-	//if res.StatusCode() == 304 {
-	//	return nil, errors.New("users no change")
-	//}
+	if res.StatusCode() == 304 {
+		return nil, errors.New("users_no_change")
+	}
 	
 	// update etag
 	if res.Header().Get("Etag") != "" && res.Header().Get("Etag") != c.eTag {
@@ -148,8 +149,7 @@ func (c *APIClient) GetUserList() (UserList *[]api.UserInfo, err error) {
 	defer func() {
 		c.LastReportOnline = make(map[int]int)
 		c.access.Unlock()
-	}()
-	
+	}()	
 	
 	for i := 0; i < len(users); i++ {
 		u := api.UserInfo{

@@ -208,14 +208,23 @@ func (c *Controller) nodeInfoMonitor() (err error) {
 	}
 
 	// Update User
+	var UserChange = false
+	
 	newUserInfo, err := c.apiClient.GetUserList()
 	if err != nil {
-		log.Print(err)
-		return nil
+		if err.Error() == "users_no_change" {
+			usersChanged = false
+			newUserInfo = c.userList
+			log.Printf("%s : No changes occured inr users list", c.logPrefix())
+		} else {
+			log.Print(err)
+			return nil
+		}
 	}
 	
-	var updateRelay = false
-	if !reflect.DeepEqual(c.userList, newUserInfo) {
+	var updateRelay = false	
+	
+	if usersChanged {
 		updateRelay = true
 		c.removeRules(c.Tag, c.userList)
 	}
@@ -239,12 +248,6 @@ func (c *Controller) nodeInfoMonitor() (err error) {
 			return nil
 		}
 		updateRelay = true
-		
-		// Reload DNS
-		if err := c.addNewDNS(newNodeInfo); err != nil {
-			log.Print(err)
-			return nil
-		}
 		
 		// Add new tag
 		c.nodeInfo = newNodeInfo
@@ -314,31 +317,39 @@ func (c *Controller) nodeInfoMonitor() (err error) {
 			log.Print(err)
 			return nil
 		}	
+		
+		// Reload DNS
+		log.Printf("%s Reload DNS service", c.logPrefix())
+		if err := c.addNewDNS(newNodeInfo); err != nil {
+			log.Print(err)
+			return nil
+		}
 	} else {
-		//var deleted, added []api.UserInfo
-		deleted, added := compareUserList(c.userList, newUserInfo)
-		if len(deleted) > 0 {
-			deletedEmail := make([]string, len(deleted))
-			for i, u := range deleted {
-				deletedEmail[i] = fmt.Sprintf("%s|%s|%d", c.Tag, u.Email, u.UID)
+		var deleted, added []api.UserInfo
+		if usersChanged {
+			deleted, added = compareUserList(c.userList, newUserInfo)
+			if len(deleted) > 0 {
+				deletedEmail := make([]string, len(deleted))
+				for i, u := range deleted {
+					deletedEmail[i] = fmt.Sprintf("%s|%s|%d", c.Tag, u.Email, u.UID)
+				}
+				err := c.removeUsers(deletedEmail, c.Tag)
+				if err != nil {
+					log.Print(err)
+				}
+				log.Printf("%s %d Users Deleted", c.logPrefix(), len(deleted))
 			}
-			err := c.removeUsers(deletedEmail, c.Tag)
-			if err != nil {
-				log.Print(err)
+			if len(added) > 0 {
+				err = c.addNewUser(&added, c.nodeInfo)
+				if err != nil {
+					log.Print(err)
+				}
+				// Update Limiter
+				if err := c.UpdateInboundLimiter(c.Tag, &added); err != nil {
+					log.Print(err)
+				}
 			}
-			log.Printf("%s %d Users Deleted", c.logPrefix(), len(deleted))
-		}
-		if len(added) > 0 {
-			err = c.addNewUser(&added, c.nodeInfo)
-			if err != nil {
-				log.Print(err)
-			}
-			// Update Limiter
-			if err := c.UpdateInboundLimiter(c.Tag, &added); err != nil {
-				log.Print(err)
-			}
-			//log.Printf("%s %d New Users Added", c.logPrefix(), len(added))
-		}
+		}	
 	}
 	c.userList = newUserInfo
 	return nil
