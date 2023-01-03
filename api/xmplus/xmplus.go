@@ -115,7 +115,9 @@ func (c *APIClient) GetNodeInfo() (nodeInfo *api.NodeInfo, err error) {
 
 // GetUserList will pull user form panel
 func (c *APIClient) GetUserList() (UserList *[]api.UserInfo, err error) {
+	var users []*User
 	path := fmt.Sprintf("/api/v2/query/users/%d", c.NodeID)
+	
 	res, err := c.client.R().
 		SetHeader("If-None-Match", c.eTag).
 		ForceContentType("application/json").
@@ -125,6 +127,7 @@ func (c *APIClient) GetUserList() (UserList *[]api.UserInfo, err error) {
 	//if res.StatusCode() == 304 {
 	//	return nil, errors.New("users no change")
 	//}
+	
 	// update etag
 	if res.Header().Get("Etag") != "" && res.Header().Get("Etag") != c.eTag {
 		c.eTag = res.Header().Get("Etag")
@@ -134,9 +137,10 @@ func (c *APIClient) GetUserList() (UserList *[]api.UserInfo, err error) {
 	if err != nil {
 		return nil, err
 	}
+	b, _ := response.Get("users").Encode()
+	json.Unmarshal(b, &users)
 
-	numOfUsers := len(response.Get("users").MustArray())
-	userList := make([]api.UserInfo, numOfUsers)
+	userList := make([]api.UserInfo, len(users))
 	var deviceLimit, onlineipcount, ipcount int = 0, 0, 0
 	
 	c.access.Lock()
@@ -146,14 +150,22 @@ func (c *APIClient) GetUserList() (UserList *[]api.UserInfo, err error) {
 		c.access.Unlock()
 	}()
 	
-	for i := 0; i < numOfUsers; i++ {
-		user := response.Get("users").GetIndex(i)
-		deviceLimit = user.Get("iplimit").MustInt()
-		ipcount = user.Get("ipcount").MustInt()
+	
+	for i := 0; i < len(users); i++ {
+		u := api.UserInfo{
+			UID:  users[i].Id,
+			UUID: users[i].Uuid,
+			Email: users[i].Email,
+			Passwd: users[i].Uuid,
+			SpeedLimit:  uint64(users[i].Speedlimit * 1000000 / 8),
+		}
+		
+		deviceLimit = users[i].Iplimit
+		ipcount = users[i].Ipcount
 		
 		if deviceLimit > 0 && ipcount > 0 {
 			lastOnline := 0
-			if v, ok := c.LastReportOnline[user.Get("id").MustInt()]; ok {
+			if v, ok := c.LastReportOnline[users[i].Id]; ok {
 				lastOnline = v
 			}
 			if onlineipcount = deviceLimit - ipcount + lastOnline; onlineipcount > 0 {
@@ -165,14 +177,7 @@ func (c *APIClient) GetUserList() (UserList *[]api.UserInfo, err error) {
 			}
 		}
 		
-		u := api.UserInfo{
-			UID:  user.Get("id").MustInt(),
-			UUID: user.Get("uuid").MustString(),
-			Email: user.Get("email").MustString(),
-			Passwd: user.Get("uuid").MustString(),
-			DeviceLimit: deviceLimit,
-			SpeedLimit: user.Get("speedlimit").MustUint64() * 1000000 / 8,
-		}
+		u.DeviceLimit = deviceLimit
 		
 		userList[i] = u
 	}

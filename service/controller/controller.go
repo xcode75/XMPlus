@@ -224,14 +224,6 @@ func (c *Controller) nodeInfoMonitor() (err error) {
 	var nodeInfoChanged = false
 	// If nodeInfo changed
 	if !reflect.DeepEqual(c.nodeInfo, newNodeInfo) {
-		//Reload DNS
-		if !reflect.DeepEqual(c.nodeInfo.NameServerConfig, newNodeInfo.NameServerConfig) {
-			log.Printf("%s Reload DNS service", c.logPrefix())
-			if err := c.addNewDNS(newNodeInfo); err != nil {
-				log.Print(err)
-				return nil
-			}
-		}
 		// Remove old tag
 		oldTag := c.Tag
 		err := c.removeOldTag(oldTag)
@@ -247,6 +239,13 @@ func (c *Controller) nodeInfoMonitor() (err error) {
 			return nil
 		}
 		updateRelay = true
+		
+		// Reload DNS
+		if err := c.addNewDNS(newNodeInfo); err != nil {
+			log.Print(err)
+			return nil
+		}
+		
 		// Add new tag
 		c.nodeInfo = newNodeInfo
 		c.Tag = c.buildNodeTag()

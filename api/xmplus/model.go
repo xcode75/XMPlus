@@ -2,6 +2,16 @@ package xmplus
 
 import "encoding/json"
 
+
+type User struct {
+	Id         int    `json:"id"`
+	Uuid       string `json:"uuid"`
+	Email      string `json:"email"`
+	Speedlimit int    `json:"speedlimit"`
+	Iplimit    int    `json:"iplimit"`
+	Ipcount    int    `json:"ipcount"`
+}
+
 // Response is the common response
 type Response struct {
 	Ret  uint            `json:"ret"`
