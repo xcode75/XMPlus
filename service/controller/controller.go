@@ -208,20 +208,19 @@ func (c *Controller) nodeInfoMonitor() (err error) {
 	}
 
 	// Update User
-	var usersChanged = false
+	var usersChanged = true
 	
 	newUserInfo, err := c.apiClient.GetUserList()
 	if err != nil {
 		if err.Error() == "users_no_change" {
 			usersChanged = false
 			newUserInfo = c.userList
-			log.Printf("%s : No changes occured inr users list", c.logPrefix())
 		} else {
 			log.Print(err)
 			return nil
 		}
 	}
-	
+
 	var updateRelay = false	
 	
 	if usersChanged {
