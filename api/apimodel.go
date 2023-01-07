@@ -89,6 +89,7 @@ type RelayNodeInfo struct {
 	Flow              string
 	Seed              string
 	Congestion        bool
+	Fingerprint       string
 }
 
 type UserInfo struct {

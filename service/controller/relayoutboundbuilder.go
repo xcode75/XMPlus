@@ -215,10 +215,12 @@ func OutboundRelayBuilder(config *Config, nodeInfo *api.RelayNodeInfo , tag stri
 		if nodeInfo.TLSType == "tls" {
 			tlsSettings := &conf.TLSConfig{}
 			tlsSettings.Insecure = true
+			tlsSettings.Fingerprint = nodeInfo.Fingerprint
 			streamSetting.TLSSettings = tlsSettings	
 		} else if nodeInfo.TLSType == "xtls" {
 			xtlsSettings := &conf.XTLSConfig{}
 			xtlsSettings.Insecure = true
+			xtlsSettings.Fingerprint = nodeInfo.Fingerprint
 			streamSetting.XTLSSettings = xtlsSettings
 		}
 	}

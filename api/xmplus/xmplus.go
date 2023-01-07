@@ -579,6 +579,7 @@ func (c *APIClient) GetRelayNodeInfo() (*api.RelayNodeInfo, error) {
 		Seed :             seed,
 		Congestion:        congestion,	
 		ServiceName:       serviceName,
+		Fingerprint:       nodeInfoResponse.Get("relay_server").Get("securitySettings").Get("fingerprint").MustString(), 
 		AllowInsecure:     nodeInfoResponse.Get("relay_server").Get("securitySettings").Get("allowInsecure").MustBool(),
 		Header:            header,
 		AlterID:           alterID,
