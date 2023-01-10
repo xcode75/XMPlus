@@ -139,11 +139,25 @@ func (c *APIClient) GetUserList() (UserList *[]api.UserInfo, err error) {
 		return nil, err
 	}
 	
-	var users []*User
+	users := new([]User)
 	
 	b, _ := response.Get("users").Encode()
-	json.Unmarshal(b, &users)
+	json.Unmarshal(b, users)
+	
+	if err := json.Unmarshal(b, users); err != nil {
+		return nil, fmt.Errorf("Unmarshal %s failed: %s", reflect.TypeOf(users), err)
+	}
+	
+	userList, err := c.ParseUserListResponse(users)
+	if err != nil {
+		res, _ := json.Marshal(users)
+		return nil, fmt.Errorf("Parse user list failed: %s", string(res))
+	}
 
+	return userList, nil
+}
+
+func (c *APIClient) ParseUserListResponse(userInfoResponse *[]User) (*[]api.UserInfo, error) {
 	c.access.Lock()
 	defer func() {
 		c.LastReportOnline = make(map[int]int)
@@ -154,7 +168,7 @@ func (c *APIClient) GetUserList() (UserList *[]api.UserInfo, err error) {
 	
 	userList := []api.UserInfo{}
 	
-	for _, user := range *users {
+	for _, user := range *userInfoResponse {
 		deviceLimit = user.Iplimit
 		ipcount = user.Ipcount
 		
@@ -171,14 +185,13 @@ func (c *APIClient) GetUserList() (UserList *[]api.UserInfo, err error) {
 				continue
 			}
 		}
-		
-		u.DeviceLimit = deviceLimit
-		
+
 		userList = append(userList, api.UserInfo{
 			UID:  user.Id,
 			UUID: user.Uuid,
 			Email: user.Email,
 			Passwd: user.Uuid,
+			DeviceLimit: deviceLimit,
 			SpeedLimit:  uint64(user.Speedlimit * 1000000 / 8),
 		})
 	}
