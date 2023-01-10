@@ -16,7 +16,7 @@ require (
 	github.com/shirou/gopsutil/v3 v3.22.12
 	github.com/spf13/viper v1.14.0
 	github.com/stretchr/testify v1.8.1
-	github.com/xcode75/xcore v1.7.1
+	github.com/xcode75/xcore v1.7.2
 	golang.org/x/crypto v0.5.0
 	golang.org/x/net v0.5.0
 	golang.org/x/time v0.3.0

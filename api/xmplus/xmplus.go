@@ -116,7 +116,7 @@ func (c *APIClient) GetNodeInfo() (nodeInfo *api.NodeInfo, err error) {
 
 // GetUserList will pull user form panel
 func (c *APIClient) GetUserList() (UserList *[]api.UserInfo, err error) {
-	var users []*User
+	
 	path := fmt.Sprintf("/api/v2/query/users/%d", c.NodeID)
 	
 	res, err := c.client.R().
@@ -138,34 +138,29 @@ func (c *APIClient) GetUserList() (UserList *[]api.UserInfo, err error) {
 	if err != nil {
 		return nil, err
 	}
+	
+	var users []*User
+	
 	b, _ := response.Get("users").Encode()
 	json.Unmarshal(b, &users)
 
-	userList := make([]api.UserInfo, len(users))
-	var deviceLimit, onlineipcount, ipcount int = 0, 0, 0
-	
 	c.access.Lock()
-	// Clear Last report log
 	defer func() {
 		c.LastReportOnline = make(map[int]int)
 		c.access.Unlock()
 	}()	
 	
-	for i := 0; i < len(users); i++ {
-		u := api.UserInfo{
-			UID:  users[i].Id,
-			UUID: users[i].Uuid,
-			Email: users[i].Email,
-			Passwd: users[i].Uuid,
-			SpeedLimit:  uint64(users[i].Speedlimit * 1000000 / 8),
-		}
-		
-		deviceLimit = users[i].Iplimit
-		ipcount = users[i].Ipcount
+	var deviceLimit, onlineipcount, ipcount int = 0, 0, 0
+	
+	userList := []api.UserInfo{}
+	
+	for _, user := range *users {
+		deviceLimit = user.Iplimit
+		ipcount = user.Ipcount
 		
 		if deviceLimit > 0 && ipcount > 0 {
 			lastOnline := 0
-			if v, ok := c.LastReportOnline[users[i].Id]; ok {
+			if v, ok := c.LastReportOnline[user.Id]; ok {
 				lastOnline = v
 			}
 			if onlineipcount = deviceLimit - ipcount + lastOnline; onlineipcount > 0 {
@@ -179,7 +174,13 @@ func (c *APIClient) GetUserList() (UserList *[]api.UserInfo, err error) {
 		
 		u.DeviceLimit = deviceLimit
 		
-		userList[i] = u
+		userList = append(userList, api.UserInfo{
+			UID:  user.Id,
+			UUID: user.Uuid,
+			Email: user.Email,
+			Passwd: user.Uuid,
+			SpeedLimit:  uint64(user.Speedlimit * 1000000 / 8),
+		})
 	}
 
 	return &userList, nil

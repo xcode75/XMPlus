@@ -20,13 +20,15 @@ Nodes:
       NodeID: 1
       Timeout: 30 
     ControllerConfig:
-      UpdatePeriodic: 60
+      UpdatePeriodic: 120
       CertConfig:
-        Provider: cloudflare
-        Email: author@xmplus.dev
-        CertEnv:
-          CLOUDFLARE_EMAIL: 
-          CLOUDFLARE_API_KEY: 
+        Email: author@xmplus.dev                    # Required when Cert Mode is not none
+        CertFile: /etc/XMPlus/node1.test.com.crt    # Required when Cert Mode is file
+        KeyFile: /etc/XMPlus/node1.test.com.key     # Required when Cert Mode is file
+        Provider: cloudflare                        # Required when Cert Mode is dns
+        CertEnv:                                    # Required when Cert Mode is dns
+          CLOUDFLARE_EMAIL:                         # Required when Cert Mode is dns
+          CLOUDFLARE_API_KEY:                       # Required when Cert Mode is dns
           
 #  -
 #    ApiConfig:
@@ -35,10 +37,12 @@ Nodes:
 #      NodeID: 2
 #      Timeout: 30 
 #    ControllerConfig:
-#      UpdatePeriodic: 60
+#      UpdatePeriodic: 120
 #      CertConfig:
-#        Provider: cloudflare
-#        Email: author@xmplus.dev
-#        CertEnv:
-#          CLOUDFLARE_EMAIL: 
-#          CLOUDFLARE_API_KEY: 
+#        Email: author@xmplus.dev                    # Required when Cert Mode is not none
+#        CertFile: /etc/XMPlus/node1.test.com.crt    # Required when Cert Mode is file
+#        KeyFile: /etc/XMPlus/node1.test.com.key     # Required when Cert Mode is file
+#        Provider: cloudflare                        # Required when Cert Mode is dns
+#        CertEnv:                                    # Required when Cert Mode is dns
+#          CLOUDFLARE_EMAIL:                         # Required when Cert Mode is dns
+#          CLOUDFLARE_API_KEY:                       # Required when Cert Mode is dns

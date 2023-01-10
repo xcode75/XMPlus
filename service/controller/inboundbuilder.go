@@ -224,6 +224,11 @@ func InboundBuilder(config *Config, nodeInfo *api.NodeInfo, tag string) (*core.I
 
 func getCertFile(certConfig *mylego.CertConfig, CertMode string, Domain string) (certFile string, keyFile string, err error) {
 	switch CertMode {
+	case "file":
+		if certConfig.CertFile == "" || certConfig.KeyFile == "" {
+			return "", "", fmt.Errorf("Cert file path or key file path missing, check your config.yml parameters.")
+		}
+		return certConfig.CertFile, certConfig.KeyFile, nil
 	case "dns":
 		lego, err := mylego.New(certConfig)
 		if err != nil {
