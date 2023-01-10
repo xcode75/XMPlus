@@ -11,6 +11,7 @@ import (
 	"time"
 	"sync"
 	"errors"
+	"reflect"
 
 	"github.com/bitly/go-simplejson"
 	"github.com/go-resty/resty/v2"
