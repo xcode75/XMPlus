@@ -6,18 +6,14 @@ import (
 	"reflect"
 	"time"
 	"strings"
-	"sync"
 
 	"github.com/xcode75/xcore/common/protocol"
-	"github.com/xcode75/xcore/common/serial"
 	"github.com/xcode75/xcore/common/task"
 	"github.com/xcode75/xcore/core"
-	"github.com/xcode75/xcore/features"
 	"github.com/xcode75/xcore/features/inbound"
 	"github.com/xcode75/xcore/features/outbound"
 	"github.com/xcode75/xcore/features/routing"
 	"github.com/xcode75/xcore/features/stats"
-	"github.com/xcode75/xcore/infra/conf"
 	"github.com/xcode75/xcore/app/router"
 	
 	C "github.com/sagernet/sing/common"
@@ -30,7 +26,6 @@ import (
 )
 
 type Controller struct {
-    sync.Mutex
 	server       *core.Instance
 	config       *Config
 	clientInfo   api.ClientInfo
@@ -82,12 +77,6 @@ func (c *Controller) Start() error {
 	}
 	c.nodeInfo = newNodeInfo
 	c.Tag = c.buildNodeTag()
-
-	// append remote DNS config and init dns service
-	err = c.addNewDNS(newNodeInfo)
-	if err != nil {
-		return err
-	}
 
 	// Update user
 	userInfo, err := c.apiClient.GetUserList()
@@ -316,13 +305,6 @@ func (c *Controller) nodeInfoMonitor() (err error) {
 			log.Print(err)
 			return nil
 		}	
-		
-		// Reload DNS
-		log.Printf("%s Reload DNS service", c.logPrefix())
-		if err := c.addNewDNS(newNodeInfo); err != nil {
-			log.Print(err)
-			return nil
-		}
 	} else {
 		var deleted, added []api.UserInfo
 		if usersChanged {
@@ -665,37 +647,3 @@ func (c *Controller) certMonitor() error {
 	return nil
 }
 
-// append remote dns
-func (c *Controller) addNewDNS(newNodeInfo *api.NodeInfo) error {
-	// reserve local DNS
-	servers := c.config.DNSConfig.Servers
-	servers = append(servers, newNodeInfo.NameServerConfig...)
-	dns := conf.DNSConfig{
-		Servers:                servers,
-		Hosts:                  c.config.DNSConfig.Hosts,
-		ClientIP:               c.config.DNSConfig.ClientIP,
-		Tag:                    c.config.DNSConfig.Tag,
-		QueryStrategy:          c.config.DNSConfig.QueryStrategy,
-		DisableCache:           c.config.DNSConfig.DisableCache,
-		DisableFallback:        c.config.DNSConfig.DisableFallback,
-		DisableFallbackIfMatch: c.config.DNSConfig.DisableFallbackIfMatch,
-	}
-
-	dnsConfig, err := dns.Build()
-	if err != nil {
-		log.Panicf("Failed to understand DNS config, Please check: https://xtls.github.io/config/dns.html for help: %s", err)
-	}
-	dnsInstance, err := serial.ToTypedMessage(dnsConfig).GetInstance()
-	if err != nil {
-		return err
-	}
-	obj, err := core.CreateObject(c.server, dnsInstance)
-	if err != nil {
-		return err
-	}
-	if feature, ok := obj.(features.Feature); ok {
-		c.server.AddFeature(feature)
-	}
-
-	return nil
-}
