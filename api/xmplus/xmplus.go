@@ -336,6 +336,7 @@ func (c *APIClient) parseNodeResponse(nodeInfoResponse *simplejson.Json) (*api.N
 	)
 
 	Flow := "xtls-rprx-direct"
+	
 	Alpn := ""
 	
 	if data, ok := nodeInfoResponse.Get("server").Get("securitySettings").CheckGet("alpn"); ok  {
