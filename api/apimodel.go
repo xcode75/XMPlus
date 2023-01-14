@@ -57,6 +57,7 @@ type NodeInfo struct {
 	EnableDNS         bool
 	Flow              string
 	Seed              string
+	Alpn              string
 	Congestion        bool
 	TrojanFallBack    []*conf.TrojanInboundFallback
 	VlessFallBack     []*conf.VLessInboundFallback
@@ -88,6 +89,7 @@ type RelayNodeInfo struct {
 	Header            json.RawMessage
 	Flow              string
 	Seed              string
+	Alpn              string
 	Congestion        bool
 	Fingerprint       string
 }

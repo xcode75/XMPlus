@@ -336,8 +336,15 @@ func (c *APIClient) parseNodeResponse(nodeInfoResponse *simplejson.Json) (*api.N
 	)
 
 	Flow := "xtls-rprx-direct"
+	Alpn := ""
 	
-	if data, ok := nodeInfoResponse.Get("relay_server").Get("securitySettings").CheckGet("flow"); ok  {
+	if data, ok := nodeInfoResponse.Get("server").Get("securitySettings").CheckGet("alpn"); ok  {
+		if data.MustString() != "" {
+			Alpn = data.MustString()
+		}
+	}
+	
+	if data, ok := nodeInfoResponse.Get("server").Get("securitySettings").CheckGet("flow"); ok  {
 		if data.MustString() == "xtls-rprx-vision" {
 			Flow = data.MustString()
 		}
@@ -420,6 +427,7 @@ func (c *APIClient) parseNodeResponse(nodeInfoResponse *simplejson.Json) (*api.N
 		RejectUnknownSNI:  nodeInfoResponse.Get("server").Get("securitySettings").Get("rejectUnknownSni").MustBool(),
 		Fingerprint:       nodeInfoResponse.Get("server").Get("securitySettings").Get("fingerprint").MustString(), 
 		Quic_security:     quic_security,
+		Alpn:              Alpn,
 		Quic_key:          quic_key,
 		CypherMethod:      nodeInfoResponse.Get("server").Get("cipher").MustString(),
 		Address:           nodeInfoResponse.Get("server").Get("address").MustString(), 
@@ -517,6 +525,14 @@ func (c *APIClient) GetRelayNodeInfo() (*api.RelayNodeInfo, error) {
 
 	Flow := "xtls-rprx-direct"
 	
+	Alpn := ""
+	
+	if data, ok := nodeInfoResponse.Get("server").Get("securitySettings").CheckGet("alpn"); ok  {
+		if data.MustString() != "" {
+			Alpn = data.MustString()
+		}
+	}
+	
 	if data, ok := nodeInfoResponse.Get("relay_server").Get("securitySettings").CheckGet("flow"); ok  {
 		if data.MustString() == "xtls-rprx-vision" {
 			Flow = data.MustString()
@@ -598,6 +614,7 @@ func (c *APIClient) GetRelayNodeInfo() (*api.RelayNodeInfo, error) {
 		AllowInsecure:     nodeInfoResponse.Get("relay_server").Get("securitySettings").Get("allowInsecure").MustBool(),
 		Header:            header,
 		AlterID:           alterID,
+		Alpn:              Alpn,
 		Quic_security:     quic_security,
 		Quic_key:          quic_key,
 		CypherMethod:      nodeInfoResponse.Get("relay_server").Get("cipher").MustString(),

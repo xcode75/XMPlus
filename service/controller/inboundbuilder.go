@@ -195,6 +195,10 @@ func InboundBuilder(config *Config, nodeInfo *api.NodeInfo, tag string) (*core.I
 			}
 			tlsSettings.Insecure = nodeInfo.AllowInsecure
 			tlsSettings.ServerName = nodeInfo.CertDomain
+			if nodeInfo.Alpn != "" {
+				alpn := conf.StringList{nodeInfo.Alpn}
+				tlsSettings.ALPN = &alpn
+			}
 			tlsSettings.Fingerprint = nodeInfo.Fingerprint
 			tlsSettings.Certs = append(tlsSettings.Certs, &conf.TLSCertConfig{CertFile: certFile, KeyFile: keyFile, OcspStapling: 3600})
 
