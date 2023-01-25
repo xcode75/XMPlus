@@ -3,9 +3,9 @@ package xmplus
 import "encoding/json"
 
 type serverConfig struct {
-	server  json:"server"`
+	server  `json:"server"`
 	Relay   bool 	`json:"relay"`
-	relay_server     json:"relay_server"`
+	relay_server     `json:"relay_server"`
 	Routes []route  `json:"routes"`
 	DNS    []dnsconf    `json:"dns"`
 	Fallback bool 	`json:"fallback"`
