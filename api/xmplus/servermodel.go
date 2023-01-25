@@ -3,9 +3,9 @@ package xmplus
 import "encoding/json"
 
 type serverConfig struct {
-	server
+	server  json:"server"`
 	Relay   bool 	`json:"relay"`
-	relay_server
+	relay_server     json:"relay_server"`
 	Routes []route  `json:"routes"`
 	DNS    []dnsconf    `json:"dns"`
 	Fallback bool 	`json:"fallback"`
@@ -13,13 +13,13 @@ type serverConfig struct {
 }
 
 type server struct {
-	Address     string 	`json:"address"`
-	Certmode    string 	`json:"certmode"`
-	Cipher      string 	`json:"cipher"`
+	Address     string 	 `json:"address"`
+	Certmode    string 	 `json:"certmode"`
+	Cipher      string 	 `json:"cipher"`
 	Domainstrategy string `json:"domainstrategy"`
-	EnableDns   bool 	`json:"enable_dns"`
+	EnableDns   bool 	 `json:"enable_dns"`
 	IP          string   `json:"ip"`
-	Port        int   `json:"listeningport"`
+	Port        int      `json:"listeningport"`
 	Listenip    string   `json:"listenip"`
 	Network     string   `json:"network"`
 	NetworkSettings struct {
@@ -83,7 +83,7 @@ type relay_server struct {
 		rejectUnknownSni  bool `json:"rejectUnknownSni"`
 		serverName   string   `json:"serverName"`
 		Flow          string `json:"flow"`
-		Alpn         string `json:"alpn"`
+		Alpn          string `json:"alpn"`
 	} `json:"securitySettings"`	
 	RsendThrough string `json:"sendthrough"`
 	RserverKey  string `json:"server_key"`
