@@ -349,6 +349,9 @@ func (c *APIClient) parseNodeResponse(s *serverConfig) (*api.NodeInfo, error) {
 	
 	if TLSType == "tls" || TLSType == "xtls" {
 		enableTLS = true
+		if s.SecuritySettings.ServerName == "" {
+			return nil, fmt.Errorf("TLS certificate domain is empty: %s",  s.SecuritySettings.ServerName)
+		}
 	}
 
 	transportProtocol := s.Network
@@ -434,7 +437,7 @@ func (c *APIClient) parseNodeResponse(s *serverConfig) (*api.NodeInfo, error) {
 		Seed:              seed,
 		Congestion:        congestion,
 		Sniffing:          s.Sniffing,
-		RejectUnknownSNI:  s.SecuritySettings.rejectUnknownSni,
+		RejectUnknownSNI:  s.SecuritySettings.RejectUnknownSni,
 		Fingerprint:       s.SecuritySettings.Fingerprint, 
 		Quic_security:     quic_security,
 		Alpn:              Alpn,
@@ -447,7 +450,7 @@ func (c *APIClient) parseNodeResponse(s *serverConfig) (*api.NodeInfo, error) {
 		ListenIP:          s.Listenip, 
 		ProxyProtocol:     s.NetworkSettings.ProxyProtocol,
 		CertMode:          s.Certmode,
-		CertDomain:        s.SecuritySettings.serverName,
+		CertDomain:        s.SecuritySettings.ServerName,
 		ServerKey:         s.serverKey,
 		SpeedLimit:        uint64(s.Speedlimit * 1000000 / 8),
 		EnableFallback:    s.Fallback,

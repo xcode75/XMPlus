@@ -39,8 +39,8 @@ type server struct {
 	SecuritySettings struct {
 	    AllowInsecure bool 	`json:"allowInsecure"`
 		Fingerprint   string   `json:"fingerprint"`
-		rejectUnknownSni  bool `json:"rejectUnknownSni"`
-		serverName   string   `json:"serverName"`
+		RejectUnknownSni  bool `json:"rejectUnknownSni"`
+		ServerName   string   `json:"serverName"`
 		Flow         string `json:"flow"`
 		Alpn         string `json:"alpn"`
 	} `json:"securitySettings"`	
@@ -80,8 +80,8 @@ type relay_server struct {
 	RSecuritySettings struct {
 	    AllowInsecure bool 	`json:"allowInsecure"`
 		Fingerprint   string   `json:"fingerprint"`
-		rejectUnknownSni  bool `json:"rejectUnknownSni"`
-		serverName   string   `json:"serverName"`
+		RejectUnknownSni  bool `json:"rejectUnknownSni"`
+		ServerName   string   `json:"serverName"`
 		Flow          string `json:"flow"`
 		Alpn          string `json:"alpn"`
 	} `json:"securitySettings"`	
