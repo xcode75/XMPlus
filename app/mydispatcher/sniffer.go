@@ -4,8 +4,10 @@ import (
 	"context"
 
 	"github.com/xcode75/xcore/common"
+	"github.com/xcode75/xcore/common/net"
 	"github.com/xcode75/xcore/common/protocol/bittorrent"
 	"github.com/xcode75/xcore/common/protocol/http"
+	"github.com/xcode75/xcore/common/protocol/quic"
 	"github.com/xcode75/xcore/common/protocol/tls"
 )
 
@@ -22,6 +24,8 @@ type protocolSnifferWithMetadata struct {
 	// for both TCP and UDP connections
 	// It will not be shown as a traffic type for routing unless there is no other successful sniffing.
 	metadataSniffer bool
+	network         net.Network
+}
 }
 
 type Sniffer struct {
@@ -31,9 +35,11 @@ type Sniffer struct {
 func NewSniffer(ctx context.Context) *Sniffer {
 	ret := &Sniffer{
 		sniffer: []protocolSnifferWithMetadata{
-			{func(c context.Context, b []byte) (SniffResult, error) { return http.SniffHTTP(b) }, false},
-			{func(c context.Context, b []byte) (SniffResult, error) { return tls.SniffTLS(b) }, false},
-			{func(c context.Context, b []byte) (SniffResult, error) { return bittorrent.SniffBittorrent(b) }, false},
+			{func(c context.Context, b []byte) (SniffResult, error) { return http.SniffHTTP(b) }, false, net.Network_TCP},
+			{func(c context.Context, b []byte) (SniffResult, error) { return tls.SniffTLS(b) }, false, net.Network_TCP},
+			{func(c context.Context, b []byte) (SniffResult, error) { return bittorrent.SniffBittorrent(b) }, false, net.Network_TCP},
+			{func(c context.Context, b []byte) (SniffResult, error) { return quic.SniffQUIC(b) }, false, net.Network_UDP},
+			{func(c context.Context, b []byte) (SniffResult, error) { return bittorrent.SniffUTP(b) }, false, net.Network_UDP},
 		},
 	}
 	if sniffer, err := newFakeDNSSniffer(ctx); err == nil {
@@ -49,11 +55,11 @@ func NewSniffer(ctx context.Context) *Sniffer {
 
 var errUnknownContent = newError("unknown content")
 
-func (s *Sniffer) Sniff(c context.Context, payload []byte) (SniffResult, error) {
+func (s *Sniffer) Sniff(c context.Context, payload []byte, network net.Network) (SniffResult, error) {
 	var pendingSniffer []protocolSnifferWithMetadata
 	for _, si := range s.sniffer {
 		s := si.protocolSniffer
-		if si.metadataSniffer {
+		if si.metadataSniffer || si.network != network {
 			continue
 		}
 		result, err := s(c, payload)

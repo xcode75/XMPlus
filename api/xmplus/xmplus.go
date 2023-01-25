@@ -6,7 +6,6 @@ import (
 	"log"
 	"regexp"
 	"strconv"
-	"strings"
 	"sync/atomic"
 	"time"
 	"sync"
@@ -21,7 +20,7 @@ import (
 	"github.com/xcode75/XMPlus/api"
 )
 
-// APIClient create an api client to the panel.
+
 type APIClient struct {
 	client        *resty.Client
 	APIHost       string
@@ -33,7 +32,6 @@ type APIClient struct {
 	access        sync.Mutex
 }
 
-// New create an api instance
 func New(apiConfig *api.Config) *APIClient {
 	client := resty.New()
 	client.SetRetryCount(3)
@@ -51,10 +49,8 @@ func New(apiConfig *api.Config) *APIClient {
 	})
 	client.SetBaseURL(apiConfig.APIHost)
 	
-	// Create Key for each requests
 	client.SetQueryParam("key", apiConfig.Key)
 	
-	// apiClient
 	apiClient := &APIClient{
 		client:        client,
 		NodeID:        apiConfig.NodeID,
@@ -65,12 +61,12 @@ func New(apiConfig *api.Config) *APIClient {
 	return apiClient
 }
 
-// Describe return a description of the client
+
 func (c *APIClient) Describe() api.ClientInfo {
 	return api.ClientInfo{APIHost: c.APIHost, NodeID: c.NodeID, Key: c.Key}
 }
 
-// Debug set the client debug for client
+
 func (c *APIClient) Debug() {
 	c.client.SetDebug(true)
 }
@@ -95,8 +91,9 @@ func (c *APIClient) parseResponse(res *resty.Response, path string, err error) (
 	return rtn, nil
 }
 
-// GetNodeInfo will pull NodeInfo Config from panel
+
 func (c *APIClient) GetNodeInfo() (nodeInfo *api.NodeInfo, err error) {
+	server := new(serverConfig)
 	path := fmt.Sprintf("/api/v2/query/server/%d", c.NodeID)
 	res, err := c.client.R().
 		ForceContentType("application/json").
@@ -106,31 +103,36 @@ func (c *APIClient) GetNodeInfo() (nodeInfo *api.NodeInfo, err error) {
 	if err != nil {
 		return nil, err
 	}
-	c.resp.Store(response)
-	nodeInfo, err = c.parseNodeResponse(response)
+	
+	b, _ := response.Encode()
+	json.Unmarshal(b, server)
+	
+	if server.Port <= 0 {
+		return nil, errors.New("server port must > 0")
+	}
+	
+	c.resp.Store(server)
+	
+	nodeInfo, err = c.parseNodeResponse(server)
 	if err != nil {
-		res, _ := response.MarshalJSON()
-		return nil, fmt.Errorf("Parse node info failed: %s, \nError: %s", string(res), err)
+		return nil, fmt.Errorf("Parse node info failed: %s, \nError: %v", res.String(), err)
 	}
 	return nodeInfo, nil
 }
 
-// GetUserList will pull user form panel
+
 func (c *APIClient) GetUserList() (UserList *[]api.UserInfo, err error) {
-	
 	path := fmt.Sprintf("/api/v2/query/users/%d", c.NodeID)
-	
 	res, err := c.client.R().
 		SetHeader("If-None-Match", c.eTag).
 		ForceContentType("application/json").
 		Get(path)
 
-	// Etag identifier for a specific version of a resource. StatusCode = 304 means no changed
+
 	if res.StatusCode() == 304 {
 		return nil, errors.New("users_no_change")
 	}
 	
-	// update etag
 	if res.Header().Get("Etag") != "" && res.Header().Get("Etag") != c.eTag {
 		c.eTag = res.Header().Get("Etag")
 	}
@@ -200,20 +202,17 @@ func (c *APIClient) ParseUserListResponse(userInfoResponse *[]User) (*[]api.User
 	return &userList, nil
 }
 
-// GetNodeRule implements the API interface
+
 func (c *APIClient) GetNodeRule() (*[]api.DetectRule, error) {
+	routes := c.resp.Load().(*serverConfig).Routes
 	
-	nodeInfoResponse := c.resp.Load().(*simplejson.Json)	
+	Rules := len(s.Routes)
+	detects := make([]api.DetectRule, Rules)
 	
-	numOfRules := len(nodeInfoResponse.Get("routes").MustArray())
-	detects := make([]api.DetectRule, numOfRules)
-	
-	for i := 0; i < numOfRules; i++ {
-		detect := nodeInfoResponse.Get("routes").GetIndex(i)
-	
+	for i := range routes {
 		ruleList := api.DetectRule{
-			ID:      detect.Get("id").MustInt(),
-			Pattern: regexp.MustCompile(detect.Get("regex").MustString()),
+			ID:      routes[i].Id,
+			Pattern: regexp.MustCompile(routes[i].Regex),
 		}
 		detects[i] = ruleList
 	}
@@ -221,7 +220,7 @@ func (c *APIClient) GetNodeRule() (*[]api.DetectRule, error) {
 	return &detects, nil
 }
 
-// ReportUserTraffic reports the user traffic
+
 func (c *APIClient) ReportUserTraffic(userTraffic *[]api.UserTraffic) error {
 	path := fmt.Sprintf("/api/v2/query/users/traffic/%d", c.NodeID)
 
@@ -246,7 +245,7 @@ func (c *APIClient) ReportUserTraffic(userTraffic *[]api.UserTraffic) error {
 	return nil
 }
 
-// ReportNodeStatus implements the API interface
+
 func (c *APIClient) ReportNodeStatus(nodeStatus *api.NodeStatus) (err error) {
 	path := fmt.Sprintf("/api/v2/query/server/status/%d", c.NodeID)
 	systemload := SystemLoad{
@@ -268,7 +267,7 @@ func (c *APIClient) ReportNodeStatus(nodeStatus *api.NodeStatus) (err error) {
 	return nil
 }
 
-// ReportNodeOnlineUsers implements the API interface
+
 func (c *APIClient) ReportNodeOnlineUsers(onlineUserList *[]api.OnlineUser) error {
 	c.access.Lock()
 	defer c.access.Unlock()
@@ -301,7 +300,7 @@ func (c *APIClient) ReportNodeOnlineUsers(onlineUserList *[]api.OnlineUser) erro
 	return nil
 }
 
-// ReportIllegal implements the API interface
+
 func (c *APIClient) ReportIllegal(detectResultList *[]api.DetectResult) error {
 	data := make([]IllegalItem, len(*detectResultList))
 	for i, r := range *detectResultList {
@@ -324,9 +323,8 @@ func (c *APIClient) ReportIllegal(detectResultList *[]api.DetectResult) error {
 	return nil
 }
 
-// parseNodeResponse parse the response for the given nodeInfo format
-func (c *APIClient) parseNodeResponse(nodeInfoResponse *simplejson.Json) (*api.NodeInfo, error) {
 
+func (c *APIClient) parseNodeResponse(s *serverConfig) (*api.NodeInfo, error) {
 	var (
 		TLSType                 = "none"
 		path, host, quic_security, quic_key,serviceName,seed,htype string
@@ -334,85 +332,96 @@ func (c *APIClient) parseNodeResponse(nodeInfoResponse *simplejson.Json) (*api.N
 		enableTLS,congestion    bool
 		alterID                 uint16 = 0
 	)
-
-	Flow := "xtls-rprx-direct"
 	
 	Alpn := ""
 	
-	if data, ok := nodeInfoResponse.Get("server").Get("securitySettings").CheckGet("alpn"); ok  {
-		if data.MustString() != "" {
-			Alpn = data.MustString()
-		}
+	if s.SecuritySettings.Alpn != null {
+		Alpn = s.SecuritySettings.Alpn
 	}
 	
-	if data, ok := nodeInfoResponse.Get("server").Get("securitySettings").CheckGet("flow"); ok  {
-		if data.MustString() == "xtls-rprx-vision" {
-			Flow = data.MustString()
-		}
+	if s.SecuritySettings.Flow == "xtls-rprx-vision" {
+		Flow := "xtls-rprx-vision"
+	}else{
+		Flow := "xtls-rprx-direct"
 	}
 	
-	TLSType = nodeInfoResponse.Get("server").Get("security").MustString()
+	TLSType = s.Security
 	
 	if TLSType == "tls" || TLSType == "xtls" {
 		enableTLS = true
 	}
 
-	transportProtocol := nodeInfoResponse.Get("server").Get("network").MustString()
+	transportProtocol := s.Network
 
 	switch transportProtocol {
 	case "ws":
-		path = nodeInfoResponse.Get("server").Get("networkSettings").Get("path").MustString()
-		host = nodeInfoResponse.Get("server").Get("networkSettings").Get("headers").Get("Host").MustString()
-	case "h2":
-		path = nodeInfoResponse.Get("server").Get("networkSettings").Get("path").MustString()
-		host = nodeInfoResponse.Get("server").Get("networkSettings").Get("host").MustString()
-	case "grpc":
-		if data, ok := nodeInfoResponse.Get("server").Get("networkSettings").CheckGet("serviceName"); ok {
-			serviceName = data.MustString()
+		path = s.NetworkSettings.Path
+		if headerHost, err := s.NetworkSettings.Headers.MarshalJSON(); err != nil {
+				return nil, err
+		} else {
+			w, _ := simplejson.NewJson(headerHost)
+			host = w.Get("Host").MustString()
 		}
+	case "h2":
+		path = s.NetworkSettings.Path
+		host = s.NetworkSettings.Host
+	case "grpc":
+		serviceName = s.NetworkSettings.ServiceName
 	case "tcp":
-		if nodeInfoResponse.Get("server").Get("networkSettings").Get("header").Get("type").MustString() == "http" {
-			path := "/"
-			if p := nodeInfoResponse.Get("server").Get("networkSettings").Get("header").Get("request").Get("path").MustString(); p != "" {
-				path = p
+		if httpHeader, err := s.NetworkSettings.Header.MarshalJSON(); err != nil {
+				return nil, err
+		} else {
+			t, _ := simplejson.NewJson(httpHeader)
+			type := t.Get("type").MustString()
+			if type == "http" {
+				path = t.Get("request").Get("path")).MustString()
+				header, _ = json.Marshal(map[string]any{
+					"type": "http",
+					"request": map[string]any{
+						"path": path,
+					}})
+			}else{
+				header, _ = json.Marshal(map[string]any{
+					"type": "none",
+					})
 			}
-			header, _ = json.Marshal(map[string]any{
-				"type": "http",
-				"request": map[string]any{
-					"path": path,
-				}})
-		}else{
-			header, _ = json.Marshal(map[string]any{
-				"type": "none",
-				})
 		}
 	case "quic":
-		quic_key = nodeInfoResponse.Get("server").Get("networkSettings").Get("key").MustString()
-		quic_security = nodeInfoResponse.Get("server").Get("networkSettings").Get("security").MustString()
-		htype = nodeInfoResponse.Get("server").Get("networkSettings").Get("header").Get("type").MustString()
+		quic_key = s.NetworkSettings.Quickey
+		quic_security = s.NetworkSettings.QuicSecurity
+		if headerType, err := s.NetworkSettings.Header.MarshalJSON(); err != nil {
+				return nil, err
+		} else {
+			h, _ := simplejson.NewJson(headerType)
+			htype = h.Get("type").MustString()
+		}
 		header, _ = json.Marshal(map[string]any{
 				"type": htype,
 			})
 	case "kcp":
-		seed = nodeInfoResponse.Get("server").Get("networkSettings").Get("seed").MustString()
-		congestion = nodeInfoResponse.Get("server").Get("networkSettings").Get("congestion").MustBool()
-		htype = nodeInfoResponse.Get("server").Get("networkSettings").Get("header").Get("type").MustString()
+		seed = s.NetworkSettings.Seed
+		congestion = s.NetworkSettings.Congestion
+		if headerType, err := s.NetworkSettings.Header.MarshalJSON(); err != nil {
+				return nil, err
+		} else {
+			k, _ := simplejson.NewJson(headerType)
+			htype = k.Get("type").MustString()
+		}
 		header, _ = json.Marshal(map[string]any{
 				"type": htype,
 			})		
 	}
 	
-	NodeType := nodeInfoResponse.Get("server").Get("type").MustString()
+	NodeType := s.Type
 	
 	if NodeType == "Shadowsocks"  && (transportProtocol == "ws" || transportProtocol == "grpc" || transportProtocol == "quic") {
 		NodeType = "Shadowsocks-Plugin"
 	}
 	
-	// Create GeneralNodeInfo
 	nodeInfo := &api.NodeInfo{
 		NodeType:          NodeType,
 		NodeID:            c.NodeID,
-		Port:              uint32(nodeInfoResponse.Get("server").Get("listeningport").MustUint64()),
+		Port:              uint32(s.Port),
 		TransportProtocol: transportProtocol,
 		EnableTLS:         enableTLS,
 		TLSType:           TLSType,
@@ -424,63 +433,60 @@ func (c *APIClient) parseNodeResponse(nodeInfoResponse *simplejson.Json) (*api.N
 		AlterID:           alterID,
 		Seed:              seed,
 		Congestion:        congestion,
-		Sniffing:          nodeInfoResponse.Get("server").Get("sniffing").MustBool(),
-		RejectUnknownSNI:  nodeInfoResponse.Get("server").Get("securitySettings").Get("rejectUnknownSni").MustBool(),
-		Fingerprint:       nodeInfoResponse.Get("server").Get("securitySettings").Get("fingerprint").MustString(), 
+		Sniffing:          s.SecuritySettings.Sniffing,
+		RejectUnknownSNI:  s.SecuritySettings.rejectUnknownSni,
+		Fingerprint:       s.SecuritySettings.Fingerprint, 
 		Quic_security:     quic_security,
 		Alpn:              Alpn,
 		Quic_key:          quic_key,
-		CypherMethod:      nodeInfoResponse.Get("server").Get("cipher").MustString(),
-		Address:           nodeInfoResponse.Get("server").Get("address").MustString(), 
-		AllowInsecure:     nodeInfoResponse.Get("server").Get("securitySettings").Get("allowInsecure").MustBool(),
-		Relay:             nodeInfoResponse.Get("relay").MustBool(),
-		RelayNodeID:       nodeInfoResponse.Get("server").Get("relayid").MustInt(),
-		ListenIP:          nodeInfoResponse.Get("server").Get("listenip").MustString(), 
-		ProxyProtocol:     nodeInfoResponse.Get("server").Get("networkSettings").Get("acceptProxyProtocol").MustBool(),
-		CertMode:          nodeInfoResponse.Get("server").Get("certmode").MustString(),
-		CertDomain:        nodeInfoResponse.Get("server").Get("securitySettings").Get("serverName").MustString(),
-		ServerKey:         nodeInfoResponse.Get("server").Get("server_key").MustString(),
-		SpeedLimit:        nodeInfoResponse.Get("server").Get("speedlimit").MustUint64() * 1000000 / 8,
-		EnableFallback:    nodeInfoResponse.Get("fallback").MustBool(),
-		EnableDNS:         nodeInfoResponse.Get("server").Get("enable_dns").MustBool(),
-		DomainStrategy:    nodeInfoResponse.Get("server").Get("domainstrategy").MustString(),
-		SendIP:            nodeInfoResponse.Get("server").Get("sendthrough").MustString(),
-		TrojanFallBack:    parseTrojanFallBack(nodeInfoResponse),
-		VlessFallBack:     parseVlessFallBack(nodeInfoResponse),
-		NameServerConfig:  parseDNSConfig(nodeInfoResponse),
+		CypherMethod:      s.Cipher,
+		Address:           s.Address, 
+		AllowInsecure:     s.SecuritySettings.AllowInsecure,
+		Relay:             s.Relay,
+		RelayNodeID:       s.Relayid,
+		ListenIP:          s.Listenip, 
+		ProxyProtocol:     s.NetworkSettings.ProxyProtocol,
+		CertMode:          s.Certmode,
+		CertDomain:        s.SecuritySettings.serverName,
+		ServerKey:         s.serverKey,
+		SpeedLimit:        uint64(s.Speedlimit * 1000000 / 8),
+		EnableFallback:    s.Fallback,
+		EnableDNS:         s.EnableDns,
+		DomainStrategy:    s.Domainstrategy,
+		SendIP:            s.sendThrough,
+		TrojanFallBack:    s.parseTrojanFallBack(),
+		VlessFallBack:     s.parseVlessFallBack(),
+		NameServerConfig:  s.parseDNSConfig(),
 	}
 	return nodeInfo, nil
 }
 
-func parseDNSConfig(nodeInfoResponse *simplejson.Json) (nameServerList []*conf.NameServerConfig) {
-	for _, rule := range nodeInfoResponse.Get("dns").MustArray() {
-		r := rule.(map[string]any)
-			nameServerList = append(nameServerList, &conf.NameServerConfig{
-				Address: &conf.Address{net.ParseAddress(r["address"].(string))},
-				Domains: strings.Split(r["domain"].(string), ","),
-			})
+func (s *serverConfig) parseDNSConfig() (nameServerList []*conf.NameServerConfig) {
+	for i := range s.DNS {
+		nameServerList = append(nameServerList, &conf.NameServerConfig{
+			Address: &conf.Address{net.ParseAddress(s.Routes[i].Address)},
+			Domains: s.Routes[i].Domain,
+		})
 	}
 
 	return
 }
 
-func parseTrojanFallBack(nodeInfoResponse *simplejson.Json) ([]*conf.TrojanInboundFallback) {
-	numOffallbacks := len(nodeInfoResponse.Get("fallbacks").MustArray())
+func (s *serverConfig) parseTrojanFallBack() ([]*conf.TrojanInboundFallback) {
+	numOffallbacks := len(s.Fallbacks)
 	fallbackList := make([]*conf.TrojanInboundFallback, numOffallbacks)
 	for i := 0; i < numOffallbacks; i++ {
-		fallback := nodeInfoResponse.Get("fallbacks").GetIndex(i)
-		
 		var dest json.RawMessage
-		dest, err := json.Marshal(fallback.Get("dest").MustString())
+		dest, err := json.Marshal(s.Fallbacks[i].Dest)
 		if err != nil {
 			return nil
 		}
 		u := &conf.TrojanInboundFallback{
-			Name: fallback.Get("sni").MustString(),
-			Alpn: fallback.Get("alpn").MustString(),
-			Path: fallback.Get("path").MustString(),
+			Name: s.Fallbacks[i].SNI,
+			Alpn: s.Fallbacks[i].Alpn,
+			Path: s.Fallbacks[i].Path,
 			Dest: dest,
-			Xver: fallback.Get("proxyprotocolver").MustUint64(),
+			Xver: uint64(s.Fallbacks[i].ProxyProtocol),
 		}
 		fallbackList[i] = u
 	}
@@ -488,23 +494,21 @@ func parseTrojanFallBack(nodeInfoResponse *simplejson.Json) ([]*conf.TrojanInbou
 	return fallbackList
 }
 
-func parseVlessFallBack(nodeInfoResponse *simplejson.Json) ([]*conf.VLessInboundFallback) {
-	numOffallbacks := len(nodeInfoResponse.Get("fallbacks").MustArray())
+func (s *serverConfig) parseVlessFallBack() ([]*conf.VLessInboundFallback) {
+	numOffallbacks := len(s.Fallbacks)
 	fallbackList := make([]*conf.VLessInboundFallback, numOffallbacks)
 	for i := 0; i < numOffallbacks; i++ {
-		fallback := nodeInfoResponse.Get("fallbacks").GetIndex(i)
-		
 		var dest json.RawMessage
-		dest, err := json.Marshal(fallback.Get("dest").MustString())
+		dest, err := json.Marshal(s.Fallbacks[i].Dest)
 		if err != nil {
 			return nil
 		}
 		u := &conf.VLessInboundFallback{
-			Name: fallback.Get("sni").MustString(),
-			Alpn: fallback.Get("alpn").MustString(),
-			Path: fallback.Get("path").MustString(),
+			Name: s.Fallbacks[i].SNI,
+			Alpn: s.Fallbacks[i].Alpn,
+			Path: s.Fallbacks[i].Path,
 			Dest: dest,
-			Xver: fallback.Get("proxyprotocolver").MustUint64(),
+			Xver: uint64(s.Fallbacks[i].ProxyProtocol),
 		}
 		fallbackList[i] = u
 	}
@@ -512,9 +516,9 @@ func parseVlessFallBack(nodeInfoResponse *simplejson.Json) ([]*conf.VLessInbound
 	return fallbackList
 }
 
-// GetRelayNodeInfo implements the API interface
+
 func (c *APIClient) GetRelayNodeInfo() (*api.RelayNodeInfo, error) {
-	nodeInfoResponse := c.resp.Load().(*simplejson.Json)
+	nodeInfoResponse := c.resp.Load().(*serverConfig)
 	
 	var (
 		TLSType                 = "none"
@@ -524,74 +528,86 @@ func (c *APIClient) GetRelayNodeInfo() (*api.RelayNodeInfo, error) {
 		alterID                 uint16 = 0
 	)
 
-	Flow := "xtls-rprx-direct"
-	
 	Alpn := ""
 	
-	if data, ok := nodeInfoResponse.Get("server").Get("securitySettings").CheckGet("alpn"); ok  {
-		if data.MustString() != "" {
-			Alpn = data.MustString()
-		}
+	if s.RSecuritySettings.Alpn != null {
+		Alpn = s.RSecuritySettings.Alpn
 	}
 	
-	if data, ok := nodeInfoResponse.Get("relay_server").Get("securitySettings").CheckGet("flow"); ok  {
-		if data.MustString() == "xtls-rprx-vision" {
-			Flow = data.MustString()
-		}
+	if s.RSecuritySettings.Flow == "xtls-rprx-vision" {
+		Flow := "xtls-rprx-vision"
+	}else{
+		Flow := "xtls-rprx-direct"
 	}
 	
-	TLSType = nodeInfoResponse.Get("relay_server").Get("security").MustString()
+	TLSType = s.RSecurity
 	
 	if TLSType == "tls" || TLSType == "xtls" {
 		enableTLS = true
 	}
 
-	transportProtocol := nodeInfoResponse.Get("relay_server").Get("network").MustString()
+	transportProtocol := s.RNetwork
 
 	switch transportProtocol {
 	case "ws":
-		path = nodeInfoResponse.Get("relay_server").Get("networkSettings").Get("path").MustString()
-		host = nodeInfoResponse.Get("relay_server").Get("networkSettings").Get("headers").Get("Host").MustString()
-	case "h2":
-		path = nodeInfoResponse.Get("relay_server").Get("networkSettings").Get("path").MustString()
-		host = nodeInfoResponse.Get("relay_server").Get("networkSettings").Get("host").MustString()
-	case "grpc":
-		if data, ok := nodeInfoResponse.Get("relay_server").Get("networkSettings").CheckGet("serviceName"); ok {
-			serviceName = data.MustString()
+		path = s.RNetworkSettings.Path
+		if headerHost, err := s.RNetworkSettings.Headers.MarshalJSON(); err != nil {
+				return nil, err
+		} else {
+			w, _ := simplejson.NewJson(headerHost)
+			host = w.Get("Host").MustString()
 		}
+	case "h2":
+		path = s.RNetworkSettings.Path
+		host = s.RNetworkSettings.Host
+	case "grpc":
+		serviceName = s.RNetworkSettings.ServiceName
 	case "tcp":
-		if nodeInfoResponse.Get("relay_server").Get("networkSettings").Get("header").Get("type").MustString() == "http" {
-			path := "/"
-			if p := nodeInfoResponse.Get("server").Get("networkSettings").Get("header").Get("request").Get("path").MustString(); p != "" {
-				path = p
+		if httpHeader, err := s.RNetworkSettings.Header.MarshalJSON(); err != nil {
+				return nil, err
+		} else {
+			t, _ := simplejson.NewJson(httpHeader)
+			type := t.Get("type").MustString()
+			if type == "http" {
+				path = t.Get("request").Get("path")).MustString()
+				header, _ = json.Marshal(map[string]any{
+					"type": "http",
+					"request": map[string]any{
+						"path": path,
+					}})
+			}else{
+				header, _ = json.Marshal(map[string]any{
+					"type": "none",
+					})
 			}
-			header, _ = json.Marshal(map[string]any{
-				"type": "http",
-				"request": map[string]any{
-					"path": path,
-				}})
-		}else{
-			header, _ = json.Marshal(map[string]any{
-				"type": "none",
-				})
 		}
 	case "quic":
-		quic_key = nodeInfoResponse.Get("relay_server").Get("networkSettings").Get("key").MustString()
-		quic_security = nodeInfoResponse.Get("relay_server").Get("networkSettings").Get("security").MustString()
-		htype = nodeInfoResponse.Get("server").Get("networkSettings").Get("header").Get("type").MustString()
+		quic_key = s.RNetworkSettings.Quickey
+		quic_security = s.RNetworkSettings.QuicSecurity
+		if headerType, err := s.RNetworkSettings.Header.MarshalJSON(); err != nil {
+				return nil, err
+		} else {
+			h, _ := simplejson.NewJson(headerType)
+			htype = h.Get("type").MustString()
+		}
 		header, _ = json.Marshal(map[string]any{
 				"type": htype,
 			})
 	case "kcp":
-		seed = nodeInfoResponse.Get("server").Get("networkSettings").Get("seed").MustString()
-		congestion = nodeInfoResponse.Get("server").Get("networkSettings").Get("congestion").MustBool()
-		htype = nodeInfoResponse.Get("server").Get("networkSettings").Get("header").Get("type").MustString()
+		seed = s.RNetworkSettings.Seed
+		congestion = s.RNetworkSettings.Congestion
+		if headerType, err := s.RNetworkSettings.Header.MarshalJSON(); err != nil {
+				return nil, err
+		} else {
+			k, _ := simplejson.NewJson(headerType)
+			htype = k.Get("type").MustString()
+		}
 		header, _ = json.Marshal(map[string]any{
 				"type": htype,
-			})			
+			})		
 	}
 	
-	NodeType := nodeInfoResponse.Get("relay_server").Get("type").MustString()
+	NodeType := s.RType
 	
 	if NodeType == "Shadowsocks"  && (transportProtocol == "ws" || transportProtocol == "grpc" || transportProtocol == "quic") {
 		NodeType = "Shadowsocks-Plugin"
@@ -600,8 +616,8 @@ func (c *APIClient) GetRelayNodeInfo() (*api.RelayNodeInfo, error) {
 	// Create GeneralNodeInfo
 	nodeInfo := &api.RelayNodeInfo{
 		NodeType:          NodeType,
-		NodeID:            nodeInfoResponse.Get("relay_server").Get("serverid").MustInt(),
-		Port:              uint32(nodeInfoResponse.Get("relay_server").Get("listeningport").MustUint64()),
+		NodeID:            s.RServerid,
+		Port:              uint32(s.RPort),
 		TransportProtocol: transportProtocol,
 		EnableTLS:         enableTLS,
 		TLSType:           TLSType,
@@ -611,21 +627,21 @@ func (c *APIClient) GetRelayNodeInfo() (*api.RelayNodeInfo, error) {
 		Seed :             seed,
 		Congestion:        congestion,	
 		ServiceName:       serviceName,
-		Fingerprint:       nodeInfoResponse.Get("relay_server").Get("securitySettings").Get("fingerprint").MustString(), 
-		AllowInsecure:     nodeInfoResponse.Get("relay_server").Get("securitySettings").Get("allowInsecure").MustBool(),
+		Fingerprint:       s.RSecuritySettings.Fingerprint, 
+		AllowInsecure:     s.RSecuritySettings.AllowInsecure,
 		Header:            header,
 		AlterID:           alterID,
 		Alpn:              Alpn,
 		Quic_security:     quic_security,
 		Quic_key:          quic_key,
-		CypherMethod:      nodeInfoResponse.Get("relay_server").Get("cipher").MustString(),
-		Address:           nodeInfoResponse.Get("relay_server").Get("address").MustString(), 
-		ListenIP:          nodeInfoResponse.Get("relay_server").Get("listenip").MustString(), 
-		ProxyProtocol:     nodeInfoResponse.Get("relay_server").Get("networkSettings").Get("acceptProxyProtocol").MustBool(),
-		ServerKey:         nodeInfoResponse.Get("relay_server").Get("server_key").MustString(),
-		EnableDNS:         nodeInfoResponse.Get("relay_server").Get("enable_dns").MustBool(),
-		DomainStrategy:    nodeInfoResponse.Get("relay_server").Get("domainstrategy").MustString(),
-		SendIP:            nodeInfoResponse.Get("relay_server").Get("sendthrough").MustString(),
+		CypherMethod:      s.RCipher,
+		Address:           s.RAddress, 
+		ListenIP:          s.RListenip, 
+		ProxyProtocol:     s.RNetworkSettings.ProxyProtocol,
+		ServerKey:         s.RserverKey,
+		EnableDNS:         s.REnableDns,
+		DomainStrategy:    s.RDomainstrategy,
+		SendIP:            s.RsendThrough,
 	}
 	return nodeInfo, nil
 }
