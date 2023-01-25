@@ -518,7 +518,7 @@ func (s *serverConfig) parseVlessFallBack() ([]*conf.VLessInboundFallback) {
 
 
 func (c *APIClient) GetRelayNodeInfo() (*api.RelayNodeInfo, error) {
-	nodeInfoResponse := c.resp.Load().(*serverConfig)
+	s := c.resp.Load().(*serverConfig)
 	
 	var (
 		TLSType                 = "none"

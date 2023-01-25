@@ -98,8 +98,8 @@ type route struct {
 
 type dnsconf struct {
 	Id       int      `json:"id"`
-	Domain    string   `json:"domain"`
-	Address    string   `json:"address"`
+	Domain   []string `json:"domain"`
+	Address  string   `json:"address"`
 }
 
 type fallbackconf struct {
