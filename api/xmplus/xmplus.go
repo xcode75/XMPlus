@@ -206,7 +206,7 @@ func (c *APIClient) ParseUserListResponse(userInfoResponse *[]User) (*[]api.User
 func (c *APIClient) GetNodeRule() (*[]api.DetectRule, error) {
 	routes := c.resp.Load().(*serverConfig).Routes
 	
-	Rules := len(s.Routes)
+	Rules := len(routes)
 	detects := make([]api.DetectRule, Rules)
 	
 	for i := range routes {
@@ -335,14 +335,14 @@ func (c *APIClient) parseNodeResponse(s *serverConfig) (*api.NodeInfo, error) {
 	
 	Alpn := ""
 	
-	if s.SecuritySettings.Alpn != null {
+	if s.SecuritySettings.Alpn != "" {
 		Alpn = s.SecuritySettings.Alpn
 	}
 	
+	Flow := "xtls-rprx-direct"
+	
 	if s.SecuritySettings.Flow == "xtls-rprx-vision" {
-		Flow := "xtls-rprx-vision"
-	}else{
-		Flow := "xtls-rprx-direct"
+		Flow = "xtls-rprx-vision"
 	}
 	
 	TLSType = s.Security
@@ -433,7 +433,7 @@ func (c *APIClient) parseNodeResponse(s *serverConfig) (*api.NodeInfo, error) {
 		AlterID:           alterID,
 		Seed:              seed,
 		Congestion:        congestion,
-		Sniffing:          s.SecuritySettings.Sniffing,
+		Sniffing:          s.Sniffing,
 		RejectUnknownSNI:  s.SecuritySettings.rejectUnknownSni,
 		Fingerprint:       s.SecuritySettings.Fingerprint, 
 		Quic_security:     quic_security,
@@ -464,8 +464,8 @@ func (c *APIClient) parseNodeResponse(s *serverConfig) (*api.NodeInfo, error) {
 func (s *serverConfig) parseDNSConfig() (nameServerList []*conf.NameServerConfig) {
 	for i := range s.DNS {
 		nameServerList = append(nameServerList, &conf.NameServerConfig{
-			Address: &conf.Address{net.ParseAddress(s.Routes[i].Address)},
-			Domains: s.Routes[i].Domain,
+			Address: &conf.Address{net.ParseAddress(s.DNS[i].Address)},
+			Domains: s.DNS[i].Domain,
 		})
 	}
 
@@ -530,14 +530,14 @@ func (c *APIClient) GetRelayNodeInfo() (*api.RelayNodeInfo, error) {
 
 	Alpn := ""
 	
-	if s.RSecuritySettings.Alpn != null {
+	if s.RSecuritySettings.Alpn != "" {
 		Alpn = s.RSecuritySettings.Alpn
 	}
 	
-	if s.RSecuritySettings.Flow == "xtls-rprx-vision" {
-		Flow := "xtls-rprx-vision"
-	}else{
-		Flow := "xtls-rprx-direct"
+	Flow := "xtls-rprx-direct"
+	
+	if s.SecuritySettings.Flow == "xtls-rprx-vision" {
+		Flow = "xtls-rprx-vision"
 	}
 	
 	TLSType = s.RSecurity
