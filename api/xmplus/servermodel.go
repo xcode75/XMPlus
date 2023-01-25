@@ -83,6 +83,7 @@ type relay_server struct {
 		rejectUnknownSni  bool `json:"rejectUnknownSni"`
 		serverName   string   `json:"serverName"`
 		Flow          string `json:"flow"`
+		Alpn         string `json:"alpn"`
 	} `json:"securitySettings"`	
 	RsendThrough string `json:"sendthrough"`
 	RserverKey  string `json:"server_key"`
