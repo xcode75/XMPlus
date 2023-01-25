@@ -372,8 +372,8 @@ func (c *APIClient) parseNodeResponse(s *serverConfig) (*api.NodeInfo, error) {
 				return nil, err
 		} else {
 			t, _ := simplejson.NewJson(httpHeader)
-			type := t.Get("type").MustString()
-			if type == "http" {
+			htype = t.Get("type").MustString()
+			if htype == "http" {
 				path = t.Get("request").Get("path")).MustString()
 				header, _ = json.Marshal(map[string]any{
 					"type": "http",
@@ -567,8 +567,8 @@ func (c *APIClient) GetRelayNodeInfo() (*api.RelayNodeInfo, error) {
 				return nil, err
 		} else {
 			t, _ := simplejson.NewJson(httpHeader)
-			type := t.Get("type").MustString()
-			if type == "http" {
+			htype = t.Get("type").MustString()
+			if htype == "http" {
 				path = t.Get("request").Get("path")).MustString()
 				header, _ = json.Marshal(map[string]any{
 					"type": "http",
