@@ -31,7 +31,7 @@ type server struct {
 		Headers     *json.RawMessage `json:"headers"`
 		ServiceName string           `json:"serviceName"`
 		Header      *json.RawMessage `json:"header"`
-		transport   string           `json:"transport"`
+		Transport   string           `json:"transport"`
 		Seed        string           `json:"seed"`
 		Congestion  bool 	         `json:"congestion"`
 	} `json:"networkSettings"`
@@ -45,7 +45,7 @@ type server struct {
 		Alpn         string `json:"alpn"`
 	} `json:"securitySettings"`	
 	Relayid   int   `json:"relayid"`
-	sendThrough string `json:"sendthrough"`
+	SendThrough string `json:"sendthrough"`
 	ServerKey  string `json:"server_key"`
 	Sniffing  bool 	`json:"sniffing"`
 	Speedlimit  int   `json:"speedlimit"`
@@ -72,7 +72,7 @@ type relay_server struct {
 		Headers     *json.RawMessage `json:"headers"`
 		ServiceName string           `json:"serviceName"`
 		Header      *json.RawMessage `json:"header"`
-		transport   string           `json:"transport"`
+		Transport   string           `json:"transport"`
 		Seed        string           `json:"seed"`
 		Congestion  bool 	         `json:"congestion"`
 	} `json:"networkSettings"`
@@ -85,7 +85,7 @@ type relay_server struct {
 		Flow          string `json:"flow"`
 		Alpn          string `json:"alpn"`
 	} `json:"securitySettings"`	
-	RsendThrough string `json:"sendthrough"`
+	RSendThrough string `json:"sendthrough"`
 	RServerKey  string `json:"server_key"`
 	RSniffing  bool 	`json:"sniffing"`
 	RSpeedlimit  int   `json:"speedlimit"`

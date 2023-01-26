@@ -456,7 +456,7 @@ func (c *APIClient) parseNodeResponse(s *serverConfig) (*api.NodeInfo, error) {
 		EnableFallback:    s.Fallback,
 		EnableDNS:         s.EnableDns,
 		DomainStrategy:    s.Domainstrategy,
-		SendIP:            s.sendThrough,
+		SendIP:            s.SendThrough,
 		TrojanFallBack:    s.parseTrojanFallBack(),
 		VlessFallBack:     s.parseVlessFallBack(),
 		NameServerConfig:  s.parseDNSConfig(),
@@ -644,7 +644,7 @@ func (c *APIClient) GetRelayNodeInfo() (*api.RelayNodeInfo, error) {
 		ServerKey:         s.RServerKey,
 		EnableDNS:         s.REnableDns,
 		DomainStrategy:    s.RDomainstrategy,
-		SendIP:            s.RsendThrough,
+		SendIP:            s.RSendThrough,
 	}
 	return nodeInfo, nil
 }
