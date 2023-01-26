@@ -46,7 +46,7 @@ type server struct {
 	} `json:"securitySettings"`	
 	Relayid   int   `json:"relayid"`
 	sendThrough string `json:"sendthrough"`
-	serverKey  string `json:"server_key"`
+	ServerKey  string `json:"server_key"`
 	Sniffing  bool 	`json:"sniffing"`
 	Speedlimit  int   `json:"speedlimit"`
 	Type string `json:"type"`
@@ -86,7 +86,7 @@ type relay_server struct {
 		Alpn          string `json:"alpn"`
 	} `json:"securitySettings"`	
 	RsendThrough string `json:"sendthrough"`
-	RserverKey  string `json:"server_key"`
+	RServerKey  string `json:"server_key"`
 	RSniffing  bool 	`json:"sniffing"`
 	RSpeedlimit  int   `json:"speedlimit"`
 	RType string `json:"type"`
