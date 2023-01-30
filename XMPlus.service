@@ -15,6 +15,7 @@ WorkingDirectory=/usr/local/XMPlus/
 ExecStart=/usr/local/XMPlus/XMPlus -config /etc/XMPlus/config.yml
 Restart=on-failure
 RestartSec=10
+Environment="XRAY_VMESS_AEAD_FORCED=false"
 
 [Install]
 WantedBy=multi-user.target
