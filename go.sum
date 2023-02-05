@@ -758,7 +758,7 @@ github.com/xeipuuv/gojsonschema v1.2.0/go.mod h1:anYRn/JVcOK2ZgGU+IjEV4nwlhoK5sQ
 github.com/xiang90/probing v0.0.0-20190116061207-43a291ad63a2/go.mod h1:UETIi67q53MR2AWcXfiuqkDkRtnGDLqkBTpCHuJHxtU=
 github.com/xtls/go v0.0.0-20230107031059-4610f88d00f3 h1:a3Y4WVjCxwoyO4E2xdNvq577tW8lkSBgyrA8E9+2NtM=
 github.com/xtls/go v0.0.0-20230107031059-4610f88d00f3/go.mod h1:YJTRELIWrGxR1s8xcEBgxcxBfwQfMGjdvNLTjN9XFgY=
-github.com/xcode75/xcore v1.7.4 h1:zXpF4jLBTJ8OwxCcwj+7HqYBRIpBY2UrSxVoe3ZLXZU=
+github.com/xcode75/xcore v1.7.4 h1:vDo+tcOYLLkuAVMcetoLdsjP9Rtq+w6HKreVau2eACY=
 github.com/xcode75/xcore v1.7.4/go.mod h1:sJuXMnG1meFknEI4f3o/gwr/X6SsiBhGHr59o80hcKE=
 github.com/yandex-cloud/go-genproto v0.0.0-20220805142335-27b56ddae16f h1:cG+ehPRJSlqljSufLf1KXeXpUd1dLNjnzA18mZcB/O0=
 github.com/yandex-cloud/go-genproto v0.0.0-20220805142335-27b56ddae16f/go.mod h1:HEUYX/p8966tMUHHT+TsS0hF/Ca/NYwqprC5WXSDMfE=
