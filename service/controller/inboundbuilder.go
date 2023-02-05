@@ -171,13 +171,14 @@ func InboundBuilder(config *Config, nodeInfo *api.NodeInfo, tag string) (*core.I
 				Header:    nodeInfo.Header,
 				Key:       nodeInfo.Quic_key,
 			}
+			streamSetting.QUICSettings = quicSettings
 		}else{
 			quicSettings := &conf.QUICConfig{
 				Security:  nodeInfo.Quic_security,
 				Header:    nodeInfo.Header,
 			}
+			streamSetting.QUICSettings = quicSettings
 		}
-		streamSetting.QUICSettings = quicSettings
 	case "mkcp":
 		kcpSettings := &conf.KCPConfig{
 			HeaderConfig:    nodeInfo.Header,
