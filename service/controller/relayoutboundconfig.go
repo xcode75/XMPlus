@@ -174,7 +174,8 @@ func (c *VLessOutboundConfig) Build() (proto.Message, error) {
 			}
 
 			if account.Encryption != "none" {
-				return nil, newError(`VLESS users: please add/set "encryption":"none" for every user`)
+				account.Encryption = "none"
+				//return nil, newError(`VLESS users: please add/set "encryption":"none" for every user`)
 			}
 
 			user.Account = serial.ToTypedMessage(account)

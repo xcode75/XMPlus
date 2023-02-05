@@ -165,10 +165,17 @@ func InboundBuilder(config *Config, nodeInfo *api.NodeInfo, tag string) (*core.I
 		}
 		streamSetting.GRPCConfig = grpcSettings
 	case "quic":
-		quicSettings := &conf.QUICConfig{
-			Security:  nodeInfo.Quic_security,
-			Header:    nodeInfo.Header,
-			Key:       nodeInfo.Quic_key,
+		if nodeInfo.Quic_key != "" {
+			quicSettings := &conf.QUICConfig{
+				Security:  nodeInfo.Quic_security,
+				Header:    nodeInfo.Header,
+				Key:       nodeInfo.Quic_key,
+			}
+		}else{
+			quicSettings := &conf.QUICConfig{
+				Security:  nodeInfo.Quic_security,
+				Header:    nodeInfo.Header,
+			}
 		}
 		streamSetting.QUICSettings = quicSettings
 	case "mkcp":

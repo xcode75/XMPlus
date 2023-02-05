@@ -9,7 +9,6 @@ import (
 	"sync/atomic"
 	"time"
 	"sync"
-	"errors"
 	"reflect"
 
 	"github.com/bitly/go-simplejson"
@@ -106,11 +105,7 @@ func (c *APIClient) GetNodeInfo() (nodeInfo *api.NodeInfo, err error) {
 	
 	b, _ := response.Encode()
 	json.Unmarshal(b, server)
-	
-	if server.Port <= 0 {
-		return nil, errors.New("server port must > 0")
-	}
-	
+
 	c.resp.Store(server)
 	
 	nodeInfo, err = c.parseNodeResponse(server)
@@ -127,11 +122,6 @@ func (c *APIClient) GetUserList() (UserList *[]api.UserInfo, err error) {
 		SetHeader("If-None-Match", c.eTag).
 		ForceContentType("application/json").
 		Get(path)
-
-
-	if res.StatusCode() == 304 {
-		return nil, errors.New("users_no_change")
-	}
 	
 	if res.Header().Get("Etag") != "" && res.Header().Get("Etag") != c.eTag {
 		c.eTag = res.Header().Get("Etag")
@@ -350,69 +340,69 @@ func (c *APIClient) parseNodeResponse(s *serverConfig) (*api.NodeInfo, error) {
 	if TLSType == "tls" || TLSType == "xtls" {
 		enableTLS = true
 		if s.SecuritySettings.ServerName == "" {
-			return nil, fmt.Errorf("TLS certificate domain is empty: %s",  s.SecuritySettings.ServerName)
+			return nil, fmt.Errorf("TLS certificate domain (ServerName) is empty: %s",  s.SecuritySettings.ServerName)
 		}
 	}
 
 	transportProtocol := s.Network
 
 	switch transportProtocol {
-	case "ws":
-		path = s.NetworkSettings.Path
-		if headerHost, err := s.NetworkSettings.Headers.MarshalJSON(); err != nil {
-				return nil, err
-		} else {
-			w, _ := simplejson.NewJson(headerHost)
-			host = w.Get("Host").MustString()
-		}
-	case "h2":
-		path = s.NetworkSettings.Path
-		host = s.NetworkSettings.Host
-	case "grpc":
-		serviceName = s.NetworkSettings.ServiceName
-	case "tcp":
-		if httpHeader, err := s.NetworkSettings.Header.MarshalJSON(); err != nil {
-				return nil, err
-		} else {
-			t, _ := simplejson.NewJson(httpHeader)
-			htype = t.Get("type").MustString()
-			if htype == "http" {
-				path = t.Get("request").Get("path").MustString()
-				header, _ = json.Marshal(map[string]any{
-					"type": "http",
-					"request": map[string]any{
-						"path": path,
-					}})
-			}else{
-				header, _ = json.Marshal(map[string]any{
-					"type": "none",
-					})
+		case "ws":
+			path = s.NetworkSettings.Path
+			if headerHost, err := s.NetworkSettings.Headers.MarshalJSON(); err != nil {
+					return nil, err
+			} else {
+				w, _ := simplejson.NewJson(headerHost)
+				host = w.Get("Host").MustString()
 			}
-		}
-	case "quic":
-		quic_key = s.NetworkSettings.Quickey
-		quic_security = s.NetworkSettings.QuicSecurity
-		if headerType, err := s.NetworkSettings.Header.MarshalJSON(); err != nil {
-				return nil, err
-		} else {
-			h, _ := simplejson.NewJson(headerType)
-			htype = h.Get("type").MustString()
-		}
-		header, _ = json.Marshal(map[string]any{
-				"type": htype,
-			})
-	case "kcp":
-		seed = s.NetworkSettings.Seed
-		congestion = s.NetworkSettings.Congestion
-		if headerType, err := s.NetworkSettings.Header.MarshalJSON(); err != nil {
-				return nil, err
-		} else {
-			k, _ := simplejson.NewJson(headerType)
-			htype = k.Get("type").MustString()
-		}
-		header, _ = json.Marshal(map[string]any{
-				"type": htype,
-			})		
+		case "h2":
+			path = s.NetworkSettings.Path
+			host = s.NetworkSettings.Host
+		case "grpc":
+			serviceName = s.NetworkSettings.ServiceName
+		case "tcp":
+			if httpHeader, err := s.NetworkSettings.Header.MarshalJSON(); err != nil {
+					return nil, err
+			} else {
+				t, _ := simplejson.NewJson(httpHeader)
+				htype := t.Get("type").MustString()
+				if htype == "http" {
+					path = t.Get("request").Get("path").MustString()
+					header, _ = json.Marshal(map[string]any{
+						"type": "http",
+						"request": map[string]any{
+							"path": path,
+						}})
+				}else{
+					header, _ = json.Marshal(map[string]any{
+						"type": "none",
+						})
+				}
+			}
+		case "quic":
+			quic_key = s.NetworkSettings.Quickey
+			quic_security = s.NetworkSettings.QuicSecurity
+			if headerType, err := s.NetworkSettings.Header.MarshalJSON(); err != nil {
+					return nil, err
+			} else {
+				h, _ := simplejson.NewJson(headerType)
+				htype = h.Get("type").MustString()
+			}
+			header, _ = json.Marshal(map[string]any{
+					"type": htype,
+				})
+		case "kcp":
+			seed = s.NetworkSettings.Seed
+			congestion = s.NetworkSettings.Congestion
+			if headerType, err := s.NetworkSettings.Header.MarshalJSON(); err != nil {
+					return nil, err
+			} else {
+				k, _ := simplejson.NewJson(headerType)
+				htype = k.Get("type").MustString()
+			}
+			header, _ = json.Marshal(map[string]any{
+					"type": htype,
+				})		
 	}
 	
 	NodeType := s.Type

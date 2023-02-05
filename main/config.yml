@@ -8,14 +8,14 @@ InboundConfigPath: # /etc/XMPlus/inbound.json
 OutboundConfigPath: # /etc/XMPlus/outbound.json
 ConnectionConfig:
   Handshake: 8 
-  ConnIdle: 150 
+  ConnIdle: 300 
   UplinkOnly: 0 
   DownlinkOnly: 0 
   BufferSize: 64
 Nodes:
   -
     ApiConfig:
-      ApiHost: "http://127.0.0.1"
+      ApiHost: "https://xmplus.dev"
       ApiKey: "123"
       NodeID: 1
       Timeout: 30 
@@ -23,8 +23,8 @@ Nodes:
       UpdatePeriodic: 120
       CertConfig:
         Email: author@xmplus.dev                    # Required when Cert Mode is not none
-        CertFile: /etc/XMPlus/node1.test.com.crt    # Required when Cert Mode is file
-        KeyFile: /etc/XMPlus/node1.test.com.key     # Required when Cert Mode is file
+        CertFile: /etc/XMPlus/node1.xmplus.dev.crt  # Required when Cert Mode is file
+        KeyFile: /etc/XMPlus/node1.xmplus.dev.key   # Required when Cert Mode is file
         Provider: cloudflare                        # Required when Cert Mode is dns
         CertEnv:                                    # Required when Cert Mode is dns
           CLOUDFLARE_EMAIL:                         # Required when Cert Mode is dns
@@ -32,7 +32,7 @@ Nodes:
           
 #  -
 #    ApiConfig:
-#      ApiHost: "http://127.0.0.1"
+#      ApiHost: "https://xmplus.dev"
 #      ApiKey: "123"
 #      NodeID: 2
 #      Timeout: 30 
@@ -40,8 +40,8 @@ Nodes:
 #      UpdatePeriodic: 120
 #      CertConfig:
 #        Email: author@xmplus.dev                    # Required when Cert Mode is not none
-#        CertFile: /etc/XMPlus/node1.test.com.crt    # Required when Cert Mode is file
-#        KeyFile: /etc/XMPlus/node1.test.com.key     # Required when Cert Mode is file
+#        CertFile: /etc/XMPlus/node1.xmplus.dev.crt  # Required when Cert Mode is file
+#        KeyFile: /etc/XMPlus/node1.xmplus.dev.key   # Required when Cert Mode is file
 #        Provider: cloudflare                        # Required when Cert Mode is dns
 #        CertEnv:                                    # Required when Cert Mode is dns
 #          CLOUDFLARE_EMAIL:                         # Required when Cert Mode is dns

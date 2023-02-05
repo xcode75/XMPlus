@@ -138,13 +138,13 @@ func (c *Controller) Start() error {
 	// Add periodic tasks
 	c.tasks = append(c.tasks,
 		periodicTask{
-			tag: "node monitor",
+			tag: "Node monitor",
 			Periodic: &task.Periodic{
 				Interval: time.Duration(c.config.UpdatePeriodic) * time.Second,
 				Execute:  c.nodeInfoMonitor,
 			}},
 		periodicTask{
-			tag: "user monitor",
+			tag: "User monitor",
 			Periodic: &task.Periodic{
 				Interval: time.Duration(c.config.UpdatePeriodic) * time.Second,
 				Execute:  c.userInfoMonitor,
@@ -152,9 +152,9 @@ func (c *Controller) Start() error {
 	)
 
 	// Check cert service in need
-	if c.nodeInfo.EnableTLS {
+	if c.nodeInfo.EnableTLS && c.nodeInfo.CertMode != "none" {
 		c.tasks = append(c.tasks, periodicTask{
-			tag: "cert monitor",
+			tag: "Cert monitor",
 			Periodic: &task.Periodic{
 				Interval: time.Duration(c.config.UpdatePeriodic) * time.Second * 60,
 				Execute:  c.certMonitor,
@@ -201,13 +201,8 @@ func (c *Controller) nodeInfoMonitor() (err error) {
 	
 	newUserInfo, err := c.apiClient.GetUserList()
 	if err != nil {
-		if err.Error() == "users_no_change" {
-			usersChanged = false
-			newUserInfo = c.userList
-		} else {
-			log.Print(err)
-			return nil
-		}
+		log.Print(err)
+		return nil
 	}
 
 	var updateRelay = false	

@@ -4,10 +4,10 @@ import "encoding/json"
 
 type serverConfig struct {
 	server  `json:"server"`
-	Relay   bool 	`json:"relay"`
+	Relay   bool 	 `json:"relay"`
 	relay_server     `json:"relay_server"`
-	Routes []route  `json:"routes"`
-	DNS    []dnsconf    `json:"dns"`
+	Routes []route   `json:"routes"`
+	DNS    []dnsconf `json:"dns"`
 	Fallback bool 	`json:"fallback"`
 	Fallbacks []fallbackconf `json:"fallbacks"`
 }
@@ -23,7 +23,7 @@ type server struct {
 	Listenip    string   `json:"listenip"`
 	Network     string   `json:"network"`
 	NetworkSettings struct {
-	    ProxyProtocol bool 	`json:"acceptProxyProtocol"`
+	    ProxyProtocol bool 	         `json:"acceptProxyProtocol"`
 		Path        string           `json:"path"`
 		Host        string           `json:"host"`
 		QuicSecurity string          `json:"security"`
@@ -37,34 +37,34 @@ type server struct {
 	} `json:"networkSettings"`
 	Security string `json:"security"`
 	SecuritySettings struct {
-	    AllowInsecure bool 	`json:"allowInsecure"`
+	    AllowInsecure bool 	   `json:"allowInsecure"`
 		Fingerprint   string   `json:"fingerprint"`
 		RejectUnknownSni  bool `json:"rejectUnknownSni"`
-		ServerName   string   `json:"serverName"`
-		Flow         string `json:"flow"`
-		Alpn         string `json:"alpn"`
+		ServerName   string    `json:"serverName"`
+		Flow         string    `json:"flow"`
+		Alpn         string    `json:"alpn"`
 	} `json:"securitySettings"`	
-	Relayid   int   `json:"relayid"`
-	SendThrough string `json:"sendthrough"`
-	ServerKey  string `json:"server_key"`
-	Sniffing  bool 	`json:"sniffing"`
-	Speedlimit  int   `json:"speedlimit"`
-	Type string `json:"type"`
+	Relayid   int       `json:"relayid"`
+	SendThrough string  `json:"sendthrough"`
+	ServerKey  string   `json:"server_key"`
+	Sniffing  bool 	    `json:"sniffing"`
+	Speedlimit  int     `json:"speedlimit"`
+	Type    string      `json:"type"`
 }
 
 type relay_server struct {
-	RId          int      `json:"id"`
+	RId          int        `json:"id"`
 	RAddress     string 	`json:"address"`
-	RServerid    int 	`json:"serverid"`
+	RServerid    int 	    `json:"serverid"`
 	RCipher      string 	`json:"cipher"`
-	RDomainstrategy string `json:"domainstrategy"`
-	REnableDns   bool 	`json:"enable_dns"`
-	RIP          string   `json:"ip"`
-	RPort        int   `json:"listeningport"`
-	RListenip    string   `json:"listenip"`
-	RNetwork     string   `json:"network"`
+	RDomainstrategy string  `json:"domainstrategy"`
+	REnableDns   bool 	    `json:"enable_dns"`
+	RIP          string     `json:"ip"`
+	RPort        int        `json:"listeningport"`
+	RListenip    string     `json:"listenip"`
+	RNetwork     string     `json:"network"`
 	RNetworkSettings struct {
-	    ProxyProtocol bool 	`json:"acceptProxyProtocol"`
+	    ProxyProtocol bool 	         `json:"acceptProxyProtocol"`
 		Path        string           `json:"path"`
 		Host        string           `json:"host"`
 		QuicSecurity string          `json:"security"`
@@ -78,18 +78,18 @@ type relay_server struct {
 	} `json:"networkSettings"`
 	RSecurity string `json:"security"`
 	RSecuritySettings struct {
-	    AllowInsecure bool 	`json:"allowInsecure"`
+	    AllowInsecure bool 	   `json:"allowInsecure"`
 		Fingerprint   string   `json:"fingerprint"`
 		RejectUnknownSni  bool `json:"rejectUnknownSni"`
-		ServerName   string   `json:"serverName"`
-		Flow          string `json:"flow"`
-		Alpn          string `json:"alpn"`
+		ServerName   string    `json:"serverName"`
+		Flow          string   `json:"flow"`
+		Alpn          string   `json:"alpn"`
 	} `json:"securitySettings"`	
-	RSendThrough string `json:"sendthrough"`
-	RServerKey  string `json:"server_key"`
-	RSniffing  bool 	`json:"sniffing"`
-	RSpeedlimit  int   `json:"speedlimit"`
-	RType string `json:"type"`
+	RSendThrough string   `json:"sendthrough"`
+	RServerKey  string    `json:"server_key"`
+	RSniffing  bool 	  `json:"sniffing"`
+	RSpeedlimit  int      `json:"speedlimit"`
+	RType     string      `json:"type"`
 }
 
 type route struct {
@@ -105,7 +105,7 @@ type dnsconf struct {
 
 type fallbackconf struct {
 	Id         int      `json:"id"`
-	Alpn       string      `json:"alpn"`
+	Alpn       string   `json:"alpn"`
 	Dest       string   `json:"dest"`
 	Path       string   `json:"path"`
 	SNI        string   `json:"sni"`
