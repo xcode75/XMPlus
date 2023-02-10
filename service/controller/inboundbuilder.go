@@ -122,6 +122,9 @@ func InboundBuilder(config *Config, nodeInfo *api.NodeInfo, tag string) (*core.I
 			Transparent: false,
 			UserLevel: 0,
 		}
+		
+		proxySetting, _ := proxySetting.(*conf.HTTPServerConfig)
+		
 		p := make([]byte, 32)
 		rand.Read(p)
 		randPasswd := hex.EncodeToString(p)
