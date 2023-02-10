@@ -15,10 +15,8 @@ import (
 	"github.com/xcode75/xcore/features/routing"
 	"github.com/xcode75/xcore/features/stats"
 	"github.com/xcode75/xcore/app/router"
-	
 	C "github.com/sagernet/sing/common"
 	"github.com/sagernet/sing-shadowsocks/shadowaead_2022"
-
 	"github.com/xcode75/XMPlus/api"
 	"github.com/xcode75/XMPlus/app/mydispatcher"
 	"github.com/xcode75/XMPlus/common/mylego"
@@ -373,7 +371,6 @@ func (c *Controller) addNewTag(newNodeInfo *api.NodeInfo) (err error) {
 	return nil
 }
 
-
 func (c *Controller) removeRelayTag(tag string, userInfo *[]api.UserInfo) (err error) {
 	for _, user := range *userInfo {
 		err = c.removeOutbound(fmt.Sprintf("%s_%d", tag, user.UID))
@@ -391,7 +388,7 @@ func (c *Controller) removeRules(tag string, userInfo *[]api.UserInfo){
 }
 
 func (c *Controller) addNewRelayTag(newRelayNodeInfo *api.RelayNodeInfo, userInfo *[]api.UserInfo) (err error) {
-	if newRelayNodeInfo.NodeType != "Shadowsocks-Plugin" {
+	if newRelayNodeInfo.NodeType != "Shadowsocks-Plugin" || newRelayNodeInfo.NodeType != "Http" {
 		for _, user := range *userInfo {
 			var Key string			
 			if C.Contains(shadowaead_2022.List, strings.ToLower(newRelayNodeInfo.CypherMethod)) {
@@ -484,6 +481,8 @@ func (c *Controller) addNewUser(userInfo *[]api.UserInfo, nodeInfo *api.NodeInfo
 		users = c.buildSSUser(userInfo, nodeInfo.CypherMethod)
 	case "Shadowsocks-Plugin":
 		users = c.buildSSPluginUser(userInfo, nodeInfo.CypherMethod)
+	case "Http":
+		users = c.buildHttpUser(userInfo)	
 	default:
 		return fmt.Errorf("unsupported node type: %s", nodeInfo.NodeType)
 	}
@@ -616,7 +615,7 @@ func (c *Controller) buildNodeTag() string {
 }
 
 func (c *Controller) buildRNodeTag() string {
-	return fmt.Sprintf("Relay_%s_%d_%d", c.relaynodeInfo.NodeType, c.relaynodeInfo.Port, c.relaynodeInfo.NodeID)
+	return fmt.Sprintf("Relay_%d_%s_%d_%d", c.nodeInfo.NodeID, c.relaynodeInfo.NodeType, c.relaynodeInfo.Port, c.relaynodeInfo.NodeID)
 }
 
 func (c *Controller) logPrefix() string {
@@ -627,12 +626,11 @@ func (c *Controller) logPrefix() string {
 func (c *Controller) certMonitor() error {
 	if c.nodeInfo.EnableTLS {
 		switch c.nodeInfo.CertMode {
-		case "dns", "http", "tls":
+		case "dns", "http":
 			lego, err := mylego.New(c.config.CertConfig)
 			if err != nil {
 				log.Print(err)
 			}
-			// Xray-core supports the OcspStapling certification hot renew
 			_, _, _, err = lego.RenewCert(c.nodeInfo.CertMode, c.nodeInfo.CertDomain)
 			if err != nil {
 				log.Print(err)
@@ -641,4 +639,3 @@ func (c *Controller) certMonitor() error {
 	}
 	return nil
 }
-

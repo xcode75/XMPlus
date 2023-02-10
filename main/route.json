@@ -4,15 +4,11 @@
     {
       "type": "field",
       "outboundTag": "block",
-      "ip": [
-        "geoip:private"
-      ]
-    },
-    {
-      "type": "field",
-      "outboundTag": "block",
       "protocol": [
         "bittorrent"
+      ],
+	  "ip": [
+        "geoip:private"
       ]
     },
     {

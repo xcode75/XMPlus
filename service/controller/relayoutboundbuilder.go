@@ -4,13 +4,10 @@ import (
 	"encoding/json"
 	"fmt"
 	
-
 	"github.com/xcode75/XMPlus/api"
 	"github.com/xcode75/xcore/common/net"
 	"github.com/xcode75/xcore/core"
 	"github.com/xcode75/xcore/infra/conf"
-	
-	
 	"github.com/xcode75/xcore/common/protocol"
 	"github.com/xcode75/xcore/common/serial"
 	"github.com/xcode75/xcore/proxy/vless"
@@ -264,4 +261,3 @@ func buildRVlessUser(tag string, Flow string, UUID string, Email string)  *proto
 		Account: serial.ToTypedMessage(vlessAccount),
 	}
 }
-

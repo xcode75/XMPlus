@@ -14,7 +14,6 @@ import (
 
 	"github.com/fsnotify/fsnotify"
 	"github.com/spf13/viper"
-
 	"github.com/xcode75/XMPlus/panel"
 )
 
@@ -24,7 +23,7 @@ var (
 )
 
 var (
-	version  = "XMPlus v2.0.9 (A custom version of XrayR)"
+	version  = "XMPlus v2.1.0 (A custom version of XrayR)"
 )
 
 func showVersion() {
@@ -51,7 +50,6 @@ func getConfig() *viper.Viper {
 		config.SetConfigName("config")
 		config.SetConfigType("yml")
 		config.AddConfigPath(".")
-
 	}
 
 	if err := config.ReadInConfig(); err != nil {

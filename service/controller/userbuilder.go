@@ -14,7 +14,6 @@ import (
 	"github.com/xcode75/xcore/proxy/shadowsocks_2022"
 	"github.com/xcode75/xcore/proxy/trojan"
 	"github.com/xcode75/xcore/proxy/vless"
-
 	"github.com/xcode75/XMPlus/api"
 )
 
@@ -144,6 +143,21 @@ func (c *Controller) buildSSPluginUser(userInfo *[]api.UserInfo, method string) 
 	return users
 }
 
+func (c *Controller) buildHttpUser(userInfo *[]api.UserInfo) (users []*protocol.User) {
+	users = make([]*protocol.User, len(*userInfo))
+	for i, user := range *userInfo {
+		httpAccount := &conf.HTTPAccount{
+			Username:  user.Email,
+			Password: user.Passwd,
+		}
+		users[i] = &protocol.User{
+			Level:   0,
+			Email:   c.buildUserTag(&user),
+			Account: serial.ToTypedMessage(httpAccount.Build()),
+		}
+	}
+	return users
+}
 
 func (c *Controller) buildUserTag(user *api.UserInfo) string {
 	return fmt.Sprintf("%s|%s|%d", c.Tag, user.Email, user.UID)

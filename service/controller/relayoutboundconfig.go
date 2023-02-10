@@ -16,7 +16,6 @@ import (
 	vlessoutbound "github.com/xcode75/xcore/proxy/vless/outbound"
 	"github.com/xcode75/xcore/proxy/vmess"
 	"github.com/xcode75/xcore/proxy/vmess/outbound"
-	
 	"github.com/xcode75/xcore/proxy/shadowsocks"
 	"github.com/xcode75/xcore/proxy/shadowsocks_2022"
 	"github.com/sagernet/sing-shadowsocks/shadowaead_2022"
@@ -44,7 +43,6 @@ func (v *Address) UnmarshalJSON(data []byte) error {
 func (v *Address) Build() *net.IPOrDomain {
 	return net.NewIPOrDomain(v.Address)
 }
-
 
 // TrojanServerTarget is configuration of a single trojan server
 type TrojanServerTarget struct {
@@ -220,7 +218,6 @@ func (a *VMessAccount) Build() *vmess.Account {
 		TestsEnabled: a.Experiments,
 	}
 }
-
 
 type VMessOutboundTarget struct {
 	Address *Address          `json:"address"`

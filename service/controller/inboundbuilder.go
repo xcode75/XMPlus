@@ -14,7 +14,6 @@ import (
 	"github.com/xcode75/xcore/common/net"
 	"github.com/xcode75/xcore/core"
 	"github.com/xcode75/xcore/infra/conf"
-
 	"github.com/xcode75/XMPlus/api"
 	"github.com/xcode75/XMPlus/common/mylego"
 )
@@ -29,7 +28,6 @@ func InboundBuilder(config *Config, nodeInfo *api.NodeInfo, tag string) (*core.I
 		ipAddress := net.ParseAddress(nodeInfo.ListenIP)
 		inboundDetourConfig.ListenOn = &conf.Address{Address: ipAddress}
 	}
-
 
 	portList := &conf.PortList{
 		Range: []conf.PortRange{{From: nodeInfo.Port, To: nodeInfo.Port}},
@@ -117,6 +115,19 @@ func InboundBuilder(config *Config, nodeInfo *api.NodeInfo, tag string) (*core.I
 			Host:        "v1.mux.cool",
 			NetworkList: []string{"tcp", "udp"},
 		}
+	case "Http":	
+		protocol = "http"
+		proxySetting = &conf.HTTPServerConfig{
+			Timeout: 0,
+			Transparent: false,
+			UserLevel: 0,
+		}
+		p := make([]byte, 32)
+		rand.Read(p)
+		randPasswd := hex.EncodeToString(p)
+		proxySetting.Accounts = append(proxySetting.Accounts, &conf.HTTPAccount{
+			Password: randPasswd,
+		})
 	default:
 		return nil, fmt.Errorf("Unsupported Node Type: %s", nodeInfo.NodeType)
 	}

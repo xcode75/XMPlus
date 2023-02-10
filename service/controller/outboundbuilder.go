@@ -7,7 +7,6 @@ import (
 	"github.com/xcode75/xcore/common/net"
 	"github.com/xcode75/xcore/core"
 	"github.com/xcode75/xcore/infra/conf"
-
 	"github.com/xcode75/XMPlus/api"
 )
 
@@ -29,7 +28,7 @@ func OutboundBuilder(config *Config, nodeInfo *api.NodeInfo, tag string) (*core.
 		if nodeInfo.DomainStrategy != "" {
 			domainStrategy = nodeInfo.DomainStrategy
 		} else {
-			domainStrategy = "UseIP"
+			domainStrategy = "Asis"
 		}
 	}
 	proxySetting := &conf.FreedomConfig{
