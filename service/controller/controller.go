@@ -388,7 +388,7 @@ func (c *Controller) removeRules(tag string, userInfo *[]api.UserInfo){
 }
 
 func (c *Controller) addNewRelayTag(newRelayNodeInfo *api.RelayNodeInfo, userInfo *[]api.UserInfo) (err error) {
-	if newRelayNodeInfo.NodeType != "Shadowsocks-Plugin" || newRelayNodeInfo.NodeType != "Http" {
+	if newRelayNodeInfo.NodeType != "Shadowsocks-Plugin" {
 		for _, user := range *userInfo {
 			var Key string			
 			if C.Contains(shadowaead_2022.List, strings.ToLower(newRelayNodeInfo.CypherMethod)) {
@@ -480,9 +480,7 @@ func (c *Controller) addNewUser(userInfo *[]api.UserInfo, nodeInfo *api.NodeInfo
 	case "Shadowsocks":
 		users = c.buildSSUser(userInfo, nodeInfo.CypherMethod)
 	case "Shadowsocks-Plugin":
-		users = c.buildSSPluginUser(userInfo, nodeInfo.CypherMethod)
-	case "Http":
-		users = c.buildHttpUser(userInfo)	
+		users = c.buildSSPluginUser(userInfo, nodeInfo.CypherMethod)	
 	default:
 		return fmt.Errorf("unsupported node type: %s", nodeInfo.NodeType)
 	}

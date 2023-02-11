@@ -115,22 +115,6 @@ func InboundBuilder(config *Config, nodeInfo *api.NodeInfo, tag string) (*core.I
 			Host:        "v1.mux.cool",
 			NetworkList: []string{"tcp", "udp"},
 		}
-	case "Http":	
-		protocol = "http"
-		proxySetting = &conf.HTTPServerConfig{
-			Timeout: 0,
-			Transparent: false,
-			UserLevel: 0,
-		}
-		
-		proxySetting, _ := proxySetting.(*conf.HTTPServerConfig)
-		
-		p := make([]byte, 32)
-		rand.Read(p)
-		randPasswd := hex.EncodeToString(p)
-		proxySetting.Accounts = append(proxySetting.Accounts, &conf.HTTPAccount{
-			Password: randPasswd,
-		})
 	default:
 		return nil, fmt.Errorf("Unsupported Node Type: %s", nodeInfo.NodeType)
 	}
