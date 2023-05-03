@@ -49,7 +49,7 @@ import (
 	_ "github.com/xcode75/xcore/transport/internet/tls"
 	_ "github.com/xcode75/xcore/transport/internet/udp"
 	_ "github.com/xcode75/xcore/transport/internet/websocket"
-	_ "github.com/xtls/xray-core/transport/internet/reality"
+	_ "github.com/xcode75/xcore/transport/internet/reality"
 
 	// Transport headers
 	_ "github.com/xcode75/xcore/transport/internet/headers/http"

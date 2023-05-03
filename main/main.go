@@ -17,7 +17,7 @@ import (
 	"github.com/fsnotify/fsnotify"
 	"github.com/spf13/viper"
 	"github.com/xcode75/XMPlus/panel"
-	"github.com/xtls/xray-core/main/commands/base"
+	"github.com/xcode75/xcore/main/commands/base"
 	"golang.org/x/crypto/curve25519"
 )
 
