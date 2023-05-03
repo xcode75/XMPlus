@@ -61,7 +61,14 @@ type NodeInfo struct {
 	Congestion        bool
 	TrojanFallBack    []*conf.TrojanInboundFallback
 	VlessFallBack     []*conf.VLessInboundFallback
-	NameServerConfig  []*conf.NameServerConfig
+	PrivateKey        string
+	ShortIds          string
+    Show              bool
+	Dest              string
+	Xver              int
+	MaxTimeDiff       int
+	MinClientVer      string
+	MaxClientVer      string
 }
 
 type RelayNodeInfo struct {
@@ -92,6 +99,11 @@ type RelayNodeInfo struct {
 	Alpn              string
 	Congestion        bool
 	Fingerprint       string
+	PublicKey         string
+	ShortId           string
+	SpiderX           string 
+	Show              bool
+	ServerName        string
 }
 
 type UserInfo struct {

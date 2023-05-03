@@ -7,7 +7,6 @@ type serverConfig struct {
 	Relay   bool 	 `json:"relay"`
 	relay_server     `json:"relay_server"`
 	Routes []route   `json:"routes"`
-	DNS    []dnsconf `json:"dns"`
 	Fallback bool 	`json:"fallback"`
 	Fallbacks []fallbackconf `json:"fallbacks"`
 }
@@ -43,6 +42,14 @@ type server struct {
 		ServerName   string    `json:"serverName"`
 		Flow         string    `json:"flow"`
 		Alpn         string    `json:"alpn"`
+		PrivateKey   string    `json:"privatekey"`
+		ShortIds     string    `json:"shortids"`
+		Show         bool      `json:"show"`
+		Dest         string    `json:"dest"`
+		Xver         int       `json:"xver"`
+		MaxTimeDiff  int 	   `json:"maxtimediff"`
+		MinClientVer string    `json:"minclientver"`
+		MaxClientVer string    `json:"minclientver"`
 	} `json:"securitySettings"`	
 	Relayid   int       `json:"relayid"`
 	SendThrough string  `json:"sendthrough"`
@@ -82,8 +89,12 @@ type relay_server struct {
 		Fingerprint   string   `json:"fingerprint"`
 		RejectUnknownSni  bool `json:"rejectUnknownSni"`
 		ServerName   string    `json:"serverName"`
-		Flow          string   `json:"flow"`
-		Alpn          string   `json:"alpn"`
+		Flow         string    `json:"flow"`
+		Alpn         string    `json:"alpn"`
+		PublicKey    string    `json:"publickey"`
+		ShortId      string    `json:"shortid"`
+		SpiderX      string    `json:"spiderx"`
+		Show         bool      `json:"show"`
 	} `json:"securitySettings"`	
 	RSendThrough string   `json:"sendthrough"`
 	RServerKey  string    `json:"server_key"`
@@ -95,12 +106,6 @@ type relay_server struct {
 type route struct {
 	Id       int      `json:"id"`
 	Regex    string   `json:"regex"`
-}
-
-type dnsconf struct {
-	Id       int      `json:"id"`
-	Domain   []string `json:"domain"`
-	Address  string   `json:"address"`
 }
 
 type fallbackconf struct {

@@ -188,14 +188,14 @@ func InboundBuilder(config *Config, nodeInfo *api.NodeInfo, tag string) (*core.I
 
 	streamSetting.Network = &transportProtocol
 
-	// Build TLS and XTLS settings
-	if nodeInfo.EnableTLS && nodeInfo.CertMode != "none" {
+	// Build TLS settings
+	if nodeInfo.EnableTLS && nodeInfo.TLSType == "tls" && nodeInfo.CertMode != "none" {
 		streamSetting.Security = nodeInfo.TLSType
-		certFile, keyFile, err := getCertFile(config.CertConfig, nodeInfo.CertMode, nodeInfo.CertDomain)
-		if err != nil {
-			return nil, err
-		}
 		if nodeInfo.TLSType == "tls" {
+			certFile, keyFile, err := getCertFile(config.CertConfig, nodeInfo.CertMode, nodeInfo.CertDomain)
+			if err != nil {
+				return nil, err
+			}
 			tlsSettings := &conf.TLSConfig{
 				RejectUnknownSNI: nodeInfo.RejectUnknownSNI,
 			}
@@ -209,14 +209,26 @@ func InboundBuilder(config *Config, nodeInfo *api.NodeInfo, tag string) (*core.I
 			tlsSettings.Certs = append(tlsSettings.Certs, &conf.TLSCertConfig{CertFile: certFile, KeyFile: keyFile, OcspStapling: 3600})
 
 			streamSetting.TLSSettings = tlsSettings
-		} else if nodeInfo.TLSType == "xtls" {
-			xtlsSettings := &conf.XTLSConfig{
-				RejectUnknownSNI: nodeInfo.RejectUnknownSNI,
-			}
-			xtlsSettings.Insecure = nodeInfo.AllowInsecure
-			xtlsSettings.ServerName = nodeInfo.CertDomain
-			xtlsSettings.Certs = append(xtlsSettings.Certs, &conf.XTLSCertConfig{CertFile: certFile, KeyFile: keyFile, OcspStapling: 3600})
-			streamSetting.XTLSSettings = xtlsSettings
+		}
+	}
+	
+	// Build REALITY settings
+	if nodeInfo.TLSType == "reality" {
+		streamSetting.Security = nodeInfo.TLSType
+		dest, err := json.Marshal(nodeInfo.Dest)
+		if err != nil {
+			return nil, fmt.Errorf("marshal dest %s config fialed: %s", dest, err)
+		}
+		streamSetting.REALITYSettings = &conf.REALITYConfig{
+			Show:         nodeInfo.Show,
+			Dest:         dest,
+			Xver:         nodeInfo.Xver,
+			ServerNames:  []string{nodeInfo.ServerName},
+			PrivateKey:   nodeInfo.PrivateKey,
+			MinClientVer: nodeInfo.MinClientVer,
+			MaxClientVer: nodeInfo.MaxClientVer,
+			MaxTimeDiff:  nodeInfo.MaxTimeDiff,
+			ShortIds:     []string{nodeInfo.ShortIds},
 		}
 	}
 

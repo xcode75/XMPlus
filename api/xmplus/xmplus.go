@@ -317,10 +317,11 @@ func (c *APIClient) ReportIllegal(detectResultList *[]api.DetectResult) error {
 func (c *APIClient) parseNodeResponse(s *serverConfig) (*api.NodeInfo, error) {
 	var (
 		TLSType                 = "none"
-		path, host, quic_security, quic_key,serviceName,seed,htype string
+		path, host, quic_security, quic_key, serviceName, seed, htype, PrivateKey, ShortIds, Dest, MinClientVer, MaxClientVer string
 		header                  json.RawMessage
-		enableTLS,congestion    bool
+		enableTLS, congestion, Show    bool
 		alterID                 uint16 = 0
+		Xver , MaxTimeDiff      int = 0, 0
 	)
 	
 	Alpn := ""
@@ -337,10 +338,24 @@ func (c *APIClient) parseNodeResponse(s *serverConfig) (*api.NodeInfo, error) {
 	
 	TLSType = s.Security
 	
-	if TLSType == "tls" || TLSType == "xtls" {
-		enableTLS = true
+	if TLSType == "tls" || TLSType == "reality" {
+		if TLSType == "tls" {
+			enableTLS = true
+		}
+		
 		if s.SecuritySettings.ServerName == "" {
 			return nil, fmt.Errorf("TLS certificate domain (ServerName) is empty: %s",  s.SecuritySettings.ServerName)
+		}
+		
+		if TLSType == "reality" {
+			PrivateKey = s.SecuritySettings.PrivateKey
+			Show = s.SecuritySettings.Show
+			ShortIds = s.SecuritySettings.ShortIds
+			Dest =  s.SecuritySettings.Dest
+			Xver = s.SecuritySettings.Xver
+			MaxTimeDiff =  s.SecuritySettings.MaxTimeDiff
+			MinClientVer =  s.SecuritySettings.MinClientVer
+			MaxClientVer = s.SecuritySettings.MaxClientVer
 		}
 	}
 
@@ -449,21 +464,18 @@ func (c *APIClient) parseNodeResponse(s *serverConfig) (*api.NodeInfo, error) {
 		SendIP:            s.SendThrough,
 		TrojanFallBack:    s.parseTrojanFallBack(),
 		VlessFallBack:     s.parseVlessFallBack(),
-		NameServerConfig:  s.parseDNSConfig(),
+		PrivateKey:        PrivateKey
+		ShortIds:          ShortIds
+		Show:              Show
+		Dest:              Dest
+		Xver:              Xver
+		MaxTimeDiff:       MaxTimeDiff
+		MinClientVer:      MinClientVer
+		MaxClientVer:      MaxClientVer
 	}
 	return nodeInfo, nil
 }
 
-func (s *serverConfig) parseDNSConfig() (nameServerList []*conf.NameServerConfig) {
-	for i := range s.DNS {
-		nameServerList = append(nameServerList, &conf.NameServerConfig{
-			Address: &conf.Address{net.ParseAddress(s.DNS[i].Address)},
-			Domains: s.DNS[i].Domain,
-		})
-	}
-
-	return
-}
 
 func (s *serverConfig) parseTrojanFallBack() ([]*conf.TrojanInboundFallback) {
 	numOffallbacks := len(s.Fallbacks)
@@ -515,9 +527,9 @@ func (c *APIClient) GetRelayNodeInfo() (*api.RelayNodeInfo, error) {
 	
 	var (
 		TLSType                 = "none"
-		path, host, quic_security, quic_key,serviceName,seed,htype string
+		path, host, quic_security, quic_key, serviceName, seed, htype , PublicKey , ShortId ,SpiderX, ServerName string
 		header                  json.RawMessage
-		enableTLS,congestion    bool
+		enableTLS, congestion, Show    bool
 		alterID                 uint16 = 0
 	)
 
@@ -535,8 +547,18 @@ func (c *APIClient) GetRelayNodeInfo() (*api.RelayNodeInfo, error) {
 	
 	TLSType = s.RSecurity
 	
-	if TLSType == "tls" || TLSType == "xtls" {
-		enableTLS = true
+	if TLSType == "tls" || TLSType == "reality" {
+		if TLSType == "tls" {
+			enableTLS = true
+		}
+		
+		if TLSType == "reality" {
+			PublicKey = s.RSecuritySettings.PublicKey
+			Show = s.RSecuritySettings.Show
+			ShortId = s.RSecuritySettings.ShortId
+			SpiderX = s.RSecuritySettings.SpiderX
+			ServerName = s.RSecuritySettings.ServerName
+		}
 	}
 
 	transportProtocol := s.RNetwork
@@ -635,6 +657,11 @@ func (c *APIClient) GetRelayNodeInfo() (*api.RelayNodeInfo, error) {
 		EnableDNS:         s.REnableDns,
 		DomainStrategy:    s.RDomainstrategy,
 		SendIP:            s.RSendThrough,
+		PublicKey:         PublicKey
+		ShortId:           ShortId
+		SpiderX:           SpiderX
+		Show:              Show
+		ServerName:        ServerName
 	}
 	return nodeInfo, nil
 }

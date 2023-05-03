@@ -20,7 +20,7 @@ Nodes:
       NodeID: 1
       Timeout: 30 
     ControllerConfig:
-      UpdatePeriodic: 120
+      UpdatePeriodic: 60
       CertConfig:
         Email: author@xmplus.dev                    # Required when Cert Mode is not none
         CertFile: /etc/XMPlus/node1.xmplus.dev.crt  # Required when Cert Mode is file
@@ -29,7 +29,8 @@ Nodes:
         CertEnv:                                    # Required when Cert Mode is dns
           CLOUDFLARE_EMAIL:                         # Required when Cert Mode is dns
           CLOUDFLARE_API_KEY:                       # Required when Cert Mode is dns
-          
+
+        
 #  -
 #    ApiConfig:
 #      ApiHost: "https://xmplus.dev"

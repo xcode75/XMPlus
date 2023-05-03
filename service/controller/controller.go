@@ -150,7 +150,7 @@ func (c *Controller) Start() error {
 	)
 
 	// Check cert service in need
-	if c.nodeInfo.EnableTLS && c.nodeInfo.CertMode != "none" {
+	if c.nodeInfo.TLSType == "tls"  && c.nodeInfo.CertMode != "none" {
 		c.tasks = append(c.tasks, periodicTask{
 			tag: "Cert monitor",
 			Periodic: &task.Periodic{
@@ -622,7 +622,7 @@ func (c *Controller) logPrefix() string {
 
 // Check Cert
 func (c *Controller) certMonitor() error {
-	if c.nodeInfo.EnableTLS {
+	if c.nodeInfo.TLSType == "tls"  {
 		switch c.nodeInfo.CertMode {
 		case "dns", "http":
 			lego, err := mylego.New(c.config.CertConfig)
