@@ -40,7 +40,6 @@ Nodes:
         MaxClientVer: # Optional, maximum version of Xray client, format is x.y.z.
         MaxTimeDiff: 6000 # Optional, maximum allowed time difference, unit is in milliseconds.
         ShortIds: # Required, list of available shortIds for the client, can be used to differentiate between different clients.
-          - ""
           - 6ba85179e30d4fc2
         
 #  -
