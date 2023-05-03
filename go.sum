@@ -805,7 +805,7 @@ github.com/xiang90/probing v0.0.0-20190116061207-43a291ad63a2/go.mod h1:UETIi67q
 github.com/xtls/reality v0.0.0-20230331223127-176a94313eda h1:psRJD2RrZbnI0OWyHvXfgYCPqlRM5q5SPDcjDoDBWhE=
 github.com/xtls/reality v0.0.0-20230331223127-176a94313eda/go.mod h1:rkuAY1S9F8eI8gDiPDYvACE8e2uwkyg8qoOTuwWov7Y=
 github.com/xcode75/xcore v1.8.1 h1:iSTTqXj82ZdwC1ah+eV331X4JTcnrDz+WuKuB/EB3P4=
-github.com/xcode75/xcore v1.8.1/go.mod h1:AXxSso0MZwUE4NhRocCfHCg73BtJ+T2dSpQVo1Cg9VM=
+github.com/xcode75/xcore v1.8.1/go.mod h1:+2febs2c0Sy3RcgEHC1Xc0hl3psP7JuCZ+h13TZfdJM=
 github.com/yandex-cloud/go-genproto v0.0.0-20220805142335-27b56ddae16f h1:cG+ehPRJSlqljSufLf1KXeXpUd1dLNjnzA18mZcB/O0=
 github.com/yandex-cloud/go-genproto v0.0.0-20220805142335-27b56ddae16f/go.mod h1:HEUYX/p8966tMUHHT+TsS0hF/Ca/NYwqprC5WXSDMfE=
 github.com/yandex-cloud/go-sdk v0.0.0-20220805164847-cf028e604997 h1:2wzke3JH7OtN20WsNDZx2VH/TCmsbqtDEbXzjF+i05E=
