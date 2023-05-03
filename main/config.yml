@@ -20,7 +20,6 @@ Nodes:
       NodeID: 1
       Timeout: 30 
     ControllerConfig:
-      UpdatePeriodic: 60
       CertConfig:
         Email: author@xmplus.dev                    # Required when Cert Mode is not none
         CertFile: /etc/XMPlus/node1.xmplus.dev.crt  # Required when Cert Mode is file
@@ -49,7 +48,6 @@ Nodes:
 #      NodeID: 2
 #      Timeout: 30 
 #    ControllerConfig:
-#      UpdatePeriodic: 60
 #      CertConfig:
 #        Email: author@xmplus.dev                    # Required when Cert Mode is not none
 #        CertFile: /etc/XMPlus/node1.xmplus.dev.crt  # Required when Cert Mode is file

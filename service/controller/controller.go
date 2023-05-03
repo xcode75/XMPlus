@@ -138,13 +138,13 @@ func (c *Controller) Start() error {
 		periodicTask{
 			tag: "Node monitor",
 			Periodic: &task.Periodic{
-				Interval: time.Duration(c.config.UpdatePeriodic) * time.Second,
+				Interval: time.Duration(60) * time.Second,
 				Execute:  c.nodeInfoMonitor,
 			}},
 		periodicTask{
 			tag: "User monitor",
 			Periodic: &task.Periodic{
-				Interval: time.Duration(c.config.UpdatePeriodic) * time.Second,
+				Interval: time.Duration(60) * time.Second,
 				Execute:  c.userInfoMonitor,
 			}},
 	)
@@ -154,7 +154,7 @@ func (c *Controller) Start() error {
 		c.tasks = append(c.tasks, periodicTask{
 			tag: "Cert monitor",
 			Periodic: &task.Periodic{
-				Interval: time.Duration(c.config.UpdatePeriodic) * time.Second * 60,
+				Interval: time.Duration(60) * time.Second * 60,
 				Execute:  c.certMonitor,
 			}})
 	}
@@ -183,7 +183,7 @@ func (c *Controller) Close() error {
 
 func (c *Controller) nodeInfoMonitor() (err error) {
 	// delay to start
-	if time.Since(c.startAt) < time.Duration(c.config.UpdatePeriodic)*time.Second {
+	if time.Since(c.startAt) < time.Duration(60)*time.Second {
 		return nil
 	}
 

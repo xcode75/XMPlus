@@ -5,7 +5,6 @@ import (
 )
 
 type Config struct {
-	UpdatePeriodic          int                              `mapstructure:"UpdatePeriodic"`
 	CertConfig              *mylego.CertConfig               `mapstructure:"CertConfig"`
 	RealityConfigs          *RealityConfig                   `mapstructure:"RealityConfigs"`
 }
