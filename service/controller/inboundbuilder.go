@@ -138,8 +138,12 @@ func InboundBuilder(config *Config, nodeInfo *api.NodeInfo, tag string) (*core.I
 	case "tcp":
 		tcpSetting := &conf.TCPConfig{
 			AcceptProxyProtocol: nodeInfo.ProxyProtocol,
-			HeaderConfig:        nodeInfo.Header,
 		}
+		
+		if nodeInfo.TLSType != "reality" {
+			tcpSetting.HeaderConfig = nodeInfo.Header
+		}
+		
 		streamSetting.TCPSettings = tcpSetting
 	case "websocket":
 		headers := make(map[string]string)
@@ -214,22 +218,36 @@ func InboundBuilder(config *Config, nodeInfo *api.NodeInfo, tag string) (*core.I
 	
 	// Build REALITY settings
 	if nodeInfo.TLSType == "reality" {
-		streamSetting.Security = nodeInfo.TLSType
+		streamSetting.Security = "reality"
+		
 		dest, err := json.Marshal(nodeInfo.Dest)
 		if err != nil {
 			return nil, fmt.Errorf("marshal dest %s config fialed: %s", dest, err)
 		}
-		streamSetting.REALITYSettings = &conf.REALITYConfig{
-			Show:         nodeInfo.Show,
+		
+		realitySettings :=  &conf.REALITYConfig{
 			Dest:         dest,
-			Xver:         nodeInfo.Xver,
-			ServerNames:  []string{nodeInfo.ServerName},
-			PrivateKey:   nodeInfo.PrivateKey,
-			MinClientVer: nodeInfo.MinClientVer,
-			MaxClientVer: nodeInfo.MaxClientVer,
-			MaxTimeDiff:  nodeInfo.MaxTimeDiff,
-			ShortIds:     []string{nodeInfo.ShortIds},
 		}
+		
+		realitySettings.Show = nodeInfo.Show
+		realitySettings.Xver = nodeInfo.Xver
+		realitySettings.ServerNames = []string{nodeInfo.ServerName}
+		realitySettings.PrivateKey = nodeInfo.PrivateKey
+		realitySettings.ShortIds = []string{nodeInfo.ShortIds}
+		
+		if nodeInfo.MinClientVer != "" {
+			realitySettings.MinClientVer = nodeInfo.MinClientVer
+		}
+		
+		if nodeInfo.MaxClientVer != "" {
+			realitySettings.MaxClientVer = nodeInfo.MaxClientVer
+		}	
+		
+		if nodeInfo.MaxTimeDiff > 0 {
+			realitySettings.MaxTimeDiff = nodeInfo.MaxTimeDiff
+		}
+		
+		streamSetting.REALITYSettings = realitySettings
 	}
 
 	// Support ProxyProtocol for any transport protocol
