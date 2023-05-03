@@ -21,7 +21,5 @@ func getDefaultConnectionConfig() *ConnectionConfig {
 }
 
 func getDefaultControllerConfig() *controller.Config {
-	return &controller.Config{
-		UpdatePeriodic: 60,
-	}
+	return &controller.Config{}
 }
