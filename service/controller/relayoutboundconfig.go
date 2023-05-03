@@ -2,7 +2,6 @@ package controller
 
 import (
 	"encoding/json"
-	"runtime"
 	"strings"
 
 	"github.com/golang/protobuf/proto"

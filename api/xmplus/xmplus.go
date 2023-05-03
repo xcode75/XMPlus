@@ -13,7 +13,6 @@ import (
 
 	"github.com/bitly/go-simplejson"
 	"github.com/go-resty/resty/v2"
-	"github.com/xcode75/xcore/common/net"
 	"github.com/xcode75/xcore/infra/conf"
 
 	"github.com/xcode75/XMPlus/api"
@@ -317,7 +316,7 @@ func (c *APIClient) ReportIllegal(detectResultList *[]api.DetectResult) error {
 func (c *APIClient) parseNodeResponse(s *serverConfig) (*api.NodeInfo, error) {
 	var (
 		TLSType                 = "none"
-		path, host, quic_security, quic_key, serviceName, seed, htype, PrivateKey, ShortIds, Dest, MinClientVer, MaxClientVer string
+		path, host, quic_security, quic_key, serviceName, seed, htype, PrivateKey, ShortIds, Dest, MinClientVer, MaxClientVer, ServerName string
 		header                  json.RawMessage
 		enableTLS, congestion, Show    bool
 		alterID                 uint16 = 0
