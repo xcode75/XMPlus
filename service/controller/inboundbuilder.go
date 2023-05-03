@@ -232,15 +232,15 @@ func InboundBuilder(config *Config, nodeInfo *api.NodeInfo, tag string) (*core.I
 		realitySettings.PrivateKey = config.RealityConfigs.PrivateKey
 		realitySettings.ShortIds = config.RealityConfigs.ShortIds
 		
-		if nodeInfo.MinClientVer != "" {
+		if config.RealityConfigs.MinClientVer != "" {
 			realitySettings.MinClientVer = config.RealityConfigs.MinClientVer
 		}
 		
-		if nodeInfo.MaxClientVer != "" {
+		if config.RealityConfigs.MaxClientVer != "" {
 			realitySettings.MaxClientVer = config.RealityConfigs.MaxClientVer
 		}	
 		
-		if nodeInfo.MaxTimeDiff > 0 {
+		if config.RealityConfigs.MaxTimeDiff > 0 {
 			realitySettings.MaxTimeDiff = config.RealityConfigs.MaxTimeDiff
 		}
 		
