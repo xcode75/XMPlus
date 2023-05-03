@@ -1,8 +1,8 @@
 Log:
-  Level: info # Log level: none, error, warning, info, debug 
+  Level: warning # Log level: none, error, warning, info, debug 
   AccessPath: # /etc/XMPlus/access.Log
   ErrorPath: # /etc/XMPlus/error.log
-DnsConfigPath:  /etc/XMPlus/dns.json
+DnsConfigPath:  #/etc/XMPlus/dns.json
 RouteConfigPath: # /etc/XMPlus/route.json
 InboundConfigPath: # /etc/XMPlus/inbound.json
 OutboundConfigPath: # /etc/XMPlus/outbound.json
@@ -15,7 +15,7 @@ ConnectionConfig:
 Nodes:
   -
     ApiConfig:
-      ApiHost: "https://xmplus.dev"
+      ApiHost: "https://www.xmplus.dev"
       ApiKey: "123"
       NodeID: 1
       Timeout: 30 
@@ -30,7 +30,7 @@ Nodes:
           CLOUDFLARE_EMAIL:                         # Required when Cert Mode is dns
           CLOUDFLARE_API_KEY:                       # Required when Cert Mode is dns
       RealityConfigs:
-        Show: true # Show REALITY debug
+        Show: false # Show REALITY debug
         Dest: www.lovelive-anime.jp:443 # Required, Same as fallback
         Xver : 0 # Send PROXY protocol version, 0 for disable
         ServerNames: # Required, list of available serverNames for the client, * wildcard is not supported at the moment.
@@ -38,18 +38,18 @@ Nodes:
         PrivateKey: MH0gmvlQQJjgM0pE2XhPMpcuEVtm2pTc0UKCY1oEvFU # Required, execute './xray x25519' to generate.
         MinClientVer: # Optional, minimum version of Xray client, format is x.y.z.
         MaxClientVer: # Optional, maximum version of Xray client, format is x.y.z.
-        MaxTimeDiff: 6000 # Optional, maximum allowed time difference, unit is in milliseconds.
+        MaxTimeDiff: 0 # Optional, maximum allowed time difference, unit is in milliseconds.
         ShortIds: # Required, list of available shortIds for the client, can be used to differentiate between different clients.
           - 6ba85179e30d4fc2
         
 #  -
 #    ApiConfig:
-#      ApiHost: "https://xmplus.dev"
+#      ApiHost: "https://www.xmplus.dev"
 #      ApiKey: "123"
 #      NodeID: 2
 #      Timeout: 30 
 #    ControllerConfig:
-#      UpdatePeriodic: 120
+#      UpdatePeriodic: 60
 #      CertConfig:
 #        Email: author@xmplus.dev                    # Required when Cert Mode is not none
 #        CertFile: /etc/XMPlus/node1.xmplus.dev.crt  # Required when Cert Mode is file
@@ -58,3 +58,15 @@ Nodes:
 #        CertEnv:                                    # Required when Cert Mode is dns
 #          CLOUDFLARE_EMAIL:                         # Required when Cert Mode is dns
 #          CLOUDFLARE_API_KEY:                       # Required when Cert Mode is dns
+#      RealityConfigs:
+#        Show: false # Show REALITY debug
+#        Dest: www.lovelive-anime.jp:443 # Required, Same as fallback
+#        Xver : 0 # Send PROXY protocol version, 0 for disable
+#        ServerNames: # Required, list of available serverNames for the client, * wildcard is not supported at the moment.
+#          - www.lovelive-anime.jp
+#        PrivateKey: MH0gmvlQQJjgM0pE2XhPMpcuEVtm2pTc0UKCY1oEvFU # Required, execute './xray x25519' to generate.
+#        MinClientVer: # Optional, minimum version of Xray client, format is x.y.z.
+#        MaxClientVer: # Optional, maximum version of Xray client, format is x.y.z.
+#        MaxTimeDiff: 0 # Optional, maximum allowed time difference, unit is in milliseconds.
+#        ShortIds: # Required, list of available shortIds for the client, can be used to differentiate between different clients.
+#          - 6ba85179e30d4fc2
