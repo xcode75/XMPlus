@@ -120,7 +120,7 @@ type VLessOutboundConfig struct {
 
 // Build implements Buildable
 func (c *VLessOutboundConfig) Build() (proto.Message, error) {
-	config := new(outbound.Config)
+	config := new(vlessoutbound.Config)
 
 	if len(c.Vnext) == 0 {
 		return nil, newError(`VLESS settings: "vnext" is empty`)
@@ -175,67 +175,6 @@ func (c *VLessOutboundConfig) Build() (proto.Message, error) {
 	return config, nil
 }
 
-
-func (c *VLessOutboundConfig) Build() (proto.Message, error) {
-	config := new(vlessoutbound.Config)
-
-	if len(c.Vnext) == 0 {
-		return nil, newError(`VLESS settings: "vnext" is empty`)
-	}
-	config.Vnext = make([]*protocol.ServerEndpoint, len(c.Vnext))
-	for idx, rec := range c.Vnext {
-		if rec.Address == nil {
-			return nil, newError(`VLESS vnext: "address" is not set`)
-		}
-		if len(rec.Users) == 0 {
-			return nil, newError(`VLESS vnext: "users" is empty`)
-		}
-		spec := &protocol.ServerEndpoint{
-			Address: rec.Address.Build(),
-			Port:    uint32(rec.Port),
-			User:    make([]*protocol.User, len(rec.Users)),
-		}
-		for idx, rawUser := range rec.Users {
-			user := new(protocol.User)
-			if err := json.Unmarshal(rawUser, user); err != nil {
-				return nil, newError(`VLESS users: invalid user`).Base(err)
-			}
-			account := new(vless.Account)
-			if err := json.Unmarshal(rawUser, account); err != nil {
-				return nil, newError(`VLESS users: invalid user`).Base(err)
-			}
-	
-			accid := strings.Split(user.Email, "|")
-			u, err := uuid.ParseString(accid[2])
-			//u, err := uuid.ParseString(account.Id)
-			if err != nil {
-				return nil, err
-			}
-			account.Id = u.String()
-
-			switch account.Flow {
-			case "", vless.XRO, vless.XRO + "-udp443", vless.XRD, vless.XRD + "-udp443", vless.XRV, vless.XRV + "-udp443":
-			case vless.XRS, vless.XRS + "-udp443":
-				if runtime.GOOS != "linux" && runtime.GOOS != "android" {
-					return nil, newError(`VLESS users: "` + account.Flow + `" only support linux in this version`)
-				}
-			default:
-				return nil, newError(`VLESS users: "flow" doesn't support "` + account.Flow + `" in this version`)
-			}
-
-			if account.Encryption != "none" {
-				account.Encryption = "none"
-				//return nil, newError(`VLESS users: please add/set "encryption":"none" for every user`)
-			}
-
-			user.Account = serial.ToTypedMessage(account)
-			spec.User[idx] = user
-		}
-		config.Vnext[idx] = spec
-	}
-
-	return config, nil
-}
 
 type VMessAccount struct {
 	ID          string `json:"id"`

@@ -65,10 +65,11 @@ type NodeInfo struct {
 	ShortIds          string
     Show              bool
 	Dest              string
-	Xver              int
-	MaxTimeDiff       int
+	Xver              uint64 
+	MaxTimeDiff       uint64 
 	MinClientVer      string
 	MaxClientVer      string
+	ServerName        string
 }
 
 type RelayNodeInfo struct {

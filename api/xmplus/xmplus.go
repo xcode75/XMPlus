@@ -321,7 +321,7 @@ func (c *APIClient) parseNodeResponse(s *serverConfig) (*api.NodeInfo, error) {
 		header                  json.RawMessage
 		enableTLS, congestion, Show    bool
 		alterID                 uint16 = 0
-		Xver , MaxTimeDiff      int = 0, 0
+		Xver , MaxTimeDiff      uint64  = 0, 0
 	)
 	
 	Alpn := ""
@@ -350,10 +350,11 @@ func (c *APIClient) parseNodeResponse(s *serverConfig) (*api.NodeInfo, error) {
 		if TLSType == "reality" {
 			PrivateKey = s.SecuritySettings.PrivateKey
 			Show = s.SecuritySettings.Show
+			ServerName = s.RSecuritySettings.ServerName
 			ShortIds = s.SecuritySettings.ShortIds
 			Dest =  s.SecuritySettings.Dest
-			Xver = s.SecuritySettings.Xver
-			MaxTimeDiff =  s.SecuritySettings.MaxTimeDiff
+			Xver = uint64(s.SecuritySettings.Xver)
+			MaxTimeDiff =  uint64(s.SecuritySettings.MaxTimeDiff)
 			MinClientVer =  s.SecuritySettings.MinClientVer
 			MaxClientVer = s.SecuritySettings.MaxClientVer
 		}
@@ -464,14 +465,15 @@ func (c *APIClient) parseNodeResponse(s *serverConfig) (*api.NodeInfo, error) {
 		SendIP:            s.SendThrough,
 		TrojanFallBack:    s.parseTrojanFallBack(),
 		VlessFallBack:     s.parseVlessFallBack(),
-		PrivateKey:        PrivateKey
-		ShortIds:          ShortIds
-		Show:              Show
-		Dest:              Dest
-		Xver:              Xver
-		MaxTimeDiff:       MaxTimeDiff
-		MinClientVer:      MinClientVer
-		MaxClientVer:      MaxClientVer
+		PrivateKey:        PrivateKey,
+		ShortIds:          ShortIds,
+		Show:              Show,
+		Dest:              Dest,
+		Xver:              Xver,
+		MaxTimeDiff:       MaxTimeDiff,
+		MinClientVer:      MinClientVer,
+		MaxClientVer:      MaxClientVer,
+		ServerName:        ServerName,
 	}
 	return nodeInfo, nil
 }
@@ -657,11 +659,11 @@ func (c *APIClient) GetRelayNodeInfo() (*api.RelayNodeInfo, error) {
 		EnableDNS:         s.REnableDns,
 		DomainStrategy:    s.RDomainstrategy,
 		SendIP:            s.RSendThrough,
-		PublicKey:         PublicKey
-		ShortId:           ShortId
-		SpiderX:           SpiderX
-		Show:              Show
-		ServerName:        ServerName
+		PublicKey:         PublicKey,
+		ShortId:           ShortId,
+		SpiderX:           SpiderX,
+		Show:              Show,
+		ServerName:        ServerName,
 	}
 	return nodeInfo, nil
 }
