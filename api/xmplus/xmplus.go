@@ -316,11 +316,10 @@ func (c *APIClient) ReportIllegal(detectResultList *[]api.DetectResult) error {
 func (c *APIClient) parseNodeResponse(s *serverConfig) (*api.NodeInfo, error) {
 	var (
 		TLSType                 = "none"
-		path, host, quic_security, quic_key, serviceName, seed, htype, PrivateKey, ShortIds, Dest, MinClientVer, MaxClientVer, ServerName, Alpn string
+		path, host, quic_security, quic_key, serviceName, seed, htype, Alpn string
 		header                  json.RawMessage
-		enableTLS, congestion, Show ,RejectUnknownSni, AllowInsecure    bool
+		enableTLS, congestion ,RejectUnknownSni, AllowInsecure    bool
 		alterID                 uint16 = 0
-		Xver , MaxTimeDiff      uint64  = 0, 0
 	)
 
 	if s.SecuritySettings.Alpn != "" {
@@ -335,7 +334,7 @@ func (c *APIClient) parseNodeResponse(s *serverConfig) (*api.NodeInfo, error) {
 	
 	TLSType = s.Security
 	
-	if TLSType == "tls" || TLSType == "reality" {
+	if TLSType == "tls" {
 		if TLSType == "tls" {
 			enableTLS = true
 			RejectUnknownSni = s.SecuritySettings.RejectUnknownSni
@@ -344,18 +343,6 @@ func (c *APIClient) parseNodeResponse(s *serverConfig) (*api.NodeInfo, error) {
 		
 		if s.SecuritySettings.ServerName == "" {
 			return nil, fmt.Errorf("TLS certificate domain (ServerName) is empty: %s",  s.SecuritySettings.ServerName)
-		}
-		
-		if TLSType == "reality" {
-			PrivateKey = s.SecuritySettings.PrivateKey
-			Show = s.SecuritySettings.Show
-			ServerName = s.RSecuritySettings.ServerName
-			ShortIds = s.SecuritySettings.ShortIds
-			Dest =  s.SecuritySettings.Dest
-			Xver = uint64(s.SecuritySettings.Xver)
-			MaxTimeDiff =  uint64(s.SecuritySettings.MaxTimeDiff)
-			MinClientVer =  s.SecuritySettings.MinClientVer
-			MaxClientVer = s.SecuritySettings.MaxClientVer
 		}
 	}
 
@@ -464,15 +451,6 @@ func (c *APIClient) parseNodeResponse(s *serverConfig) (*api.NodeInfo, error) {
 		SendIP:            s.SendThrough,
 		TrojanFallBack:    s.parseTrojanFallBack(),
 		VlessFallBack:     s.parseVlessFallBack(),
-		PrivateKey:        PrivateKey,
-		ShortIds:          ShortIds,
-		Show:              Show,
-		Dest:              Dest,
-		Xver:              Xver,
-		MaxTimeDiff:       MaxTimeDiff,
-		MinClientVer:      MinClientVer,
-		MaxClientVer:      MaxClientVer,
-		ServerName:        ServerName,
 	}
 	return nodeInfo, nil
 }

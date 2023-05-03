@@ -139,10 +139,7 @@ func InboundBuilder(config *Config, nodeInfo *api.NodeInfo, tag string) (*core.I
 		tcpSetting := &conf.TCPConfig{
 			AcceptProxyProtocol: nodeInfo.ProxyProtocol,
 		}
-		
-		if nodeInfo.TLSType != "reality" {
-			tcpSetting.HeaderConfig = nodeInfo.Header
-		}
+		tcpSetting.HeaderConfig = nodeInfo.Header
 		
 		streamSetting.TCPSettings = tcpSetting
 	case "websocket":
@@ -193,7 +190,7 @@ func InboundBuilder(config *Config, nodeInfo *api.NodeInfo, tag string) (*core.I
 	streamSetting.Network = &transportProtocol
 
 	// Build TLS settings
-	if nodeInfo.EnableTLS && nodeInfo.TLSType == "tls" && nodeInfo.CertMode != "none" {
+	if nodeInfo.TLSType == "tls" && nodeInfo.CertMode != "none" {
 		streamSetting.Security = nodeInfo.TLSType
 		if nodeInfo.TLSType == "tls" {
 			certFile, keyFile, err := getCertFile(config.CertConfig, nodeInfo.CertMode, nodeInfo.CertDomain)
@@ -220,7 +217,7 @@ func InboundBuilder(config *Config, nodeInfo *api.NodeInfo, tag string) (*core.I
 	if nodeInfo.TLSType == "reality" {
 		streamSetting.Security = "reality"
 		
-		dest, err := json.Marshal(nodeInfo.Dest)
+		dest, err := json.Marshal(config.RealityConfigs.Dest)
 		if err != nil {
 			return nil, fmt.Errorf("marshal dest %s config fialed: %s", dest, err)
 		}
@@ -229,22 +226,22 @@ func InboundBuilder(config *Config, nodeInfo *api.NodeInfo, tag string) (*core.I
 			Dest:         dest,
 		}
 		
-		realitySettings.Show = nodeInfo.Show
-		realitySettings.Xver = nodeInfo.Xver
-		realitySettings.ServerNames = []string{nodeInfo.ServerName}
-		realitySettings.PrivateKey = nodeInfo.PrivateKey
-		realitySettings.ShortIds = []string{nodeInfo.ShortIds}
+		realitySettings.Show = config.RealityConfigs.Show
+		realitySettings.Xver = config.RealityConfigs.Xver
+		realitySettings.ServerNames = config.RealityConfigs.ServerNames
+		realitySettings.PrivateKey = config.RealityConfigs.PrivateKey
+		realitySettings.ShortIds = config.RealityConfigs.ShortIds
 		
 		if nodeInfo.MinClientVer != "" {
-			realitySettings.MinClientVer = nodeInfo.MinClientVer
+			realitySettings.MinClientVer = config.RealityConfigs.MinClientVer
 		}
 		
 		if nodeInfo.MaxClientVer != "" {
-			realitySettings.MaxClientVer = nodeInfo.MaxClientVer
+			realitySettings.MaxClientVer = config.RealityConfigs.MaxClientVer
 		}	
 		
 		if nodeInfo.MaxTimeDiff > 0 {
-			realitySettings.MaxTimeDiff = nodeInfo.MaxTimeDiff
+			realitySettings.MaxTimeDiff = config.RealityConfigs.MaxTimeDiff
 		}
 		
 		streamSetting.REALITYSettings = realitySettings

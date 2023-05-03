@@ -61,15 +61,6 @@ type NodeInfo struct {
 	Congestion        bool
 	TrojanFallBack    []*conf.TrojanInboundFallback
 	VlessFallBack     []*conf.VLessInboundFallback
-	PrivateKey        string
-	ShortIds          string
-    Show              bool
-	Dest              string
-	Xver              uint64 
-	MaxTimeDiff       uint64 
-	MinClientVer      string
-	MaxClientVer      string
-	ServerName        string
 }
 
 type RelayNodeInfo struct {

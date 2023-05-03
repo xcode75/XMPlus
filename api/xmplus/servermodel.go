@@ -42,14 +42,6 @@ type server struct {
 		ServerName   string    `json:"serverName"`
 		Flow         string    `json:"flow"`
 		Alpn         string    `json:"alpn"`
-		PrivateKey   string    `json:"privatekey"`
-		ShortIds     string    `json:"shortids"`
-		Show         bool      `json:"show"`
-		Dest         string    `json:"dest"`
-		Xver         int       `json:"xver"`
-		MaxTimeDiff  int 	   `json:"maxtimediff"`
-		MinClientVer string    `json:"minclientver"`
-		MaxClientVer string    `json:"maxclientver"`
 	} `json:"securitySettings"`	
 	Relayid   int       `json:"relayid"`
 	SendThrough string  `json:"sendthrough"`
