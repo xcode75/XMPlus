@@ -316,15 +316,13 @@ func (c *APIClient) ReportIllegal(detectResultList *[]api.DetectResult) error {
 func (c *APIClient) parseNodeResponse(s *serverConfig) (*api.NodeInfo, error) {
 	var (
 		TLSType                 = "none"
-		path, host, quic_security, quic_key, serviceName, seed, htype, PrivateKey, ShortIds, Dest, MinClientVer, MaxClientVer, ServerName string
+		path, host, quic_security, quic_key, serviceName, seed, htype, PrivateKey, ShortIds, Dest, MinClientVer, MaxClientVer, ServerName, Alpn string
 		header                  json.RawMessage
-		enableTLS, congestion, Show    bool
+		enableTLS, congestion, Show ,RejectUnknownSni, AllowInsecure    bool
 		alterID                 uint16 = 0
 		Xver , MaxTimeDiff      uint64  = 0, 0
 	)
-	
-	Alpn := ""
-	
+
 	if s.SecuritySettings.Alpn != "" {
 		Alpn = s.SecuritySettings.Alpn
 	}
@@ -340,6 +338,8 @@ func (c *APIClient) parseNodeResponse(s *serverConfig) (*api.NodeInfo, error) {
 	if TLSType == "tls" || TLSType == "reality" {
 		if TLSType == "tls" {
 			enableTLS = true
+			RejectUnknownSni = s.SecuritySettings.RejectUnknownSni
+            AllowInsecure = s.SecuritySettings.AllowInsecure
 		}
 		
 		if s.SecuritySettings.ServerName == "" {
@@ -442,14 +442,14 @@ func (c *APIClient) parseNodeResponse(s *serverConfig) (*api.NodeInfo, error) {
 		Seed:              seed,
 		Congestion:        congestion,
 		Sniffing:          s.Sniffing,
-		RejectUnknownSNI:  s.SecuritySettings.RejectUnknownSni,
+		RejectUnknownSNI:  RejectUnknownSni,
 		Fingerprint:       s.SecuritySettings.Fingerprint, 
 		Quic_security:     quic_security,
 		Alpn:              Alpn,
 		Quic_key:          quic_key,
 		CypherMethod:      s.Cipher,
 		Address:           s.Address, 
-		AllowInsecure:     s.SecuritySettings.AllowInsecure,
+		AllowInsecure:     AllowInsecure,
 		Relay:             s.Relay,
 		RelayNodeID:       s.Relayid,
 		ListenIP:          s.Listenip, 
@@ -528,13 +528,11 @@ func (c *APIClient) GetRelayNodeInfo() (*api.RelayNodeInfo, error) {
 	
 	var (
 		TLSType                 = "none"
-		path, host, quic_security, quic_key, serviceName, seed, htype , PublicKey , ShortId ,SpiderX, ServerName string
+		path, host, quic_security, quic_key, serviceName, seed, htype , PublicKey , ShortId ,SpiderX, ServerName, Alpn string
 		header                  json.RawMessage
-		enableTLS, congestion, Show    bool
+		enableTLS, congestion, Show , AllowInsecure   bool
 		alterID                 uint16 = 0
 	)
-
-	Alpn := ""
 	
 	if s.RSecuritySettings.Alpn != "" {
 		Alpn = s.RSecuritySettings.Alpn
@@ -551,6 +549,7 @@ func (c *APIClient) GetRelayNodeInfo() (*api.RelayNodeInfo, error) {
 	if TLSType == "tls" || TLSType == "reality" {
 		if TLSType == "tls" {
 			enableTLS = true
+			AllowInsecure = s.RSecuritySettings.AllowInsecure
 		}
 		
 		if TLSType == "reality" {
@@ -644,7 +643,7 @@ func (c *APIClient) GetRelayNodeInfo() (*api.RelayNodeInfo, error) {
 		Congestion:        congestion,	
 		ServiceName:       serviceName,
 		Fingerprint:       s.RSecuritySettings.Fingerprint, 
-		AllowInsecure:     s.RSecuritySettings.AllowInsecure,
+		AllowInsecure:     AllowInsecure,
 		Header:            header,
 		AlterID:           alterID,
 		Alpn:              Alpn,

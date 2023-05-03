@@ -49,7 +49,7 @@ type server struct {
 		Xver         int       `json:"xver"`
 		MaxTimeDiff  int 	   `json:"maxtimediff"`
 		MinClientVer string    `json:"minclientver"`
-		MaxClientVer string    `json:"minclientver"`
+		MaxClientVer string    `json:"maxclientver"`
 	} `json:"securitySettings"`	
 	Relayid   int       `json:"relayid"`
 	SendThrough string  `json:"sendthrough"`
