@@ -208,7 +208,7 @@ func OutboundRelayBuilder(config *Config, nodeInfo *api.RelayNodeInfo , tag stri
 	streamSetting.Network = &transportProtocol
 	
 	if nodeInfo.TLSType == "tls" {
-		streamSetting.Security = nodeInfo.TLSType
+		streamSetting.Security = "tls"
 		if nodeInfo.TLSType == "tls" {
 			tlsSettings := &conf.TLSConfig{}
 			tlsSettings.Insecure = true
@@ -222,7 +222,7 @@ func OutboundRelayBuilder(config *Config, nodeInfo *api.RelayNodeInfo , tag stri
 	}
 	
 	if nodeInfo.TLSType == "reality" {
-		streamSetting.Security = nodeInfo.TLSType
+		streamSetting.Security = "reality"
 		streamSetting.REALITYSettings = &conf.REALITYConfig{
 			Show:         nodeInfo.Show,
 			ServerName:   nodeInfo.ServerName,
