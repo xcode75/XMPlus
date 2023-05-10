@@ -518,8 +518,8 @@ func (c *APIClient) GetRelayNodeInfo() (*api.RelayNodeInfo, error) {
 	
 	Flow := "xtls-rprx-direct"
 	
-	if s.RSecuritySettings.Flow != "xtls-rprx-direct" {
-		Flow = s.RSecuritySettings.Flow
+	if s.RSecuritySettings.Flow == "xtls-rprx-vision" {
+		Flow = "xtls-rprx-vision"
 	}
 	
 	TLSType = s.RSecurity
