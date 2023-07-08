@@ -183,7 +183,8 @@ Nodes:
           CLOUDFLARE_EMAIL:                         # Required when Cert Mode is dns
           CLOUDFLARE_API_KEY:                       # Required when Cert Mode is dns
       EnableDNS: false # Use custom DNS config, Please ensure that you set the dns.json well
-      DNSStrategy: AsIs # AsIs, UseIP, UseIPv4, UseIPv6      EnableFallback: false # Only support for Trojan and Vless
+      DNSStrategy: AsIs # AsIs, UseIP, UseIPv4, UseIPv6
+      EnableFallback: false # Only support for Trojan and Vless
       FallBackConfigs:  # Support multiple fallbacks
         - SNI: # TLS SNI(Server Name Indication), Empty for any
           Alpn: # Alpn, Empty for any
