@@ -55,10 +55,15 @@ func InboundBuilder(config *Config, nodeInfo *api.NodeInfo, tag string) (*core.I
 	case "Vless":
 		protocol = "vless"
 		// Enable fallback
-		if nodeInfo.EnableFallback && nodeInfo.VlessFallBack != nil {
-			proxySetting = &conf.VLessInboundConfig{
-				Decryption: "none",
-				Fallbacks:  nodeInfo.VlessFallBack,
+		if config.EnableFallback {
+			fallbackConfigs, err := buildVlessFallbacks(config.FallBackConfigs)
+			if err == nil {
+				proxySetting = &conf.VLessInboundConfig{
+					Decryption: "none",
+					Fallbacks:  fallbackConfigs,
+				} 
+			}else {
+				return nil, err
 			}
 		} else {
 			proxySetting = &conf.VLessInboundConfig{
@@ -71,9 +76,14 @@ func InboundBuilder(config *Config, nodeInfo *api.NodeInfo, tag string) (*core.I
 	case "Trojan":
 		protocol = "trojan"
 		// Enable fallback
-		if nodeInfo.EnableFallback  && nodeInfo.TrojanFallBack != nil  {
-			proxySetting = &conf.TrojanServerConfig{
-				Fallbacks: nodeInfo.TrojanFallBack,
+		if config.EnableFallback {
+			fallbackConfigs, err := buildTrojanFallbacks(config.FallBackConfigs)
+			if err == nil {
+				proxySetting = &conf.TrojanServerConfig{
+					Fallbacks: fallbackConfigs,
+				}
+			}else {
+				return nil, err
 			}
 		} else {
 			proxySetting = &conf.TrojanServerConfig{}
@@ -216,32 +226,31 @@ func InboundBuilder(config *Config, nodeInfo *api.NodeInfo, tag string) (*core.I
 	// Build REALITY settings
 	if nodeInfo.TLSType == "reality" {
 		streamSetting.Security = "reality"
-		
-		dest, err := json.Marshal(config.RealityConfigs.Dest)
+
+		dest, err := json.Marshal(nodeInfo.Dest)
 		if err != nil {
 			return nil, fmt.Errorf("marshal dest %s config fialed: %s", dest, err)
 		}
-		
 		realitySettings :=  &conf.REALITYConfig{
-			Dest:         dest,
+			Dest:   dest,
 		}
 		
-		realitySettings.Show = config.RealityConfigs.Show
-		realitySettings.Xver = config.RealityConfigs.Xver
-		realitySettings.ServerNames = config.RealityConfigs.ServerNames
-		realitySettings.PrivateKey = config.RealityConfigs.PrivateKey
-		realitySettings.ShortIds = config.RealityConfigs.ShortIds
+		realitySettings.Show = nodeInfo.Show
+		realitySettings.Xver = nodeInfo.Xver
+		realitySettings.ServerNames = nodeInfo.ServerNames
+		realitySettings.PrivateKey = nodeInfo.PrivateKey
+		realitySettings.ShortIds = nodeInfo.ShortIds
 		
-		if config.RealityConfigs.MinClientVer != "" {
-			realitySettings.MinClientVer = config.RealityConfigs.MinClientVer
+		if nodeInfo.MinClientVer != "" {
+			realitySettings.MinClientVer = nodeInfo.MinClientVer
 		}
 		
-		if config.RealityConfigs.MaxClientVer != "" {
-			realitySettings.MaxClientVer = config.RealityConfigs.MaxClientVer
+		if nodeInfo.MaxClientVer != "" {
+			realitySettings.MaxClientVer = nodeInfo.MaxClientVer
 		}	
 		
-		if config.RealityConfigs.MaxTimeDiff > 0 {
-			realitySettings.MaxTimeDiff = config.RealityConfigs.MaxTimeDiff
+		if nodeInfo.MaxTimeDiff > 0 {
+			realitySettings.MaxTimeDiff = nodeInfo.MaxTimeDiff
 		}
 		
 		streamSetting.REALITYSettings = realitySettings
@@ -289,4 +298,60 @@ func getCertFile(certConfig *mylego.CertConfig, CertMode string, Domain string) 
 	default:
 		return "", "", fmt.Errorf("unsupported certmode: %s", CertMode)
 	}
+}
+
+func buildVlessFallbacks(fallbackConfigs []*FallBackConfig) ([]*conf.VLessInboundFallback, error) {
+	if fallbackConfigs == nil {
+		return nil, fmt.Errorf("you must provide FallBackConfigs")
+	}
+
+	vlessFallBacks := make([]*conf.VLessInboundFallback, len(fallbackConfigs))
+	for i, c := range fallbackConfigs {
+
+		if c.Dest == "" {
+			return nil, fmt.Errorf("dest is required for fallback fialed")
+		}
+
+		var dest json.RawMessage
+		dest, err := json.Marshal(c.Dest)
+		if err != nil {
+			return nil, fmt.Errorf("marshal dest %s config fialed: %s", dest, err)
+		}
+		vlessFallBacks[i] = &conf.VLessInboundFallback{
+			Name: c.SNI,
+			Alpn: c.Alpn,
+			Path: c.Path,
+			Dest: dest,
+			Xver: c.ProxyProtocolVer,
+		}
+	}
+	return vlessFallBacks, nil
+}
+
+func buildTrojanFallbacks(fallbackConfigs []*FallBackConfig) ([]*conf.TrojanInboundFallback, error) {
+	if fallbackConfigs == nil {
+		return nil, fmt.Errorf("you must provide FallBackConfigs")
+	}
+
+	trojanFallBacks := make([]*conf.TrojanInboundFallback, len(fallbackConfigs))
+	for i, c := range fallbackConfigs {
+
+		if c.Dest == "" {
+			return nil, fmt.Errorf("dest is required for fallback fialed")
+		}
+
+		var dest json.RawMessage
+		dest, err := json.Marshal(c.Dest)
+		if err != nil {
+			return nil, fmt.Errorf("marshal dest %s config fialed: %s", dest, err)
+		}
+		trojanFallBacks[i] = &conf.TrojanInboundFallback{
+			Name: c.SNI,
+			Alpn: c.Alpn,
+			Path: c.Path,
+			Dest: dest,
+			Xver: c.ProxyProtocolVer,
+		}
+	}
+	return trojanFallBacks, nil
 }

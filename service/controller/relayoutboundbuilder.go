@@ -223,7 +223,8 @@ func OutboundRelayBuilder(config *Config, nodeInfo *api.RelayNodeInfo , tag stri
 	
 	if nodeInfo.TLSType == "reality" {
 		streamSetting.Security = "reality"
-		streamSetting.REALITYSettings = &conf.REALITYConfig{
+		
+		realitySettings :=  &conf.REALITYConfig{
 			Show:         nodeInfo.Show,
 			ServerName:   nodeInfo.ServerName,
 			PublicKey:    nodeInfo.PublicKey,
@@ -231,6 +232,7 @@ func OutboundRelayBuilder(config *Config, nodeInfo *api.RelayNodeInfo , tag stri
 			ShortId:      nodeInfo.ShortId,
 			SpiderX:      nodeInfo.SpiderX,
 		}
+		streamSetting.REALITYSettings = realitySettings
 	}
 	
 	outboundDetourConfig.Tag = fmt.Sprintf("%s_%d", tag,UID)

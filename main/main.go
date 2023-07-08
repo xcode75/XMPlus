@@ -23,7 +23,7 @@ var (
 )
 
 var (
-	version  = "XMPlus v2.1.3 (A custom version of XrayR)"
+	version  = "XMPlus v2.1.4 (A custom version of XrayR for XMPlus v1.0)"
 )
 
 func showVersion() {

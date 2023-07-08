@@ -3,9 +3,9 @@ package xmplus
 import (
 	"encoding/json"
 	"fmt"
+	"errors"
 	"log"
 	"regexp"
-	"strconv"
 	"sync/atomic"
 	"time"
 	"sync"
@@ -13,7 +13,6 @@ import (
 
 	"github.com/bitly/go-simplejson"
 	"github.com/go-resty/resty/v2"
-	"github.com/xcode75/xcore/infra/conf"
 
 	"github.com/xcode75/XMPlus/api"
 )
@@ -25,7 +24,7 @@ type APIClient struct {
 	NodeID        int
 	Key           string
 	resp          atomic.Value
-	eTag          string
+	eTags          map[string]string
 	LastReportOnline   map[int]int
 	access        sync.Mutex
 }
@@ -55,6 +54,7 @@ func New(apiConfig *api.Config) *APIClient {
 		Key:           apiConfig.Key,
 		APIHost:       apiConfig.APIHost,
 		LastReportOnline:    make(map[int]int),
+		eTags:         make(map[string]string),
 	}
 	return apiClient
 }
@@ -95,8 +95,17 @@ func (c *APIClient) GetNodeInfo() (nodeInfo *api.NodeInfo, err error) {
 	path := fmt.Sprintf("/api/v2/query/server/%d", c.NodeID)
 	res, err := c.client.R().
 		ForceContentType("application/json").
+		SetHeader("If-None-Match", c.eTags["server"]).
 		Get(path)
 
+	if res.StatusCode() == 304 {
+		return nil, errors.New(api.NodeNotModified)
+	}
+	
+	if res.Header().Get("Etag") != "" && res.Header().Get("Etag") != c.eTags["server"] {
+		c.eTags["server"] = res.Header().Get("Etag")
+	}
+	
 	response, err := c.parseResponse(res, path, err)
 	if err != nil {
 		return nil, err
@@ -105,6 +114,10 @@ func (c *APIClient) GetNodeInfo() (nodeInfo *api.NodeInfo, err error) {
 	b, _ := response.Encode()
 	json.Unmarshal(b, server)
 
+	if server.Type == "" {
+		return nil, fmt.Errorf("server Type cannot be %s", server.Type)
+	}
+	
 	c.resp.Store(server)
 	
 	nodeInfo, err = c.parseNodeResponse(server)
@@ -118,12 +131,16 @@ func (c *APIClient) GetNodeInfo() (nodeInfo *api.NodeInfo, err error) {
 func (c *APIClient) GetUserList() (UserList *[]api.UserInfo, err error) {
 	path := fmt.Sprintf("/api/v2/query/users/%d", c.NodeID)
 	res, err := c.client.R().
-		SetHeader("If-None-Match", c.eTag).
+		SetHeader("If-None-Match", c.eTags["users"]).
 		ForceContentType("application/json").
 		Get(path)
 	
-	if res.Header().Get("Etag") != "" && res.Header().Get("Etag") != c.eTag {
-		c.eTag = res.Header().Get("Etag")
+	if res.StatusCode() == 304 {
+		return nil, errors.New(api.UserNotModified)
+	}
+	
+	if res.Header().Get("Etag") != "" && res.Header().Get("Etag") != c.eTags["services"] {
+		c.eTags["services"] = res.Header().Get("Etag")
 	}
 
 	response, err := c.parseResponse(res, path, err)
@@ -234,29 +251,6 @@ func (c *APIClient) ReportUserTraffic(userTraffic *[]api.UserTraffic) error {
 	return nil
 }
 
-
-func (c *APIClient) ReportNodeStatus(nodeStatus *api.NodeStatus) (err error) {
-	path := fmt.Sprintf("/api/v2/query/server/status/%d", c.NodeID)
-	systemload := SystemLoad{
-		Uptime: strconv.FormatUint(nodeStatus.Uptime, 10),
-		Load:    fmt.Sprintf("%.2f %.2f %.2f", nodeStatus.CPU/100, nodeStatus.Mem/100, nodeStatus.Disk/100),
-	}
-
-	res, err := c.client.R().
-		SetBody(systemload).
-		SetResult(&Response{}).
-		ForceContentType("application/json").
-		Post(path)
-
-	_, err = c.parseResponse(res, path, err)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-
 func (c *APIClient) ReportNodeOnlineUsers(onlineUserList *[]api.OnlineUser) error {
 	c.access.Lock()
 	defer c.access.Unlock()
@@ -315,21 +309,25 @@ func (c *APIClient) ReportIllegal(detectResultList *[]api.DetectResult) error {
 
 func (c *APIClient) parseNodeResponse(s *serverConfig) (*api.NodeInfo, error) {
 	var (
-		TLSType                 = "none"
-		path, host, quic_security, quic_key, serviceName, seed, htype, Alpn string
+		TLSType  = "none"
+		path, host, quic_security, quic_key, serviceName, seed, htype, Alpn, Dest, PrivateKey, MinClientVer, MaxClientVer string
 		header                  json.RawMessage
-		enableTLS, congestion ,RejectUnknownSni, AllowInsecure    bool
+		enableTLS, congestion ,RejectUnknownSni, AllowInsecure, Show  bool
 		alterID                 uint16 = 0
+		MaxTimeDiff,ProxyProtocol  uint64 = 0, 0	
+		ServerNames,  ShortIds []string
 	)
+
+	NodeType := s.Type
 
 	if s.SecuritySettings.Alpn != "" {
 		Alpn = s.SecuritySettings.Alpn
 	}
 	
-	Flow := "xtls-rprx-direct"
+	Flow := ""
 	
-	if s.SecuritySettings.Flow == "xtls-rprx-vision" {
-		Flow = "xtls-rprx-vision"
+	if s.NetworkSettings.Flow == "xtls-rprx-vision" || s.NetworkSettings.Flow == "xtls-rprx-vision-udp443"{
+		Flow = s.NetworkSettings.Flow
 	}
 	
 	TLSType = s.Security
@@ -346,7 +344,19 @@ func (c *APIClient) parseNodeResponse(s *serverConfig) (*api.NodeInfo, error) {
 		}
 	}
 
-	transportProtocol := s.Network
+	if TLSType == "reality" {
+		Dest = s.SecuritySettings.Dest
+		Show = s.SecuritySettings.Show
+		PrivateKey = s.SecuritySettings.PrivateKey
+		MinClientVer = s.SecuritySettings.MinClientVer
+		MaxClientVer = s.SecuritySettings.MaxClientVer
+		MaxTimeDiff = uint64(s.SecuritySettings.MaxTimeDiff)
+		ShortIds = s.SecuritySettings.ShortIds
+		ServerNames = s.SecuritySettings.ServerNames
+		ProxyProtocol = uint64(s.SecuritySettings.ProxyProtocol)
+	}
+	
+	transportProtocol := s.NetworkSettings.Transport
 
 	switch transportProtocol {
 		case "ws":
@@ -407,8 +417,6 @@ func (c *APIClient) parseNodeResponse(s *serverConfig) (*api.NodeInfo, error) {
 				})		
 	}
 	
-	NodeType := s.Type
-	
 	if NodeType == "Shadowsocks"  && (transportProtocol == "ws" || transportProtocol == "grpc" || transportProtocol == "quic") {
 		NodeType = "Shadowsocks-Plugin"
 	}
@@ -417,7 +425,7 @@ func (c *APIClient) parseNodeResponse(s *serverConfig) (*api.NodeInfo, error) {
 		NodeType:          NodeType,
 		NodeID:            c.NodeID,
 		Port:              uint32(s.Port),
-		TransportProtocol: transportProtocol,
+		Transport:         transportProtocol,
 		EnableTLS:         enableTLS,
 		TLSType:           TLSType,
 		Path:              path,
@@ -437,69 +445,27 @@ func (c *APIClient) parseNodeResponse(s *serverConfig) (*api.NodeInfo, error) {
 		CypherMethod:      s.Cipher,
 		Address:           s.Address, 
 		AllowInsecure:     AllowInsecure,
-		Relay:             s.Relay,
-		RelayNodeID:       s.Relayid,
 		ListenIP:          s.Listenip, 
 		ProxyProtocol:     s.NetworkSettings.ProxyProtocol,
 		CertMode:          s.Certmode,
 		CertDomain:        s.SecuritySettings.ServerName,
 		ServerKey:         s.ServerKey,
 		SpeedLimit:        uint64(s.Speedlimit * 1000000 / 8),
-		EnableFallback:    s.Fallback,
-		EnableDNS:         s.EnableDns,
-		DomainStrategy:    s.Domainstrategy,
 		SendIP:            s.SendThrough,
-		TrojanFallBack:    s.parseTrojanFallBack(),
-		VlessFallBack:     s.parseVlessFallBack(),
+		Dest:              Dest,
+		Show:              Show,
+		ServerNames:       ServerNames,  
+		PrivateKey:        PrivateKey,
+		ShortIds:          ShortIds,
+		MinClientVer:      MinClientVer,
+		MaxClientVer:      MaxClientVer,
+		MaxTimeDiff:       MaxTimeDiff,
+		Xver:              ProxyProtocol,	
+		Relay:             s.Relay,
+		RelayNodeID:       s.Relayid,
 	}
 	return nodeInfo, nil
 }
-
-
-func (s *serverConfig) parseTrojanFallBack() ([]*conf.TrojanInboundFallback) {
-	numOffallbacks := len(s.Fallbacks)
-	fallbackList := make([]*conf.TrojanInboundFallback, numOffallbacks)
-	for i := 0; i < numOffallbacks; i++ {
-		var dest json.RawMessage
-		dest, err := json.Marshal(s.Fallbacks[i].Dest)
-		if err != nil {
-			return nil
-		}
-		u := &conf.TrojanInboundFallback{
-			Name: s.Fallbacks[i].SNI,
-			Alpn: s.Fallbacks[i].Alpn,
-			Path: s.Fallbacks[i].Path,
-			Dest: dest,
-			Xver: uint64(s.Fallbacks[i].ProxyProtocol),
-		}
-		fallbackList[i] = u
-	}
-
-	return fallbackList
-}
-
-func (s *serverConfig) parseVlessFallBack() ([]*conf.VLessInboundFallback) {
-	numOffallbacks := len(s.Fallbacks)
-	fallbackList := make([]*conf.VLessInboundFallback, numOffallbacks)
-	for i := 0; i < numOffallbacks; i++ {
-		var dest json.RawMessage
-		dest, err := json.Marshal(s.Fallbacks[i].Dest)
-		if err != nil {
-			return nil
-		}
-		u := &conf.VLessInboundFallback{
-			Name: s.Fallbacks[i].SNI,
-			Alpn: s.Fallbacks[i].Alpn,
-			Path: s.Fallbacks[i].Path,
-			Dest: dest,
-			Xver: uint64(s.Fallbacks[i].ProxyProtocol),
-		}
-		fallbackList[i] = u
-	}
-
-	return fallbackList
-}
-
 
 func (c *APIClient) GetRelayNodeInfo() (*api.RelayNodeInfo, error) {
 	s := c.resp.Load().(*serverConfig)
@@ -512,34 +478,34 @@ func (c *APIClient) GetRelayNodeInfo() (*api.RelayNodeInfo, error) {
 		alterID                 uint16 = 0
 	)
 	
+	NodeType := s.RType
+		
 	if s.RSecuritySettings.Alpn != "" {
 		Alpn = s.RSecuritySettings.Alpn
 	}
 	
-	Flow := "xtls-rprx-direct"
+	Flow := ""
 	
-	if s.RSecuritySettings.Flow == "xtls-rprx-vision" {
-		Flow = "xtls-rprx-vision"
+	if s.RSecuritySettings.Flow == "xtls-rprx-vision" || s.RSecuritySettings.Flow == "xtls-rprx-vision-udp443"{
+		Flow = s.RSecuritySettings.Flow
 	}
 	
 	TLSType = s.RSecurity
 	
-	if TLSType == "tls" || TLSType == "reality" {
-		if TLSType == "tls" {
-			enableTLS = true
-			AllowInsecure = s.RSecuritySettings.AllowInsecure
-		}
+	if TLSType == "tls" {
+		enableTLS = true
+		AllowInsecure = s.RSecuritySettings.AllowInsecure
+	}
 		
-		if TLSType == "reality" {
-			PublicKey = s.RSecuritySettings.PublicKey
-			Show = s.RSecuritySettings.Show
-			ShortId = s.RSecuritySettings.ShortId
-			SpiderX = s.RSecuritySettings.SpiderX
-			ServerName = s.RSecuritySettings.ServerName
-		}
+	if TLSType == "reality" {
+		PublicKey = s.RSecuritySettings.PublicKey
+		Show = s.RSecuritySettings.Show
+		ShortId = s.RSecuritySettings.ShortId
+		SpiderX = s.RSecuritySettings.SpiderX
+		ServerName = s.RSecuritySettings.ServerName
 	}
 
-	transportProtocol := s.RNetwork
+	transportProtocol := s.RNetworkSettings.Transport
 
 	switch transportProtocol {
 	case "ws":
@@ -600,8 +566,6 @@ func (c *APIClient) GetRelayNodeInfo() (*api.RelayNodeInfo, error) {
 			})		
 	}
 	
-	NodeType := s.RType
-	
 	if NodeType == "Shadowsocks"  && (transportProtocol == "ws" || transportProtocol == "grpc" || transportProtocol == "quic") {
 		NodeType = "Shadowsocks-Plugin"
 	}
@@ -632,8 +596,6 @@ func (c *APIClient) GetRelayNodeInfo() (*api.RelayNodeInfo, error) {
 		ListenIP:          s.RListenip, 
 		ProxyProtocol:     s.RNetworkSettings.ProxyProtocol,
 		ServerKey:         s.RServerKey,
-		EnableDNS:         s.REnableDns,
-		DomainStrategy:    s.RDomainstrategy,
 		SendIP:            s.RSendThrough,
 		PublicKey:         PublicKey,
 		ShortId:           ShortId,

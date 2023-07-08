@@ -31,7 +31,6 @@ import (
 	_ "github.com/xcode75/xcore/proxy/dokodemo"
 	_ "github.com/xcode75/xcore/proxy/freedom"
 	_ "github.com/xcode75/xcore/proxy/http"
-	_ "github.com/xcode75/xcore/proxy/mtproto"
 	_ "github.com/xcode75/xcore/proxy/shadowsocks"
 	_ "github.com/xcode75/xcore/proxy/socks"
 	_ "github.com/xcode75/xcore/proxy/trojan"

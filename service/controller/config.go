@@ -6,17 +6,24 @@ import (
 
 type Config struct {
 	CertConfig              *mylego.CertConfig               `mapstructure:"CertConfig"`
-	RealityConfigs          *RealityConfig                   `mapstructure:"RealityConfigs"`
+	EnableFallback          bool                             `mapstructure:"EnableFallback"`
+	FallBackConfigs         []*FallBackConfig                `mapstructure:"FallBackConfigs"`
+	EnableDNS               bool                             `mapstructure:"EnableDNS"`
+	DNSStrategy             string                           `mapstructure:"DNSStrategy"`
+	EnableFragment          bool                             `mapstructure:"EnableFragment"`
+	FragmentConfigs         *FragmentConfig                  `mapstructure:"FragmentConfigs"`
 }
 
-type RealityConfig struct {
-	Show             bool     `mapstructure:"Show"`
-	Dest             string   `mapstructure:"Dest"`
-	Xver             uint64   `mapstructure:"Xver"`
-	ServerNames      []string `mapstructure:"ServerNames"`
-	PrivateKey       string   `mapstructure:"PrivateKey"`
-	MinClientVer     string   `mapstructure:"MinClientVer"`
-	MaxClientVer     string   `mapstructure:"MaxClientVer"`
-	MaxTimeDiff      uint64   `mapstructure:"MaxTimeDiff"`
-	ShortIds         []string `mapstructure:"ShortIds"`
+type FallBackConfig struct {
+	SNI              string `mapstructure:"SNI"`
+	Alpn             string `mapstructure:"Alpn"`
+	Path             string `mapstructure:"Path"`
+	Dest             string `mapstructure:"Dest"`
+	ProxyProtocolVer uint64 `mapstructure:"ProxyProtocolVer"`
+}
+
+type FragmentConfig struct {
+	Packets  string `mapstructure:"Packets"`
+	Length   string `mapstructure:"Length"`
+	Interval string `mapstructure:"Interval"`
 }

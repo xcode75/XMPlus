@@ -20,7 +20,6 @@ import (
 	"github.com/xcode75/XMPlus/api"
 	"github.com/xcode75/XMPlus/app/mydispatcher"
 	"github.com/xcode75/XMPlus/common/mylego"
-	"github.com/xcode75/XMPlus/common/serverstatus"
 )
 
 type Controller struct {
@@ -136,13 +135,13 @@ func (c *Controller) Start() error {
 	// Add periodic tasks
 	c.tasks = append(c.tasks,
 		periodicTask{
-			tag: "Node monitor",
+			tag: "Node",
 			Periodic: &task.Periodic{
 				Interval: time.Duration(60) * time.Second,
 				Execute:  c.nodeInfoMonitor,
 			}},
 		periodicTask{
-			tag: "User monitor",
+			tag: "User",
 			Periodic: &task.Periodic{
 				Interval: time.Duration(60) * time.Second,
 				Execute:  c.userInfoMonitor,
@@ -152,7 +151,7 @@ func (c *Controller) Start() error {
 	// Check cert service in need
 	if c.nodeInfo.TLSType == "tls"  && c.nodeInfo.CertMode != "none" {
 		c.tasks = append(c.tasks, periodicTask{
-			tag: "Cert monitor",
+			tag: "Cert",
 			Periodic: &task.Periodic{
 				Interval: time.Duration(60) * time.Second * 60,
 				Execute:  c.certMonitor,
@@ -161,7 +160,7 @@ func (c *Controller) Start() error {
 
 	// Start periodic tasks
 	for i := range c.tasks {
-		log.Printf("%s Task Scheduler for %s started", c.logPrefix(), c.tasks[i].tag)
+		log.Printf("%s task scheduler for %s started", c.logPrefix(), c.tasks[i].tag)
 		go c.tasks[i].Start()
 	}
 
@@ -187,20 +186,30 @@ func (c *Controller) nodeInfoMonitor() (err error) {
 		return nil
 	}
 
-	// First fetch Node Info
+	var nodeInfoChanged = true
 	newNodeInfo, err := c.apiClient.GetNodeInfo()
 	if err != nil {
-		log.Print(err)
-		return nil
-	}
+		if err.Error() == api.NodeNotModified {
+			nodeInfoChanged = false
+			newNodeInfo = c.nodeInfo
+		} else {
+			log.Print(err)
+			return nil
+		}
+	}	
 
 	// Update User
 	var usersChanged = true
 	
 	newUserInfo, err := c.apiClient.GetUserList()
 	if err != nil {
-		log.Print(err)
-		return nil
+		if err.Error() == api.UserNotModified {
+			usersChanged = false
+			newUserInfo = c.userList
+		} else {
+			log.Print(err)
+			return nil
+		}
 	}
 
 	var updateRelay = false	
@@ -211,38 +220,40 @@ func (c *Controller) nodeInfoMonitor() (err error) {
 	}
 	
 	
-	var nodeInfoChanged = false
-	// If nodeInfo changed
-	if !reflect.DeepEqual(c.nodeInfo, newNodeInfo) {
-		// Remove old tag
-		oldTag := c.Tag
-		err := c.removeOldTag(oldTag)
-		if err != nil {
-			log.Print(err)
-			return nil
-		}
-		if c.nodeInfo.NodeType == "Shadowsocks-Plugin" {
-			err = c.removeOldTag(fmt.Sprintf("dokodemo-door_%s+1", c.Tag))
-		}
-		if err != nil {
-			log.Print(err)
-			return nil
-		}
-		updateRelay = true
-		
-		// Add new tag
-		c.nodeInfo = newNodeInfo
-		c.Tag = c.buildNodeTag()
-		err = c.addNewTag(newNodeInfo)
-		if err != nil {
-			log.Print(err)
-			return nil
-		}
-		nodeInfoChanged = true
-		// Remove Old limiter
-		if err = c.DeleteInboundLimiter(oldTag); err != nil {
-			log.Print(err)
-			return nil
+	if nodeInfoChanged {
+		if !reflect.DeepEqual(c.nodeInfo, newNodeInfo) {
+			// Remove old tag
+			oldTag := c.Tag
+			err := c.removeOldTag(oldTag)
+			if err != nil {
+				log.Print(err)
+				return nil
+			}
+			if c.nodeInfo.NodeType == "Shadowsocks-Plugin" {
+				err = c.removeOldTag(fmt.Sprintf("dokodemo-door_%s+1", c.Tag))
+			}
+			if err != nil {
+				log.Print(err)
+				return nil
+			}
+			updateRelay = true
+			
+			// Add new tag
+			c.nodeInfo = newNodeInfo
+			c.Tag = c.buildNodeTag()
+			err = c.addNewTag(newNodeInfo)
+			if err != nil {
+				log.Print(err)
+				return nil
+			}
+			nodeInfoChanged = true
+			// Remove Old limiter
+			if err = c.DeleteInboundLimiter(oldTag); err != nil {
+				log.Print(err)
+				return nil
+			}
+		} else {
+			nodeInfoChanged = false
 		}
 	}
 	
@@ -275,17 +286,17 @@ func (c *Controller) nodeInfoMonitor() (err error) {
 		c.Relay = true
 	}	
 	
-	// Check Rule
-
+	// Check Rule	
 	if ruleList, err := c.apiClient.GetNodeRule(); err != nil {
-		log.Printf("Get rule list filed: %s", err)
+		if err.Error() != api.RuleNotModified {
+			log.Printf("Get rule list filed: %s", err)
+		}
 	} else if len(*ruleList) > 0 {
 		if err := c.UpdateRule(c.Tag, *ruleList); err != nil {
 			log.Print(err)
 		}
 	}
 	
-
 	if nodeInfoChanged {
 		err = c.addNewUser(newUserInfo, newNodeInfo)
 		if err != nil {
@@ -474,7 +485,7 @@ func (c *Controller) addNewUser(userInfo *[]api.UserInfo, nodeInfo *api.NodeInfo
 	case "Vless":
 		users = c.buildVlessUser(userInfo, nodeInfo.Flow)
 	case "Vmess":
-		users = c.buildVmessUser(userInfo, nodeInfo.AlterID)	
+		users = c.buildVmessUser(userInfo)	
 	case "Trojan":
 		users = c.buildTrojanUser(userInfo)
 	case "Shadowsocks":
@@ -532,22 +543,6 @@ func compareUserList(old, new *[]api.UserInfo) (deleted, added []api.UserInfo) {
 
 func (c *Controller) userInfoMonitor() (err error) {
 
-	// Get server status
-	CPU, Mem, Disk, Uptime, err := serverstatus.GetSystemInfo()
-	if err != nil {
-		log.Print(err)
-	}
-	err = c.apiClient.ReportNodeStatus(
-		&api.NodeStatus{
-			CPU:    CPU,
-			Mem:    Mem,
-			Disk:   Disk,
-			Uptime: Uptime,
-		})
-	if err != nil {
-		log.Print(err)
-	}
-
 	// Get User traffic
 	var userTraffic []api.UserTraffic
 	var upCounterList []stats.Counter
@@ -593,18 +588,13 @@ func (c *Controller) userInfoMonitor() (err error) {
 			log.Printf("%s Report %d online IPs", c.logPrefix(), len(*onlineDevice))
 		}
 	}
-
-	// Report Illegal user
+	
 	if detectResult, err := c.GetDetectResult(c.Tag); err != nil {
 		log.Print(err)
 	} else if len(*detectResult) > 0 {
-		if err = c.apiClient.ReportIllegal(detectResult); err != nil {
-			log.Print(err)
-		} else {
-			log.Printf("%s Report %d operations blocked by detection rules", c.logPrefix(), len(*detectResult))
-		}
-
+		log.Printf("%s blocked %d access by detection rules", c.logPrefix(), len(*detectResult))
 	}
+	
 	return nil
 }
 

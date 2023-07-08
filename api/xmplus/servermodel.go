@@ -7,48 +7,52 @@ type serverConfig struct {
 	Relay   bool 	 `json:"relay"`
 	relay_server     `json:"relay_server"`
 	Routes []route   `json:"routes"`
-	Fallback bool 	`json:"fallback"`
-	Fallbacks []fallbackconf `json:"fallbacks"`
 }
 
 type server struct {
 	Address     string 	 `json:"address"`
 	Certmode    string 	 `json:"certmode"`
 	Cipher      string 	 `json:"cipher"`
-	Domainstrategy string `json:"domainstrategy"`
-	EnableDns   bool 	 `json:"enable_dns"`
 	IP          string   `json:"ip"`
 	Port        int      `json:"listeningport"`
 	Listenip    string   `json:"listenip"`
-	Network     string   `json:"network"`
 	NetworkSettings struct {
-	    ProxyProtocol bool 	         `json:"acceptProxyProtocol"`
-		Path        string           `json:"path"`
-		Host        string           `json:"host"`
-		QuicSecurity string          `json:"security"`
-		Quickey      string          `json:"key"`
-		Headers     *json.RawMessage `json:"headers"`
-		ServiceName string           `json:"serviceName"`
-		Header      *json.RawMessage `json:"header"`
-		Transport   string           `json:"transport"`
-		Seed        string           `json:"seed"`
-		Congestion  bool 	         `json:"congestion"`
+	    ProxyProtocol bool 	           `json:"acceptProxyProtocol"`
+		Path          string           `json:"path"`
+		Host          string           `json:"host"`
+		QuicSecurity  string           `json:"security"`
+		Quickey       string           `json:"key"`
+		Headers       *json.RawMessage `json:"headers"`
+		ServiceName   string           `json:"serviceName"`
+		Header        *json.RawMessage `json:"header"`
+		Transport     string           `json:"transport"`
+		Seed          string           `json:"seed"`
+		Congestion    bool 	           `json:"congestion"`
+		Flow          string           `json:"flow"`
 	} `json:"networkSettings"`
-	Security string `json:"security"`
-	SecuritySettings struct {
-	    AllowInsecure bool 	   `json:"allowInsecure"`
-		Fingerprint   string   `json:"fingerprint"`
-		RejectUnknownSni  bool `json:"rejectUnknownSni"`
-		ServerName   string    `json:"serverName"`
-		Flow         string    `json:"flow"`
-		Alpn         string    `json:"alpn"`
+	Security    string `json:"security"`
+	SecuritySettings  struct {
+	    AllowInsecure bool 	    `json:"allowInsecure"`
+		Fingerprint   string    `json:"fingerprint"`
+		RejectUnknownSni bool   `json:"rejectUnknownSni"`
+		ServerName    string    `json:"serverName"`
+		Alpn          string    `json:"alpn"`
+		Dest          string    `json:"dest"`
+		Show          bool      `json:"show"`  
+		PrivateKey    string    `json:"privatekey"`
+		MinClientVer  string    `json:"minclientver"`
+		MaxClientVer  string    `json:"maxclientver"`
+		MaxTimeDiff   int       `json:"maxtimediff"`
+		ProxyProtocol int       `json:"proxyprotocol"`
+		ServerNames   []string  `json:"serverNames"`
+		ShortIds      []string  `json:"shortids"`
 	} `json:"securitySettings"`	
-	Relayid   int       `json:"relayid"`
-	SendThrough string  `json:"sendthrough"`
-	ServerKey  string   `json:"server_key"`
-	Sniffing  bool 	    `json:"sniffing"`
-	Speedlimit  int     `json:"speedlimit"`
-	Type    string      `json:"type"`
+	Relayid     int        `json:"relayid"`
+	SendThrough string     `json:"sendthrough"`
+	ServerKey   string     `json:"server_key"`
+	Sniffing    bool 	   `json:"sniffing"`
+	Speedlimit  int        `json:"speedlimit"`
+	Type        string     `json:"type"`
 }
 
 type relay_server struct {
@@ -56,37 +60,36 @@ type relay_server struct {
 	RAddress     string 	`json:"address"`
 	RServerid    int 	    `json:"serverid"`
 	RCipher      string 	`json:"cipher"`
-	RDomainstrategy string  `json:"domainstrategy"`
-	REnableDns   bool 	    `json:"enable_dns"`
 	RIP          string     `json:"ip"`
 	RPort        int        `json:"listeningport"`
 	RListenip    string     `json:"listenip"`
-	RNetwork     string     `json:"network"`
 	RNetworkSettings struct {
-	    ProxyProtocol bool 	         `json:"acceptProxyProtocol"`
-		Path        string           `json:"path"`
-		Host        string           `json:"host"`
-		QuicSecurity string          `json:"security"`
-		Quickey      string          `json:"key"`
-		Headers     *json.RawMessage `json:"headers"`
-		ServiceName string           `json:"serviceName"`
-		Header      *json.RawMessage `json:"header"`
-		Transport   string           `json:"transport"`
-		Seed        string           `json:"seed"`
-		Congestion  bool 	         `json:"congestion"`
+	    ProxyProtocol bool 	           `json:"acceptProxyProtocol"`
+		Path          string           `json:"path"`
+		Host          string           `json:"host"`
+		QuicSecurity  string           `json:"security"`
+		Quickey       string           `json:"key"`
+		Headers       *json.RawMessage `json:"headers"`
+		ServiceName   string           `json:"serviceName"`
+		Header        *json.RawMessage `json:"header"`
+		Transport     string           `json:"transport"`
+		Seed          string           `json:"seed"`
+		Congestion    bool 	           `json:"congestion"`
+		Flow          string           `json:"flow"`
 	} `json:"networkSettings"`
 	RSecurity string `json:"security"`
 	RSecuritySettings struct {
-	    AllowInsecure bool 	   `json:"allowInsecure"`
-		Fingerprint   string   `json:"fingerprint"`
-		RejectUnknownSni  bool `json:"rejectUnknownSni"`
-		ServerName   string    `json:"serverName"`
-		Flow         string    `json:"flow"`
-		Alpn         string    `json:"alpn"`
-		PublicKey    string    `json:"publickey"`
-		ShortId      string    `json:"shortid"`
-		SpiderX      string    `json:"spiderx"`
-		Show         bool      `json:"show"`
+        AllowInsecure bool 	    `json:"allowInsecure"`
+		Fingerprint   string    `json:"fingerprint"`
+		RejectUnknownSni bool   `json:"rejectUnknownSni"`
+		ServerName    string    `json:"serverName"`
+		Alpn          string    `json:"alpn"`
+		Dest          string    `json:"dest"`
+		Show          bool      `json:"show"`  
+		PublicKey     string    `json:"publickey"`
+		ServerName    string    `json:"serverName"`
+		ShortId       string    `json:"shortid"`
+		SpiderX       string    `json:"spiderx"`
 	} `json:"securitySettings"`	
 	RSendThrough string   `json:"sendthrough"`
 	RServerKey  string    `json:"server_key"`
@@ -98,13 +101,4 @@ type relay_server struct {
 type route struct {
 	Id       int      `json:"id"`
 	Regex    string   `json:"regex"`
-}
-
-type fallbackconf struct {
-	Id         int      `json:"id"`
-	Alpn       string   `json:"alpn"`
-	Dest       string   `json:"dest"`
-	Path       string   `json:"path"`
-	SNI        string   `json:"sni"`
-	ProxyProtocol int 	`json:"proxyprotocolver"`
 }

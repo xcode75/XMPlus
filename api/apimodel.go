@@ -3,9 +3,14 @@ package api
 import (
 	"encoding/json"
 	"regexp"
-
-	"github.com/xcode75/xcore/infra/conf"
 )
+
+const (
+	UserNotModified = "users not modified"
+	NodeNotModified = "node not modified"
+	RuleNotModified = "rules not modified"
+)
+
 
 // Config API config
 type Config struct {
@@ -51,16 +56,20 @@ type NodeInfo struct {
 	ServerKey         string
 	ServiceName       string
 	Header            json.RawMessage
-	EnableFallback    bool
-	DomainStrategy    string
 	SendIP            string
-	EnableDNS         bool
 	Flow              string
 	Seed              string
 	Alpn              string
 	Congestion        bool
-	TrojanFallBack    []*conf.TrojanInboundFallback
-	VlessFallBack     []*conf.VLessInboundFallback
+	Dest              string
+	Show              bool
+	ServerNames       []string 
+	PrivateKey        string
+	ShortIds          []string 
+	MinClientVer      string          
+	MaxClientVer      string          
+	MaxTimeDiff       uint64
+	Xver              uint64
 }
 
 type RelayNodeInfo struct {
@@ -80,9 +89,7 @@ type RelayNodeInfo struct {
 	ListenIP          string
 	AllowInsecure     bool
 	ProxyProtocol     bool
-	DomainStrategy    string
 	SendIP            string
-	EnableDNS         bool
 	ServerKey         string
 	ServiceName       string
 	Header            json.RawMessage
