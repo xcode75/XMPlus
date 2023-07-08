@@ -193,7 +193,6 @@ func (a *VMessAccount) Build() *vmess.Account {
 	}
 	return &vmess.Account{
 		Id:      a.ID,
-		AlterId: uint32(a.AlterIds),
 		SecuritySettings: &protocol.SecurityConfig{
 			Type: st,
 		},

@@ -425,7 +425,7 @@ func (c *APIClient) parseNodeResponse(s *serverConfig) (*api.NodeInfo, error) {
 		NodeType:          NodeType,
 		NodeID:            c.NodeID,
 		Port:              uint32(s.Port),
-		Transport:         transportProtocol,
+		TransportProtocol: transportProtocol,
 		EnableTLS:         enableTLS,
 		TLSType:           TLSType,
 		Path:              path,
@@ -486,8 +486,8 @@ func (c *APIClient) GetRelayNodeInfo() (*api.RelayNodeInfo, error) {
 	
 	Flow := ""
 	
-	if s.RSecuritySettings.Flow == "xtls-rprx-vision" || s.RSecuritySettings.Flow == "xtls-rprx-vision-udp443"{
-		Flow = s.RSecuritySettings.Flow
+	if s.RNetworkSettings.Flow == "xtls-rprx-vision" || s.RNetworkSettings.Flow == "xtls-rprx-vision-udp443"{
+		Flow = s.RNetworkSettings.Flow
 	}
 	
 	TLSType = s.RSecurity
