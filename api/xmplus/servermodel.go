@@ -87,7 +87,6 @@ type relay_server struct {
 		Dest          string    `json:"dest"`
 		Show          bool      `json:"show"`  
 		PublicKey     string    `json:"publickey"`
-		ServerName    string    `json:"serverName"`
 		ShortId       string    `json:"shortid"`
 		SpiderX       string    `json:"spiderx"`
 	} `json:"securitySettings"`	
