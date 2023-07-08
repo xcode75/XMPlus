@@ -174,8 +174,6 @@ Nodes:
       NodeID: 1
       Timeout: 30 
     ControllerConfig:
-      EnableDNS: false # Use custom DNS config, Please ensure that you set the dns.json well
-      DNSStrategy: AsIs # AsIs, UseIP, UseIPv4, UseIPv6
       CertConfig:
         Email: author@xmplus.dev                    # Required when Cert Mode is not none
         CertFile: /etc/XMPlus/node1.xmplus.dev.crt  # Required when Cert Mode is file
@@ -184,7 +182,8 @@ Nodes:
         CertEnv:                                    # Required when Cert Mode is dns
           CLOUDFLARE_EMAIL:                         # Required when Cert Mode is dns
           CLOUDFLARE_API_KEY:                       # Required when Cert Mode is dns
-      EnableFallback: false # Only support for Trojan and Vless
+      EnableDNS: false # Use custom DNS config, Please ensure that you set the dns.json well
+      DNSStrategy: AsIs # AsIs, UseIP, UseIPv4, UseIPv6      EnableFallback: false # Only support for Trojan and Vless
       FallBackConfigs:  # Support multiple fallbacks
         - SNI: # TLS SNI(Server Name Indication), Empty for any
           Alpn: # Alpn, Empty for any
