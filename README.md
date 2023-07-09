@@ -1,4 +1,4 @@
-## Features
+]## Features
 
 |Function             | vmess | vless | trojan | ss   | ss-plugin|
 | ----------------| ----- | ----- | -------| -----|----------|
@@ -123,7 +123,7 @@ bash <(curl -Ls https://raw.githubusercontent.com/xcode75/XMPlus/install/install
   "serverName": "xmplus.dev",
   "rejectUnknownSni": true,
   "allowInsecure": false,
-  "fingerprint": "chrome",
+  "fingerprint": "chrome"
 }
 ```
 #### REALITY
