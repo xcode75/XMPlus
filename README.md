@@ -127,6 +127,7 @@ bash <(curl -Ls https://raw.githubusercontent.com/xcode75/XMPlus/install/install
 }
 ```
 #### REALITY
+[Generate Private and Public Keys Here](https://go.dev/play/p/N5kQhIjtye7)
 ```
 {
   "show" : false,
