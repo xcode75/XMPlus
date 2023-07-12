@@ -1,4 +1,4 @@
-]## Features
+## Features
 
 |Function             | vmess | vless | trojan | ss   | ss-plugin|
 | ----------------| ----- | ----- | -------| -----|----------|
