@@ -77,7 +77,7 @@ func OutboundRelayBuilder(config *Config, nodeInfo *api.RelayNodeInfo , tag stri
 			}
 		case "Vmess":
 			protocol = "vmess"
-			VmessUser := buildRVmessUser(tag, UUID, Email, nodeInfo.AlterID)
+			VmessUser := buildRVmessUser(tag, UUID, Email)
 			User := []json.RawMessage{}
 			rawUser,err := json.Marshal(&VmessUser)
 			if err != nil {
@@ -97,33 +97,17 @@ func OutboundRelayBuilder(config *Config, nodeInfo *api.RelayNodeInfo , tag stri
 			}
 		case "Trojan":
 			protocol = "trojan"	
-			if nodeInfo.TLSType == "xtls" {
-				proxySetting = struct {
-					Servers []*TrojanServer `json:"servers"`
-				}{
-					Servers: []*TrojanServer{&TrojanServer{
-							Address:  nodeInfo.Address,
-							Port:     uint16(nodeInfo.Port),
-							Password: UUID,
-							Email:    fmt.Sprintf("%s|%s|%s", tag, Email, UUID),
-							Level:    0,
-							Flow:    nodeInfo.Flow,
-						},
+			proxySetting = struct {
+				Servers []*TrojanServer `json:"servers"`
+			}{
+				Servers: []*TrojanServer{&TrojanServer{
+						Address: nodeInfo.Address,
+						Port:     uint16(nodeInfo.Port),
+						Password: UUID,
+						Email:    fmt.Sprintf("%s|%s|%s", tag, Email, UUID),
+						Level:    0,
 					},
-				}
-			} else {
-				proxySetting = struct {
-					Servers []*TrojanServer `json:"servers"`
-				}{
-					Servers: []*TrojanServer{&TrojanServer{
-							Address: nodeInfo.Address,
-							Port:     uint16(nodeInfo.Port),
-							Password: UUID,
-							Email:    fmt.Sprintf("%s|%s|%s", tag, Email, UUID),
-							Level:    0,
-						},
-					},
-				}
+				},
 			}
 		case "Shadowsocks":
 			protocol = "shadowsocks"
@@ -246,10 +230,9 @@ func OutboundRelayBuilder(config *Config, nodeInfo *api.RelayNodeInfo , tag stri
 	return outboundDetourConfig.Build()
 }
 
-func buildRVmessUser(tag string, UUID string, Email string, AlterID uint16) *protocol.User {
+func buildRVmessUser(tag string, UUID string, Email string) *protocol.User {
 	vmessAccount := &VMessAccount{
 		ID:       UUID,
-		AlterIds: uint16(AlterID),
 		Security: "auto",
 	}
 	return &protocol.User{

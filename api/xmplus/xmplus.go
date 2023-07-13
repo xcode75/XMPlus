@@ -283,30 +283,6 @@ func (c *APIClient) ReportNodeOnlineUsers(onlineUserList *[]api.OnlineUser) erro
 	return nil
 }
 
-
-func (c *APIClient) ReportIllegal(detectResultList *[]api.DetectResult) error {
-	data := make([]IllegalItem, len(*detectResultList))
-	for i, r := range *detectResultList {
-		data[i] = IllegalItem{
-			ID:  r.RuleID,
-			UID: r.UID,
-		}
-	}
-	postData := &PostData{Data: data}
-	path := fmt.Sprintf("/api/v2/query/server/detects/%d", c.NodeID)
-	res, err := c.client.R().
-		SetBody(postData).
-		SetResult(&Response{}).
-		ForceContentType("application/json").
-		Post(path)
-	_, err = c.parseResponse(res, path, err)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-
 func (c *APIClient) parseNodeResponse(s *serverConfig) (*api.NodeInfo, error) {
 	var (
 		TLSType  = "none"
@@ -474,8 +450,7 @@ func (c *APIClient) GetRelayNodeInfo() (*api.RelayNodeInfo, error) {
 		TLSType                 = "none"
 		path, host, quic_security, quic_key, serviceName, seed, htype , PublicKey , ShortId ,SpiderX, ServerName, Alpn string
 		header                  json.RawMessage
-		enableTLS, congestion, Show , AllowInsecure   bool
-		alterID                 uint16 = 0
+		congestion, Show , AllowInsecure   bool
 	)
 	
 	NodeType := s.RType
@@ -493,7 +468,6 @@ func (c *APIClient) GetRelayNodeInfo() (*api.RelayNodeInfo, error) {
 	TLSType = s.RSecurity
 	
 	if TLSType == "tls" {
-		enableTLS = true
 		AllowInsecure = s.RSecuritySettings.AllowInsecure
 	}
 		
@@ -576,7 +550,6 @@ func (c *APIClient) GetRelayNodeInfo() (*api.RelayNodeInfo, error) {
 		NodeID:            s.RServerid,
 		Port:              uint32(s.RPort),
 		TransportProtocol: transportProtocol,
-		EnableTLS:         enableTLS,
 		TLSType:           TLSType,
 		Path:              path,
 		Host:              host,
@@ -587,7 +560,6 @@ func (c *APIClient) GetRelayNodeInfo() (*api.RelayNodeInfo, error) {
 		Fingerprint:       s.RSecuritySettings.Fingerprint, 
 		AllowInsecure:     AllowInsecure,
 		Header:            header,
-		AlterID:           alterID,
 		Alpn:              Alpn,
 		Quic_security:     quic_security,
 		Quic_key:          quic_key,
